@@ -1,68 +1,55 @@
+// src/pages/Login.js
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ROLES from '../utils/roles';
 import { useAuth } from '../providers/AuthProvider';
-import { login } from '../utils/authService';
+import { login as authenticate } from '../utils/authService';
+import AuthLogin from '../components/AuthLogin';
+import AuthCard from '../components/AuthCard';
+
 function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth(); // Use the login function from context
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
-  const { setRole } = useAuth(); // Use the Auth context to store the role globally
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // Replace this with your actual login logic
-      const user = await login(username, password);
+      const user = await authenticate(username, password);
+      login(user.username, user.role); // Call login with username and role
 
-      // Assume `user.role` is returned from your login response
-      const userRole = user.role;
-
-      // Set the role in the Auth context or local state
-      setRole(userRole);
-
-      // Redirect based on role
-      switch (userRole) {
-        case ROLES.TEACHER:
-          navigate('/teacher-dashboard');
+      // Redirect based on user role
+      switch (user.role) {
+        case 'teacher':
+          navigate('/dashboard/teacher');
           break;
-        case ROLES.HR:
-          navigate('/hr-dashboard');
+        case 'hr':
+          navigate('/dashboard/hr');
           break;
-        case ROLES.MENTOR:
-          navigate('/mentor-dashboard');
+        case 'mentor':
+          navigate('/dashboard/mentor');
           break;
-        case ROLES.ADMIN:
-          navigate('/admin-dashboard');
+        case 'admin':
+          navigate('/dashboard/admin');
           break;
         default:
-          navigate('/'); // Fallback or unauthorized route
-          break;
+          navigate('/');
       }
     } catch (err) {
       setError('Invalid credentials, please try again.');
     }
   };
 
-  return React.createElement('div', { className: 'login-container' },
-    React.createElement('h1', null, 'Login'),
-    React.createElement('form', { onSubmit: handleLogin },
-      React.createElement('input', {
-        type: 'text',
-        placeholder: 'Username',
-        value: username,
-        onChange: (e) => setUsername(e.target.value),
-      }),
-      React.createElement('input', {
-        type: 'password',
-        placeholder: 'Password',
-        value: password,
-        onChange: (e) => setPassword(e.target.value),
-      }),
-      error && React.createElement('p', null, error),
-      React.createElement('button', { type: 'submit' }, 'Login')
-    )
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: '#f4f5fa' }}>
+      
+        <AuthLogin/>
+    
+       
+      
+    </div>
   );
 }
 

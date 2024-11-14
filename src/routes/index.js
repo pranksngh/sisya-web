@@ -17,7 +17,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/dashboard',
-    element: React.createElement(DashboardLayout), // Wrap in React.createElement
+    element: React.createElement(
+      ProtectedRoute,
+      { allowedRoles: [ROLES.TEACHER, ROLES.HR, ROLES.MENTOR, ROLES.ADMIN] }, // Protect entire dashboard
+      React.createElement(DashboardLayout)
+    ),// Wrap in React.createElement
     children: [
       {
         path: '',
