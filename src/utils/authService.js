@@ -7,10 +7,10 @@ async function authenticate(username, password) {
   
     // Mock user data for demonstration purposes
     const mockUserDatabase = {
-      teacher: { username: 'teacherUser', role: 'teacher', password: 'teacher123' },
-      hr: { username: 'hrUser', role: 'hr', password: 'hr123' },
-      mentor: { username: 'mentorUser', role: 'mentor', password: 'mentor123' },
-      admin: { username: 'adminUser', role: 'admin', password: 'admin123' },
+      teacher: { username: 'teacher@gmail.com', role: 'teacher', password: 'teacher123' },
+      hr: { username: 'hr@gmail.com', role: 'hr', password: 'hr123' },
+      mentor: { username: 'mentrol@gmail.com', role: 'mentor', password: 'mentor123' },
+      admin: { username: 'admin@gmail.com', role: 'admin', password: 'admin123' },
     };
   
     // Check if username exists and password matches
@@ -18,7 +18,7 @@ async function authenticate(username, password) {
       (u) => u.username === username && u.password === password
     );
   
-    if (user) {
+    if (!!user) {
       return { username: user.username, role: user.role };
     }
   

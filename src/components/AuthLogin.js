@@ -1,16 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Button, Checkbox, Divider, FormControlLabel, FormHelperText, Grid, Link, InputAdornment, IconButton, InputLabel, OutlinedInput, Stack, Typography } from '@mui/material';
+import { Button, Checkbox, Divider, FormControlLabel, FormHelperText, Grid, Link, InputAdornment, IconButton, InputLabel, OutlinedInput, Stack, Typography, Backdrop, CircularProgress } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import Logo from '../assets/images/logo.png';
 import BackgroundImage from '../assets/images/loginBackground.jpg';
-
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../providers/AuthProvider';
+import { login as authenticate } from '../utils/authService';
 export default function AuthLogin() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [checked, setChecked] = React.useState(false);
-
+  const navigate = useNavigate();
+  const { login } = useAuth(); // Use the login function from context
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -19,8 +24,49 @@ export default function AuthLogin() {
     event.preventDefault();
   };
 
+  const handleLogin = async (username,password) => {
+    
+    setLoading(true);
+
+  
+    try {
+      const user = await authenticate(username, password);
+      login(user.username, user.role); // Call login with username and role
+
+      // Redirect based on user role
+      switch (user.role) {
+        case 'teacher':
+          navigate('/dashboard/teacher');
+          break;
+        case 'hr':
+          navigate('/dashboard/hr');
+          break;
+        case 'mentor':
+          navigate('/dashboard/mentor');
+          break;
+        case 'admin':
+          navigate('/dashboard/admin');
+          break;
+        default:
+          navigate('/');
+      }
+    } catch (err) {
+      setError('Invalid credentials, please try again.');
+      console.log("error found : ",err);
+    } finally{
+      setLoading(false);
+    }
+
+    
+  };
+
+
   return (
     <Grid container sx={{ minHeight: '100vh' }}>
+      {/* Loading screen */}
+      <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       {/* Left Image Section */}
       <Grid item xs={12} md={7} 
       
@@ -76,6 +122,9 @@ export default function AuthLogin() {
               email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
               password: Yup.string().max(255).required('Password is required')
             })}
+            onSubmit={(values) => {
+              handleLogin(values.email, values.password); // Only set this once in Formik
+            }}
           >
             {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
               <form noValidate onSubmit={handleSubmit}>
@@ -201,6 +250,7 @@ export default function AuthLogin() {
                   >
                     Login Now
                   </Button>
+                   
 
                   {/* Social Login Divider */}
                   {/* <Divider sx={{ my: 2 }}>
