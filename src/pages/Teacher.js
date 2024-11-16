@@ -66,6 +66,15 @@ function Teacher() {
           <AnalyticsReport />
         </Grid>
       </Grid>
+      <Grid container spacing={3} sx={{ marginTop: '20px', justifyContent:'center' }}>
+        {/* Recent Orders Table - 60% Width */}
+        <Grid item xs={12} md={7.2} lg={11}>
+          <RecentOrders />
+        </Grid>
+
+        {/* Analytics Report - 30% Width */}
+      
+      </Grid>
       </Box>
       </Box>
     );

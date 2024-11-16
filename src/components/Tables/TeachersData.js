@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Box } from '@mui/material';
 
 const rows = [
-  { trackingNo: '13256498', productName: 'Keyboard', totalOrder: 125, status: 'Rejected', totalAmount: '70,999' },
+  { teacherId: '13256498', Name: 'Keyboard', Email: 125, Status: 'Rejected', mobileNo: '70,999' },
   { trackingNo: '13286564', productName: 'Computer Accessories', totalOrder: 100, status: 'Approved', totalAmount: '83,348' },
   { trackingNo: '13256495', productName: 'Keyboard', totalOrder: 125, status: 'Rejected', totalAmount: '70,999' },
   { trackingNo: '13286562', productName: 'Computer Accessories', totalOrder: 100, status: 'Approved', totalAmount: '83,348' },

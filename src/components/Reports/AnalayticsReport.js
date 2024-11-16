@@ -36,17 +36,17 @@ const lineData = {
 function AnalyticsReport() {
   return (
     <Paper elevation={0} variant="outlined" sx={{ padding: '16px' }}>
-      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>Analytics Report</Typography>
+      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>Doubt Report</Typography>
       <Box sx={{ mb: 2 }}>
-        <Typography variant="body2">Total User Joined Today</Typography>
+        <Typography variant="body2">Total Doubt's Raised </Typography>
         <Typography variant="h6" sx={{ color: '#2e7d32', fontWeight: 'bold' }}>+45.14%</Typography>
       </Box>
       <Box sx={{ mb: 2 }}>
-        <Typography variant="body2">Today's Purchases</Typography>
+        <Typography variant="body2">Total Doubt Resolved</Typography>
         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>0.58%</Typography>
       </Box>
       <Box sx={{ mb: 2 }}>
-        <Typography variant="body2">Total Teachers Joined Today</Typography>
+        <Typography variant="body2">Doubt's Raised Today</Typography>
         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Low</Typography>
       </Box>
       <Box sx={{ height: '200px' }}> {/* Set a fixed height for the chart */}
