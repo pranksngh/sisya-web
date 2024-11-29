@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Button, Checkbox, Divider, FormControlLabel, FormHelperText, Grid, Link, InputAdornment, IconButton, InputLabel, OutlinedInput, Stack, Typography, Backdrop, CircularProgress } from '@mui/material';
+import { Button, Checkbox, Divider, FormControlLabel, FormHelperText, Grid, Link, InputAdornment, IconButton, InputLabel, OutlinedInput, Stack, Typography, Backdrop, CircularProgress, FormControl, Radio, RadioGroup } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import Logo from '../assets/images/logo.png';
 import BackgroundImage from '../assets/images/loginBackground.jpg';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../providers/AuthProvider';
-import { login as authenticate } from '../utils/authService';
+import { login, mentorlogin, teacherlogin } from '../Functions/Login';
 export default function AuthLogin() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [checked, setChecked] = React.useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth(); // Use the login function from context
+  // Use the login function from context
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedRole, setSelectedRole] = useState('admin');
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -24,41 +24,74 @@ export default function AuthLogin() {
     event.preventDefault();
   };
 
+  const handleRoleChange = (event) => {
+    setSelectedRole(event.target.value);
+  };
   const handleLogin = async (username,password) => {
-    
+    console.log(selectedRole);
     setLoading(true);
 
-  
-    try {
-      const user = await authenticate(username, password);
-      login(user.username, user.role); // Call login with username and role
+    if(selectedRole === "admin"){
+      adminLogin(username,password);
+    }else if(selectedRole === "teacher"){
+      teacherLogin(username,password);
+    }else if(selectedRole === "mentor"){
+      mentorLogin(username,password);
+    }
+   
+
+   
+    
 
       // Redirect based on user role
-      switch (user.role) {
-        case 'teacher':
-          navigate('/dashboard/teacher');
-          break;
-        case 'hr':
-          navigate('/dashboard/hr');
-          break;
-        case 'mentor':
-          navigate('/dashboard/mentor');
-          break;
-        case 'admin':
-          navigate('/dashboard/admin');
-          break;
-        default:
-          navigate('/');
-      }
-    } catch (err) {
-      setError('Invalid credentials, please try again.');
-      console.log("error found : ",err);
-    } finally{
-      setLoading(false);
-    }
+      
+  
 
     
   };
+
+  const adminLogin = async(username, password)=>{
+    
+      const response = await login(username,password);
+
+      if(response.success){
+        setLoading(false);
+        navigate('/dashboard/admin');
+      }else{
+        console.log("Admin Login Error: ", response.error);
+        setLoading(false);
+      }
+
+    
+    
+  }
+
+  const teacherLogin = async(username, password)=>{
+    console.log("hitting teacher login");
+    const response = await teacherlogin(username,password);
+
+    if(response.success){
+      setLoading(false);
+      console.log("teacher login successfull", JSON.stringify(response));
+      navigate('/dashboard/teacher');
+    }else{
+      console.log("Teacher Login Error: ", response.error);
+      setLoading(false);
+    }
+  }
+
+  const mentorLogin = async(username,password)=>{
+    const response = await mentorlogin(username,password);
+
+    if(response.success){
+      setLoading(false);
+     return navigate('/dashboard/mentor');
+    }else{
+      console.log("Teacher Login Error: ", response.error);
+      setLoading(false);
+    }
+
+  }
 
 
   return (
@@ -119,7 +152,16 @@ export default function AuthLogin() {
               submit: null
             }}
             validationSchema={Yup.object().shape({
-              email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+              email: Yup.string()
+              .required('Username, email, or phone number is required')
+              .test(
+                'valid-identifier',
+                'Must be a valid username, email, or phone number',
+                (value) =>
+                  /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value) || // Valid email
+                  /^\d{10}$/.test(value) || // Valid phone number
+                  /^[a-zA-Z0-9_]+$/.test(value) // Valid username (alphanumeric)
+              ),
               password: Yup.string().max(255).required('Password is required')
             })}
             onSubmit={(values) => {
@@ -216,6 +258,25 @@ export default function AuthLogin() {
                       <FormHelperText error>{errors.password}</FormHelperText>
                     )}
                   </Stack>
+                  {/* Role Selection */}
+                  <FormControl component="fieldset">
+                    <RadioGroup
+                      row
+                      aria-label="user-role"
+                      name="user-role"
+                      value={selectedRole}
+                      onChange={handleRoleChange}
+                    >
+                      {['admin', 'teacher', 'mentor'].map((role) => (
+                        <FormControlLabel
+                          key={role}
+                          value={role}
+                          control={<Radio color="primary" />}
+                          label={role === "admin"? "Admin": role ==="teacher"?"Teacher":"Mentor"}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
 
                   {/* Keep Me Signed In and Forgot Password */}
                   <Stack direction="row" justifyContent="space-between" alignItems="center">

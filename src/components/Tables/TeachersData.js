@@ -13,7 +13,7 @@ const rows = [
   // Add more rows here...
 ];
 
-function RecentOrders() {
+function TeachersData() {
   return (
     <Paper elevation={0} variant="outlined" sx={{ padding: '16px' }}>
       <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>Recent Orders</Typography>
@@ -58,4 +58,4 @@ function RecentOrders() {
   );
 }
 
-export default RecentOrders;
+export default TeachersData;

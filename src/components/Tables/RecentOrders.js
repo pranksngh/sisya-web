@@ -1,27 +1,17 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Box } from '@mui/material';
 
-const rows = [
-  { trackingNo: '13256498', productName: 'Keyboard', totalOrder: 125, status: 'Rejected', totalAmount: '70,999' },
-  { trackingNo: '13286564', productName: 'Computer Accessories', totalOrder: 100, status: 'Approved', totalAmount: '83,348' },
-  { trackingNo: '13256495', productName: 'Keyboard', totalOrder: 125, status: 'Rejected', totalAmount: '70,999' },
-  { trackingNo: '13286562', productName: 'Computer Accessories', totalOrder: 100, status: 'Approved', totalAmount: '83,348' },
-  { trackingNo: '13256492', productName: 'Keyboard', totalOrder: 125, status: 'Rejected', totalAmount: '70,999' },
-  { trackingNo: '13286563', productName: 'Computer Accessories', totalOrder: 100, status: 'Approved', totalAmount: '83,348' },
-  { trackingNo: '13286563', productName: 'Computer Accessories', totalOrder: 100, status: 'Approved', totalAmount: '83,348' },
-  
-  // Add more rows here...
-];
 
-function RecentOrders() {
+
+function RecentOrders(data) {
   return (
     <Paper elevation={0} variant="outlined" sx={{ padding: '16px' }}>
-      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>Recent Orders</Typography>
+      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>Recent Transactions</Typography>
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Tracking No.</TableCell>
+              <TableCell>ORDER ID</TableCell>
               <TableCell>Course Name</TableCell>
     
               <TableCell>Status</TableCell>

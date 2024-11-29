@@ -18,9 +18,7 @@ const router = createBrowserRouter([
   {
     path: '/dashboard',
     element: React.createElement(
-      ProtectedRoute,
-      { allowedRoles: [ROLES.TEACHER, ROLES.HR, ROLES.MENTOR, ROLES.ADMIN] }, // Protect entire dashboard
-      React.createElement(DashboardLayout)
+      DashboardLayout
     ),// Wrap in React.createElement
     children: [
       {
@@ -30,32 +28,28 @@ const router = createBrowserRouter([
       {
         path: 'teacher',
         element: React.createElement(
-          ProtectedRoute,
-          { allowedRoles: [ROLES.TEACHER] },
-          React.createElement(TeacherPage)
+          
+          TeacherPage
         ),
       },
       {
         path: 'hr',
         element: React.createElement(
-          ProtectedRoute,
-          { allowedRoles: [ROLES.HR] },
+          
           React.createElement(HrPage)
         ),
       },
       {
         path: 'mentor',
         element: React.createElement(
-          ProtectedRoute,
-          { allowedRoles: [ROLES.MENTOR] },
+         
           React.createElement(MentorPage)
         ),
       },
       {
         path: 'admin',
         element: React.createElement(
-          ProtectedRoute,
-          { allowedRoles: [ROLES.ADMIN] },
+         
           React.createElement(AdminPage)
         ),
       },

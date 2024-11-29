@@ -1,12 +1,18 @@
 // src/pages/Teacher.js
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import DashboardHeader from '../components/DashboardHeader';
 import { Box, Container, Grid } from '@mui/material';
 import SummaryCardWithChart from '../components/SummaryCard';
 import StatCard from '../components/StatCard';
 import RecentOrders from '../components/Tables/RecentOrders';
 import AnalyticsReport from '../components/Reports/AnalayticsReport';
+
+
+useEffect(()=>{
+  
+
+},[]);
 
 function Teacher() {
   const totalUsersChartData = {
