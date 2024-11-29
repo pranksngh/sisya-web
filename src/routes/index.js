@@ -10,6 +10,7 @@ import ProtectedRoute from '../components/ProtectedRoutes';
 import ROLES from '../utils/roles';
 import Boards from '../pages/Admin/Boards';
 import Teacher from '../pages/Teacher';
+import Subjects from '../pages/Admin/Subjects';
 
 const router = createBrowserRouter([
   {
@@ -59,6 +60,13 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           Boards
+        ),
+      },
+      {
+        path: 'subjects',
+        element: React.createElement(
+         
+          Subjects
         ),
       },
     ],
