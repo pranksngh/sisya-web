@@ -9,10 +9,7 @@ import RecentOrders from '../components/Tables/RecentOrders';
 import AnalyticsReport from '../components/Reports/AnalayticsReport';
 
 
-useEffect(()=>{
-  
 
-},[]);
 
 function Teacher() {
   const totalUsersChartData = {
@@ -47,6 +44,9 @@ function Teacher() {
       },
     ],
   };
+
+
+  
   
  
     return (

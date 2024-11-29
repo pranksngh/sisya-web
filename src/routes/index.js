@@ -3,12 +3,13 @@ import React from 'react';
 import LoginPage from '../pages/login';
 import DashboardLayout from '../layouts/DashboardLayout';
 import DashboardPage from '../pages/Dashboard';
-import TeacherPage from '../pages/Teacher';
 import HrPage from '../pages/Hr';
 import MentorPage from '../pages/Mentor';
 import AdminPage from '../pages/Admin';
 import ProtectedRoute from '../components/ProtectedRoutes';
 import ROLES from '../utils/roles';
+import Boards from '../pages/Admin/Boards';
+import Teacher from '../pages/Teacher';
 
 const router = createBrowserRouter([
   {
@@ -29,7 +30,7 @@ const router = createBrowserRouter([
         path: 'teacher',
         element: React.createElement(
           
-          TeacherPage
+          Teacher
         ),
       },
       {
@@ -43,14 +44,21 @@ const router = createBrowserRouter([
         path: 'mentor',
         element: React.createElement(
          
-          React.createElement(MentorPage)
+        MentorPage
         ),
       },
       {
         path: 'admin',
         element: React.createElement(
          
-          React.createElement(AdminPage)
+         AdminPage
+        ),
+      },
+      {
+        path: 'boards',
+        element: React.createElement(
+         
+          Boards
         ),
       },
     ],

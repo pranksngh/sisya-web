@@ -1,11 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Box } from '@mui/material';
 
 
 
-function RecentOrders(data) {
+function RecentOrders() {
+
+  const [purchases, setPurchases] = useState([]);
+
+
+  useEffect(()=>{
+    recentPurchases();
+  },[])
+
+ const recentPurchases = async()=>{
+
+  try{
+
+    const purchaseResponse = await fetch('https://sisyabackend.in/rkadmin/get_purchases', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const purchaseResult = await purchaseResponse.json();
+    if(purchaseResult.success){
+       setPurchases(purchaseResult.subs)
+    }else{
+      console.log("fetch recent purchase failed");
+    }
+  }catch(error){
+    console.log("fetch recent purchase failed", error);
+  }
+ }
+
+
   return (
-    <Paper elevation={0} variant="outlined" sx={{ padding: '16px' }}>
+    <Paper elevation={0} variant="elevation" sx={{ padding: '16px', alignSelf:'center', justifyContent:'center',justifyItems:'center' }}>
       <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>Recent Transactions</Typography>
       <TableContainer>
         <Table>
@@ -14,31 +44,21 @@ function RecentOrders(data) {
               <TableCell>ORDER ID</TableCell>
               <TableCell>Course Name</TableCell>
     
-              <TableCell>Status</TableCell>
+              <TableCell>Class</TableCell>
               <TableCell>Total Amount</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row, index) => (
+            {purchases.slice(0,5).map((row, index) => (
               <TableRow key={index}>
-                <TableCell>{row.trackingNo}</TableCell>
-                <TableCell>{row.productName}</TableCell>
+                <TableCell>{row.OrderId}</TableCell>
+                <TableCell>{row.course.name}</TableCell>
             
                 <TableCell>
-                  <Box
-                    component="span"
-                    sx={{
-                      display: 'inline-block',
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      backgroundColor: row.status === 'Approved' ? 'green' : row.status === 'Pending' ? 'orange' : 'red',
-                      mr: 1,
-                    }}
-                  />
-                  {row.status}
+                 
+                  {row.course.grade}
                 </TableCell>
-                <TableCell>{row.totalAmount}</TableCell>
+                <TableCell>{row.PurchasePrice}</TableCell>
               </TableRow>
             ))}
           </TableBody>
