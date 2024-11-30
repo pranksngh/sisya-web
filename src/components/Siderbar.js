@@ -140,25 +140,25 @@ const Sidebar = () => {
             <List component="div" disablePadding>
               <ListItem
                 button
-                onClick={() => handleNavigation('/teachers/list')}
+                onClick={() => handleNavigation('teachers')}
                 sx={{
                   pl: 4,
-                  backgroundColor: isActive('/teachers/list') ? '#e0f7fa' : 'transparent',
+                  backgroundColor: isActive('teachers') ? '#e0f7fa' : 'transparent',
                   '&:hover': { backgroundColor: '#e0f7fa' },
                 }}
               >
-                <ListItemText primary="List Teachers" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('/teachers/list') ? '#1976d2' : '#666' }} />
+                <ListItemText primary="List Teachers" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('teachers') ? '#1976d2' : '#666' }} />
               </ListItem>
               <ListItem
                 button
-                onClick={() => handleNavigation('/teachers/add')}
+                onClick={() => handleNavigation('addTeacher')}
                 sx={{
                   pl: 4,
-                  backgroundColor: isActive('/teachers/add') ? '#e0f7fa' : 'transparent',
+                  backgroundColor: isActive('addTeacher') ? '#e0f7fa' : 'transparent',
                   '&:hover': { backgroundColor: '#e0f7fa' },
                 }}
               >
-                <ListItemText primary="Add Teacher" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('/teachers/add') ? '#1976d2' : '#666' }} />
+                <ListItemText primary="Add Teacher" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('addTeacher') ? '#1976d2' : '#666' }} />
               </ListItem>
             </List>
           </Collapse>

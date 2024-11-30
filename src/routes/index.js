@@ -13,6 +13,8 @@ import Teacher from '../pages/Teacher';
 import Subjects from '../pages/Admin/Subjects';
 import Students from '../pages/Admin/Students';
 import AddStudent from '../pages/Admin/AddStudent';
+import Teachers from '../pages/Admin/Teachers';
+import AddTeacher from '../pages/Admin/AddTeacher';
 
 const router = createBrowserRouter([
   {
@@ -83,6 +85,20 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           AddStudent
+        ),
+      },
+      {
+        path: 'teachers',
+        element: React.createElement(
+         
+          Teachers
+        ),
+      },
+      {
+        path: 'addTeacher',
+        element: React.createElement(
+         
+          AddTeacher
         ),
       },
     ],
