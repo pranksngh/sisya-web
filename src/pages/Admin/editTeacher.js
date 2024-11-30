@@ -14,20 +14,24 @@ import {
   Chip,
 } from "@mui/material";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const steps = ["Basic Info", "Select Classes", "Qualification", "Add Subjects"];
 
-const AddTeacher = () => {
+const EditTeacher = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const location = useLocation();
+  const teacherData = location.state?.teacher || {};
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    profilePicture: null,
-    classes: [],
+    name: teacherData.name,
+    email: teacherData.email,
+    phone: teacherData.phone,
+    profilePicture: teacherData.imageData,
+    classes: teacherData.Grades,
     qualification: "",
-    subjects: [],
+    selectedSubjects: teacherData.subjectRecord,
+    dob:teacherData.dateOfBirth,
+    address: teacherData.address
   });
   const [subjectOptions, setSubjectOptions] = useState([]);
 
@@ -38,6 +42,8 @@ const AddTeacher = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
+  console.log("teacher data" + JSON.stringify(teacherData));
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -533,7 +539,7 @@ const AddTeacher = () => {
       }}
     >
       <Typography variant="h5" sx={{ fontWeight: "bold", textAlign: "center", mb: 3 }}>
-        Add Teacher
+        Edit Teacher
       </Typography>
       <Stepper activeStep={activeStep} alternativeLabel>
         {steps.map((label) => (
@@ -566,4 +572,4 @@ const AddTeacher = () => {
   );
 };
 
-export default AddTeacher;
+export default EditTeacher;

@@ -15,6 +15,7 @@ import Students from '../pages/Admin/Students';
 import AddStudent from '../pages/Admin/AddStudent';
 import Teachers from '../pages/Admin/Teachers';
 import AddTeacher from '../pages/Admin/AddTeacher';
+import EditTeacher from '../pages/Admin/editTeacher';
 
 const router = createBrowserRouter([
   {
@@ -99,6 +100,13 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           AddTeacher
+        ),
+      },
+      {
+        path: 'edit-teacher',
+        element: React.createElement(
+         
+          EditTeacher
         ),
       },
     ],

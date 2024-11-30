@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typog
 import AddStudentDialog from '../DialogBoxes/AddStudentDialog';
 import EditStudentDialog from '../DialogBoxes/EditStudentDialog';
 import ViewStudentDialog from '../DialogBoxes/ViewStudentModal';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -13,6 +14,7 @@ function TeacherData() {
   const [open, setOpen] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openViewModal, setOpenViewModal] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     type: 'student',
     name: '',
@@ -326,7 +328,7 @@ function TeacherData() {
       <Button
         variant="outlined"
         color="secondary"
-        onClick={() => handleEditModalOpen(row)}
+        onClick={() => navigate('/dashboard/edit-teacher', { state: { teacher: row } })}
         sx={{
           textTransform: 'capitalize',
           fontWeight: 'bold',
