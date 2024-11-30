@@ -5,6 +5,7 @@ import { addBoardFunction } from '../../Functions/AddBoard';
 import DeleteBoardDialog from '../DialogBoxes/DeleteBoardDialog';
 import EditBoardDialog from '../DialogBoxes/EditBoardDialog';
 import AddStudentDialog from '../DialogBoxes/AddStudentDialog';
+import EditStudentDialog from '../DialogBoxes/EditStudentDialog';
 
 
 
@@ -13,7 +14,6 @@ function StudentData() {
   const [boards, setBoards] = useState([]);
   const [students, setStudentList] = useState([]);
   const [open, setOpen] = useState(false);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [formData, setFormData] = useState({
     type: 'student',
@@ -24,11 +24,34 @@ function StudentData() {
     educationBoardId: '', // Add educationBoardId to form data as a number
     imageData: '' // Key for the image will be imageData
   });
-  const [selectedBoard, setSelectedBoard] = useState({});
+  const [selectedStudent, setSelectedStudent] = useState({});
    
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
- 
+ const handleEditModalOpen = (student)=> {
+    setSelectedStudent(student);
+    setFormData({ type:'student', name: student.name,
+      email: student.email,
+      phone:student.phone,
+      grade:student.grade,
+      educationBoardId: student.educationBoardId,
+      imageData: `https://sisyabackend.in/student/thumbs/users/${student.id}.jpg`
+    });
+
+    setOpenEditModal(true);
+
+ }
+
+ const handleEditModalClose = ()=>{
+  setFormData({ type:'student', name: '',
+    email: '',
+    phone:'',
+    grade:'',
+    educationBoardId: '',
+    imageData: ''
+  });
+  setOpenEditModal(false);
+ }
 
   
 
@@ -86,6 +109,34 @@ function StudentData() {
       console.log("Error adding student:", error);
     //  handleClose();
      
+    }
+  }
+
+
+  const handleEditSubmit = async() =>{
+     console.log("Edit Form", JSON.stringify(formData));
+     if (formData.imageData) {
+      formData.imageData = formData.imageData.replace(/^data:image\/[a-z]+;base64,/, '');
+    }
+     try {
+      const response = await fetch('https://sisyabackend.in/rkadmin/update_student', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+       body:JSON.stringify({...formData, id:selectedStudent.id }),
+      });
+      const result = await response.json();
+
+      if (result.success) {
+       fetchStudentData(1,1000);
+       handleEditModalClose();
+      
+      } else {
+       console.log("Student Update Failed", result.error);
+      }
+    } catch (error) {
+      console.error("Error fetching students:", error);
     }
   }
 
@@ -221,7 +272,7 @@ function StudentData() {
               <TableCell>Email</TableCell>
               <TableCell>Phone</TableCell>
               <TableCell>Grade</TableCell>
-              <TableCell>Board</TableCell>
+            
               <TableCell>Created On</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Action</TableCell>
@@ -235,7 +286,6 @@ function StudentData() {
                 <TableCell> {row.email}</TableCell>
                 <TableCell>{row.phone}</TableCell>
                 <TableCell>{row.grade}</TableCell>
-                <TableCell>{row.board}</TableCell>
                 <TableCell>{row.createdOn}</TableCell>
                 <TableCell>
                   <Box
@@ -256,7 +306,7 @@ function StudentData() {
       <Button
         variant="outlined"
         color="secondary"
-        onClick={() => null}
+        onClick={() => handleEditModalOpen(row)}
         sx={{
           textTransform: 'capitalize',
           fontWeight: 'bold',
@@ -292,6 +342,15 @@ function StudentData() {
       >
        View
       </Button>
+      <EditStudentDialog
+          open={openEditModal}
+          onClose={handleEditModalClose}
+          onSubmit={handleEditSubmit}
+          boards={boards}
+          handleChange={handleChange}
+          handleFileChange={handleFileChange}
+          formData={formData}
+      />
     
                 </TableCell>
               </TableRow>
