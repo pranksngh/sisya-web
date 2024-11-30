@@ -11,6 +11,8 @@ import ROLES from '../utils/roles';
 import Boards from '../pages/Admin/Boards';
 import Teacher from '../pages/Teacher';
 import Subjects from '../pages/Admin/Subjects';
+import Students from '../pages/Admin/Students';
+import AddStudent from '../pages/Admin/AddStudent';
 
 const router = createBrowserRouter([
   {
@@ -67,6 +69,20 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           Subjects
+        ),
+      },
+      {
+        path: 'students',
+        element: React.createElement(
+         
+          Students
+        ),
+      },
+      {
+        path: 'addStudent',
+        element: React.createElement(
+         
+          AddStudent
         ),
       },
     ],

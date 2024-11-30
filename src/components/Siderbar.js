@@ -102,25 +102,25 @@ const Sidebar = () => {
             <List component="div" disablePadding>
               <ListItem
                 button
-                onClick={() => handleNavigation('/students/list')}
+                onClick={() => handleNavigation('students')}
                 sx={{
                   pl: 4,
-                  backgroundColor: isActive('/students/list') ? '#e0f7fa' : 'transparent',
+                  backgroundColor: isActive('/dashboard/students') ? '#e0f7fa' : 'transparent',
                   '&:hover': { backgroundColor: '#e0f7fa' }, 
                 }}
               >
-                <ListItemText primary="List Students" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('/students/list') ? '#1976d2' : '#666' }} />
+                <ListItemText primary="List Students" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('students') ? '#1976d2' : '#666' }} />
               </ListItem>
               <ListItem
                 button
-                onClick={() => handleNavigation('/students/add')}
+                onClick={() => handleNavigation('addStudent')}
                 sx={{
                   pl: 4,
-                  backgroundColor: isActive('/students/add') ? '#e0f7fa' : 'transparent',
+                  backgroundColor: isActive('addStudent') ? '#e0f7fa' : 'transparent',
                   '&:hover': { backgroundColor: '#e0f7fa' },
                 }}
               >
-                <ListItemText primary="Add Student" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('/students/add') ? '#1976d2' : '#666' }} />
+                <ListItemText primary="Add Student" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('addStudent') ? '#1976d2' : '#666' }} />
               </ListItem>
             </List>
           </Collapse>
