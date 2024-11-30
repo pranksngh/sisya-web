@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Box, Button } from '@mui/material';
-import AddBoardDialog from '../DialogBoxes/AddBoardDialog';
-import { addBoardFunction } from '../../Functions/AddBoard';
-import DeleteBoardDialog from '../DialogBoxes/DeleteBoardDialog';
-import EditBoardDialog from '../DialogBoxes/EditBoardDialog';
 import AddStudentDialog from '../DialogBoxes/AddStudentDialog';
 import EditStudentDialog from '../DialogBoxes/EditStudentDialog';
+import ViewStudentDialog from '../DialogBoxes/ViewStudentModal';
 
 
 
@@ -15,6 +12,7 @@ function StudentData() {
   const [students, setStudentList] = useState([]);
   const [open, setOpen] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
+  const [openViewModal, setOpenViewModal] = useState(false);
   const [formData, setFormData] = useState({
     type: 'student',
     name: '',
@@ -42,6 +40,20 @@ function StudentData() {
 
  }
 
+ const handleViewModalOpen = (student)=> {
+  setSelectedStudent(student);
+  setFormData({ type:'student', name: student.name,
+    email: student.email,
+    phone:student.phone,
+    grade:student.grade,
+    educationBoardId: student.educationBoardId,
+    imageData: `https://sisyabackend.in/student/thumbs/users/${student.id}.jpg`
+  });
+
+  setOpenViewModal(true);
+
+}
+
  const handleEditModalClose = ()=>{
   setFormData({ type:'student', name: '',
     email: '',
@@ -52,6 +64,18 @@ function StudentData() {
   });
   setOpenEditModal(false);
  }
+
+ const handleViewModalClose = ()=>{
+  setFormData({ type:'student', name: '',
+    email: '',
+    phone:'',
+    grade:'',
+    educationBoardId: '',
+    imageData: ''
+  });
+  setOpenViewModal(false);
+ }
+
 
   
 
@@ -328,7 +352,7 @@ function StudentData() {
       <Button
         variant="contained"
         color="primary"
-        onClick={()=> null}
+        onClick={()=> handleViewModalOpen(row)}
         sx={{
           textTransform: 'capitalize',
           fontWeight: 'normal',
@@ -349,6 +373,15 @@ function StudentData() {
           boards={boards}
           handleChange={handleChange}
           handleFileChange={handleFileChange}
+          formData={formData}
+      />
+
+<ViewStudentDialog
+          open={openViewModal}
+          onClose={handleViewModalClose}
+          boards={boards}
+          handleChange={handleChange}
+      
           formData={formData}
       />
     
