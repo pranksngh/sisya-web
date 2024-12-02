@@ -426,7 +426,12 @@ const AddTeacher = () => {
                       label="Select Subject"
                       name="selectedSubject"
                       value={formData.selectedSubject || ""}
-                      onChange={(e) => setFormData({ ...formData, selectedSubject: e.target.value })}
+                      onChange={(e) => {
+                        const selectedId = e.target.value; // Get the selected subject ID
+                        const selectedSubject = subjectOptions.find(subject => subject.id === parseInt(selectedId)); // Find the subject object
+                        console.log("Selected subject is: ", JSON.stringify(selectedSubject));
+                        setFormData({ ...formData, selectedSubject });
+                      }}
                       SelectProps={{
                         native: true,
                       }}
@@ -434,7 +439,7 @@ const AddTeacher = () => {
                     >
                       <option value="">Select Subject</option>
                       {subjectOptions.map((subject) => (
-                        <option key={subject.id} value={subject.name}>
+                        <option key={subject.id} value={subject.id}>
                           {subject.name}
                         </option>
                       ))}
@@ -447,10 +452,10 @@ const AddTeacher = () => {
                       onClick={() => {
                         if (formData.selectedSubject) {
                           const newSubject = {
-                            id: (formData.selectedSubjects?.length || 0) + 1,  // Unique ID based on current list length
+                            id: formData.selectedSubject.id,  // Unique ID based on current list length
                             class: formData.selectedClass,
-                            subject: formData.selectedSubject,
-                            comment: `Proficient in ${formData.selectedSubject}`,
+                            subject: formData.selectedSubject.name,
+                            comment: `Proficient in ${formData.selectedSubject.name}`,
                           };
           
                           // Add the new subject to the formData.selectedSubjects array

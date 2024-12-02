@@ -178,14 +178,14 @@ const Sidebar = () => {
             <List component="div" disablePadding>
               <ListItem
                 button
-                onClick={() => handleNavigation('/courses/list')}
+                onClick={() => handleNavigation('courses')}
                 sx={{
                   pl: 4,
-                  backgroundColor: isActive('/courses/list') ? '#e0f7fa' : 'transparent',
+                  backgroundColor: isActive('courses') ? '#e0f7fa' : 'transparent',
                   '&:hover': { backgroundColor: '#e0f7fa' }
                 }}
               >
-                <ListItemText primary="List Courses" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('/courses/list') ? '#1976d2' : '#666' }} />
+                <ListItemText primary="List Courses" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('courses') ? '#1976d2' : '#666' }} />
               </ListItem>
               <ListItem
                 button

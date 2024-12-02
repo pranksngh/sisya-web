@@ -29,9 +29,15 @@ const EditTeacher = () => {
     profilePicture: teacherData.imageData,
     classes: teacherData.Grades,
     qualification: "",
-    selectedSubjects: teacherData.subjectRecord,
-    dob:teacherData.dateOfBirth,
-    address: teacherData.address
+    selectedSubjects: teacherData.subjectRecord.map((record, index) => ({
+      id: record.id, // Unique ID based on the current list length (index starts from 0)
+      class: record.subject.gradeLevel, // Assuming `gradeLevel` corresponds to `class`
+      subject: record.subject.name, // The subject name
+      comment: record.comment, // The comment
+    })),
+    dob:teacherData.dateOfBirth.split("T")[0],
+    address: teacherData.address,
+    profilePicture: `https://sisyabackend.in/student/thumbs/mentors/${teacherData.id}.jpg`
   });
   const [subjectOptions, setSubjectOptions] = useState([]);
 
@@ -70,6 +76,7 @@ const EditTeacher = () => {
     e.preventDefault();
 
     const payload = {
+      id: teacherData.id,
         name: formData.name,
         email: formData.email,
         address: formData.address,
@@ -88,10 +95,10 @@ const EditTeacher = () => {
           comment: s.comment,
           subjectId: s.id // Assuming subjectId is the index
         })),
-        imageData: formData.imageData // Add imageData to the payload
+        ...(formData.imageData && { imageData: formData.imageData }),
       };
       try {
-        const response = await fetch('https://sisyabackend.in/rkadmin/insert_mentor', {
+        const response = await fetch('https://sisyabackend.in/rkadmin/update_mentor', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -106,7 +113,7 @@ const EditTeacher = () => {
           alert("Teacher addition failed", result.error);
         }
       } catch (error) {
-        console.error("Error adding teacher:", error);
+        console.log("Error adding teacher:", error);
         alert("An error occurred while adding the teacher.");
       }
   
@@ -432,7 +439,13 @@ const EditTeacher = () => {
                       label="Select Subject"
                       name="selectedSubject"
                       value={formData.selectedSubject || ""}
-                      onChange={(e) => setFormData({ ...formData, selectedSubject: e.target.value })}
+                      onChange={(e) => {
+                        const selectedId = e.target.value; // Get the selected subject ID
+                        const selectedSubject = subjectOptions.find(subject => subject.id === parseInt(selectedId)); // Find the subject object
+                        console.log("Selected subject is: ", JSON.stringify(selectedSubject));
+                        setFormData({ ...formData, selectedSubject })
+                      
+                      }}
                       SelectProps={{
                         native: true,
                       }}
@@ -440,7 +453,7 @@ const EditTeacher = () => {
                     >
                       <option value="">Select Subject</option>
                       {subjectOptions.map((subject) => (
-                        <option key={subject.id} value={subject.name}>
+                        <option key={subject.id} value={subject.id}>
                           {subject.name}
                         </option>
                       ))}
@@ -453,10 +466,10 @@ const EditTeacher = () => {
                       onClick={() => {
                         if (formData.selectedSubject) {
                           const newSubject = {
-                            id: (formData.selectedSubjects?.length || 0) + 1,  // Unique ID based on current list length
+                            id: formData.selectedSubject.id,  // Unique ID based on current list length
                             class: formData.selectedClass,
-                            subject: formData.selectedSubject,
-                            comment: `Proficient in ${formData.selectedSubject}`,
+                            subject: formData.selectedSubject.name,
+                            comment: `Proficient in ${formData.selectedSubject.name}`,
                           };
           
                           // Add the new subject to the formData.selectedSubjects array
