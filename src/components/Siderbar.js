@@ -189,14 +189,14 @@ const Sidebar = () => {
               </ListItem>
               <ListItem
                 button
-                onClick={() => handleNavigation('/courses/add')}
+                onClick={() => handleNavigation('addCourse')}
                 sx={{
                   pl: 4,
-                  backgroundColor: isActive('/courses/add') ? '#e0f7fa' : 'transparent',
+                  backgroundColor: isActive('addCourse') ? '#e0f7fa' : 'transparent',
                   '&:hover': { backgroundColor: '#e0f7fa' }, 
                 }}
               >
-                <ListItemText primary="Add Course" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('/courses/add') ? '#1976d2' : '#666' }} />
+                <ListItemText primary="Add Course" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('addCourse') ? '#1976d2' : '#666' }} />
               </ListItem>
             </List>
           </Collapse>

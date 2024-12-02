@@ -9,7 +9,7 @@ import EditBoardDialog from '../DialogBoxes/EditBoardDialog';
 
 function CourseData() {
 
-  const [boards, setBoards] = useState([]);
+  const [courses, setCourses ] = useState([]);
 
   const [open, setOpen] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -62,7 +62,7 @@ function CourseData() {
         if(result.sucess){
             handleClose();
             //refresh board data
-            fetchBoardData();
+            fetchCourses();
         }else{
             console.log("Add Board Failed", JSON.stringify(result.error));
         }
@@ -94,7 +94,7 @@ function CourseData() {
       const updateboardResult = await updateboardResponse.json();
 
       if (updateboardResult.sucess) {
-        fetchBoardData();
+        fetchCourses();
         handleDeleteModalClose();
         console.log("Boards Deleted successfully");
       } else {
@@ -127,7 +127,7 @@ function CourseData() {
       const result = await response.json();
       if (result.sucess) {
         handleEditModalClose();
-        fetchBoardData();
+        fetchCourses();
       } else {
         console.error('Edit Board Failed', result.error);
       }
@@ -139,27 +139,26 @@ function CourseData() {
 
 
   useEffect(()=>{
-    fetchBoardData();
+    fetchCourses();
   },[])
 
-  const fetchBoardData = async () => {
-    try {
-      const boardResponse = await fetch('https://sisyabackend.in/student/get_all_boards', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      });
-      const boardResult = await boardResponse.json();
+  const fetchCourses = async () => {
+    
 
-      if (boardResult.success) {
-        setBoards(boardResult.boards);
-        console.log("Boards fetched successfully");
-      } else {
-        console.error("Failed to fetch boards");
-      }
-    } catch (error) {
-      console.error("Error fetching boards:", error);
+    const courseResponse = await fetch('https://sisyabackend.in/rkadmin//get_all_courses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+   
+    });
+    const courseResult = await courseResponse.json();
+
+    if (courseResult.success) {
+      setCourses(courseResult.bigCourses);
+     // setFilteredData(courseResult.bigCourses);
+
+      console.log(JSON.stringify(courseResult));
     }
   };
 
@@ -197,21 +196,23 @@ function CourseData() {
     
               <TableCell>Created On</TableCell>
               <TableCell>Updated On</TableCell>
+              <TableCell>Class</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {boards.map((row, index) => (
+            {courses.map((row, index) => (
               <TableRow key={index}>
                 <TableCell>{index+1}</TableCell>
                 <TableCell>{row.name}</TableCell>
             
                 <TableCell>
                  
-                  {row.createdAt}
+                  {row.createdOn}
                 </TableCell>
-                <TableCell>{row.updatedAt}</TableCell>
+                <TableCell>{row.modifiedOn}</TableCell>
+                <TableCell>Class {row.grade}</TableCell>
                 <TableCell>
                   <Box
                     component="span"
