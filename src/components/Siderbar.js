@@ -284,10 +284,10 @@ const Sidebar = () => {
           </ListItem>
 
         
-          <ListItem button onClick={() => null} sx={{ backgroundColor: isActive('/pushNotification') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
+          <ListItem button onClick={() => handleNavigation('pushNotification')} sx={{ backgroundColor: isActive('pushNotification') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
                 paddingY:'10px' }}>
             <ListItemIcon sx={{ color:  '#1976d2',minWidth: '35px' }}><Notifications /></ListItemIcon>
-            <ListItemText primary="Push Notification" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('/pushNotification') ? '#1976d2' : '#333' }} />
+            <ListItemText primary="Push Notification" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('pushNotification') ? '#1976d2' : '#333' }} />
           </ListItem>
 
         

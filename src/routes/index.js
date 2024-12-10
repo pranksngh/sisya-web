@@ -27,6 +27,7 @@ import LeadManager from '../pages/Admin/LeadManager';
 import Doubts from '../pages/Admin/Doubts';
 import Enquiry from '../pages/Admin/Enquiry';
 import Banners from '../pages/Admin/Banners';
+import PushNotification from '../pages/Admin/PushNotification';
 
 const router = createBrowserRouter([
   {
@@ -195,6 +196,13 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           Banners
+        ),
+      },
+      {
+        path: 'pushNotification',
+        element: React.createElement(
+         
+          PushNotification
         ),
       },
     ],
