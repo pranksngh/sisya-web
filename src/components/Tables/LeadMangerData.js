@@ -16,6 +16,7 @@ import {
   TextField,
   Autocomplete,
 } from '@mui/material';
+import { toast } from 'react-toastify'; // Add this if you want to show success/error messages
 
 // Provided function for fetching leads data
 const fetchLeadsData = async (setLeadsData, setFilteredLeads, setTotalLeads, setConvertedLeads) => {
@@ -26,19 +27,18 @@ const fetchLeadsData = async (setLeadsData, setFilteredLeads, setTotalLeads, set
     });
     const result = await response.json();
     if (result.success) {
-      const leads = result.lead.sort((a, b) => new Date(b.updatedOn) - new Date(a.updatedOn)); // Sort by most recent update
+      const leads = result.lead.sort((a, b) => new Date(b.updatedOn) - new Date(a.updatedOn));
       const convertedCount = leads.filter(lead => lead.status === 'converted').length;
       setTotalLeads(leads.length);
       setConvertedLeads(convertedCount);
       setLeadsData(leads);
-      setFilteredLeads(leads); // Initially show all leads
+      setFilteredLeads(leads);
     }
   } catch (error) {
-    console.error("Error fetching leads:", error);
+    console.error('Error fetching leads:', error);
   }
 };
 
-// Provided fetchCourses logic
 const fetchCourses = async (setCourseList) => {
   try {
     const response = await fetch('https://sisyabackend.in/rkadmin/get_all_courses', {
@@ -51,8 +51,17 @@ const fetchCourses = async (setCourseList) => {
       setCourseList(shortTermCourses);
     }
   } catch (error) {
-    console.error("Error fetching courses:", error);
+    console.error('Error fetching courses:', error);
   }
+};
+
+const convertFileToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(',')[1]); // Remove the prefix from base64 string
+    reader.onerror = (error) => reject(error);
+  });
 };
 
 const LeadManagerData = () => {
@@ -62,11 +71,11 @@ const LeadManagerData = () => {
   const [convertedLeads, setConvertedLeads] = useState(0);
   const [filter, setFilter] = useState('ALL');
 
-  // Modal state
   const [openModal, setOpenModal] = useState(false);
   const [courseList, setCourseList] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [file, setFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchLeadsData(setLeadsData, setFilteredLeads, setTotalLeads, setConvertedLeads);
@@ -90,19 +99,91 @@ const LeadManagerData = () => {
   const handleModalClose = () => {
     setOpenModal(false);
     setSelectedCourse(null);
-    setUploadedFile(null);
+    setFile(null);
   };
 
-  const handleFileChange = (e) => {
-    setUploadedFile(e.target.files[0]);
+  const handleImport = async () => {
+    if (!file || !selectedCourse) {
+      alert('Please select a course and upload a file.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const fileData = await convertFileToBase64(file);
+
+      const postData = {
+        courseId: selectedCourse.id,
+        fileData,
+        grade: Number(selectedCourse.grade),
+      };
+
+      const response = await fetch('https://sisyabackend.in/student/leads/bulk_insert', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      });
+
+      const result = await response.json();
+      setIsLoading(false);
+
+      if (result.success) {
+        toast.success('Leads uploaded successfully.');
+        fetchLeadsData(setLeadsData, setFilteredLeads, setTotalLeads, setConvertedLeads);
+        handleModalClose();
+      } else {
+        toast.error('Failed to upload leads.');
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error('Error during file import:', error);
+      toast.error('Error occurred during file upload.');
+    }
   };
 
-  const handleSubmit = () => {
-    console.log("Selected Course: ", selectedCourse);
-    console.log("Uploaded File: ", uploadedFile);
-    alert("Form Submitted!");
-    handleModalClose();
+  const approveLead = async (leadId) => {
+    try {
+      const response = await fetch(`https://sisyabackend.in/rkadmin/approve_lead/${leadId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+  
+      const result = await response.json();
+      if (result.success) {
+        toast.success('Lead approved successfully.');
+        fetchLeadsData(setLeadsData, setFilteredLeads, setTotalLeads, setConvertedLeads);
+      } else {
+        toast.error('Failed to approve lead.');
+      }
+    } catch (error) {
+      console.error('Error approving lead:', error);
+      toast.error('Error occurred while approving the lead.');
+    }
   };
+  
+  const rejectLead = async (leadId) => {
+    try {
+      const response = await fetch(`https://sisyabackend.in/rkadmin/reject_lead/${leadId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+  
+      const result = await response.json();
+      if (result.success) {
+        toast.success('Lead rejected successfully.');
+        fetchLeadsData(setLeadsData, setFilteredLeads, setTotalLeads, setConvertedLeads);
+      } else {
+        toast.error('Failed to reject lead.');
+      }
+    } catch (error) {
+      console.error('Error rejecting lead:', error);
+      toast.error('Error occurred while rejecting the lead.');
+    }
+  };
+  
 
   return (
     <Grid container spacing={3} style={{ padding: '20px' }}>
@@ -147,29 +228,79 @@ const LeadManagerData = () => {
                   <TableCell><strong>Phone</strong></TableCell>
                   <TableCell><strong>Status</strong></TableCell>
                   <TableCell><strong>Last Updated</strong></TableCell>
+                  <TableCell><strong>Details</strong></TableCell>
+                  <TableCell><strong>Actions</strong></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredLeads.length > 0 ? (
-                  filteredLeads.map((lead, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{lead.name}</TableCell>
-                      <TableCell>{lead.email}</TableCell>
-                      <TableCell>{lead.phone}</TableCell>
-                      <TableCell>{lead.status}</TableCell>
-                      <TableCell>{new Date(lead.updatedOn).toLocaleDateString()}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      <Typography variant="body1" color="textSecondary">
-                        No leads match the filter criteria.
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
+  {filteredLeads.length > 0 ? (
+    filteredLeads.map((lead, index) => (
+      <TableRow key={index}>
+        <TableCell>{lead.name}</TableCell>
+        <TableCell>{lead.email}</TableCell>
+        <TableCell>{lead.phone}</TableCell>
+        <TableCell>{lead.status}</TableCell>
+        <TableCell>{new Date(lead.updatedOn).toLocaleDateString()}</TableCell>
+        {/* Action Field */}
+        <TableCell>
+          {lead.status === 'pending approval' ? (
+            <a href={`#view-proof/${lead.id}`} className="view-proof-link" style={{ color: '#1976d2', textDecoration: 'underline' }}>
+              View Proof
+            </a>
+          ) : lead.status === 'converted' ? (
+            <Button variant="outlined" size="small">
+              View
+            </Button>
+          ) : (
+            <Typography variant="body2" color="textSecondary">
+              N/A
+            </Typography>
+          )}
+        </TableCell>
+        <TableCell>
+          {lead.status === 'pending approval' ? (
+            <>
+              <Button
+                variant="contained"
+                color="success"
+                size="small"
+                onClick={() => approveLead(lead.id)}
+                style={{ marginRight: '10px' }}
+              >
+                Approve
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                size="small"
+                onClick={() => rejectLead(lead.id)}
+              >
+                Reject
+              </Button>
+            </>
+          ) : lead.status === 'converted' ? (
+            <Typography variant="body2" color="textSecondary">
+              Completed
+            </Typography>
+          ) : (
+            <Typography variant="body2" color="textSecondary">
+              N/A
+            </Typography>
+          )}
+        </TableCell>
+      </TableRow>
+    ))
+  ) : (
+    <TableRow>
+      <TableCell colSpan={7} align="center">
+        <Typography variant="body1" color="textSecondary">
+          No leads match the filter criteria.
+        </Typography>
+      </TableCell>
+    </TableRow>
+  )}
+</TableBody>
+
             </Table>
           </TableContainer>
         </Paper>
@@ -195,7 +326,7 @@ const LeadManagerData = () => {
           </Typography>
           <Autocomplete
             options={courseList}
-            getOptionLabel={(option) => option.name || "Unknown Course"}
+            getOptionLabel={(option) => option.name || 'Unknown Course'}
             value={selectedCourse}
             onChange={(event, newValue) => setSelectedCourse(newValue)}
             renderInput={(params) => (
@@ -208,15 +339,15 @@ const LeadManagerData = () => {
               />
             )}
           />
-          <input type="file" onChange={handleFileChange} style={{ marginBottom: '20px' }} />
+          <input type="file" onChange={(e) => setFile(e.target.files[0])} style={{ marginBottom: '20px' }} />
           <Button
             variant="contained"
             color="primary"
             fullWidth
-            onClick={handleSubmit}
-            disabled={!selectedCourse || !uploadedFile}
+            onClick={handleImport}
+            disabled={!selectedCourse || !file || isLoading}
           >
-            Submit
+            {isLoading ? 'Uploading...' : 'Submit'}
           </Button>
         </Box>
       </Modal>

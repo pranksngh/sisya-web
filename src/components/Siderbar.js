@@ -263,10 +263,10 @@ const Sidebar = () => {
           </ListItem>
 
          
-          <ListItem button onClick={() => handleNavigation('/doubts')} sx={{ backgroundColor: isActive('/doubts') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
+          <ListItem button onClick={() => handleNavigation('doubts')} sx={{ backgroundColor: isActive('doubts') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
                 paddingY:'10px'}}>
             <ListItemIcon sx={{ color:  '#1976d2',minWidth: '35px' }}><Chat /></ListItemIcon>
-            <ListItemText primary="Doubts" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('/doubts') ? '#1976d2' : '#333' }} />
+            <ListItemText primary="Doubts" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('doubts') ? '#1976d2' : '#333' }} />
           </ListItem>
 
           

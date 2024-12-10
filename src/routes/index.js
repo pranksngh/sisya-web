@@ -24,6 +24,7 @@ import TeacherReport from '../pages/Admin/TeacherReport';
 import CoursePurchaseList from '../pages/Admin/CoursePurchaseList';
 import SalesMentorList from '../pages/Admin/SaleMentorList';
 import LeadManager from '../pages/Admin/LeadManager';
+import Doubts from '../pages/Admin/Doubts';
 
 const router = createBrowserRouter([
   {
@@ -171,6 +172,13 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           LeadManager
+        ),
+      },
+      {
+        path: 'doubts',
+        element: React.createElement(
+         
+          Doubts
         ),
       },
     ],
