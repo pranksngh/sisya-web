@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Stepper,
   Step,
@@ -18,28 +18,36 @@ import {
   duration,
   Alert,
 } from "@mui/material";
+import { useLocation } from "react-router-dom";
 const defaultUserImage = "https://via.placeholder.com/100?text=User";
 
-const AddCourse = () => {
+const EditCourse = () => {
   const [activeStep, setActiveStep] = useState(0);
   const steps = ["Course Banner", "Course Info", "Subjects", "Teachers"];
 
+  const location = useLocation();
+  const courseData = location.state?.course || {};
+ // console.log("Edit Course Data", JSON.stringify(courseData));
   // Step 1 States
   const [banner, setBanner] = useState(null);
   const [mainImage, setMainImage] = useState(null);
 
   // Step 2 States
   const [courseInfo, setCourseInfo] = useState({
-    name: "",
-    description: "",
-    currentPrice: 0.0,
-    price: 0.0,
-    courseType: "",
-    duration: 0.0,
-    grade: "",
-    startDate: "",
-    endDate: "",
+    name: courseData.name,
+    description: courseData.description,
+    currentPrice: courseData.currentPrice,
+    price: courseData.price,
+    courseType: courseData.isLongTerm === true ? "long": (courseData.isLongTerm === false && courseData.isFree === true)? "free":"short",
+    duration: courseData.duration,
+    grade: courseData.grade,
+    startDate: courseData.startDate.split('T')[0],
+    endDate: courseData.endDate.split('T')[0],
   });
+
+  
+
+  
 
   // Step 3 States
   const [selectedSubjects, setSelectedSubjects] = useState([]);
@@ -55,23 +63,52 @@ const AddCourse = () => {
   const [validationError, setValidationError] = useState("");
 
 
+  useEffect(()=>{
+     if(courseData.grade){
+    fetchSubjects(parseInt(courseData.grade));
+    fetchTeacherList(courseData.grade);
+     }
+     
+   },[]);
+
+   const fetchSelectedTeachers = (available) =>{
+    if(courseData.mentorList) {
+        courseData.mentorList.forEach((mentor)=>{
+          console.log("my selected mentors are", mentor);
+          const matchingMentor = available.find((m)=>m.id === mentor);
+          if(matchingMentor){
+            selectedTeachers.push(matchingMentor);
+          }
+        })
+    }
+   }
+
+
+   const fetchSelectedSubjects = (available)=>{
+         
+        if (courseData.subjectList) {
+         courseData.subjectList.forEach((subject) => {
+             console.log("my selected subject id is ", subject);
+           // Find the matching subject in availableSubjects
+           const matchingSubject = available.find((s) => s.id === subject);
+       
+           // If a match is found, add it to selectedSubjects
+           if (matchingSubject) {
+             selectedSubjects.push(matchingSubject);
+           }
+         });
+
+         console.log("selected subjects list", JSON.stringify(selectedSubjects));
+       
+     }
+   }
+
   const handleNext = () => {
     // Reset validation error
     setValidationError("");
   
     switch (activeStep) {
-      case 0:
-        // Validate Step 0 (Course Media)
-        if (!banner) {
-          setValidationError("Please upload a course banner.");
-          return;
-        }
-        if (!mainImage) {
-          setValidationError("Please upload a main image.");
-          return;
-        }
-        break;
-  
+     
       case 1:
         // Validate Step 1 (Course Information)
         if (!courseInfo.name.trim()) {
@@ -243,6 +280,7 @@ const AddCourse = () => {
       if (subjectResult.success) {
         setAvailableSubjects(subjectResult.subjects);
         console.log("Subjects fetched successfully");
+        fetchSelectedSubjects(subjectResult.subjects);
       } else {
         console.error("Failed to fetch Subjects", subjectResult.error);
       }
@@ -268,7 +306,7 @@ const AddCourse = () => {
           mentor.Grades.includes(selectedGrade.toString())
         );
 
-        console.log("Filtered Mentors List", JSON.stringify(filteredMentors));
+        
         setAvailableTeachers(filteredMentors); // Set the filtered mentors in the state
 
         console.log("Mentors fetched and filtered successfully");
@@ -731,4 +769,4 @@ const AddCourse = () => {
   );
 };
 
-export default AddCourse;
+export default EditCourse;

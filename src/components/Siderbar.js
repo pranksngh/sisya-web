@@ -40,7 +40,7 @@ const Sidebar = () => {
           {/* Non-expandable Dashboard Item */}
           <ListItem
             button
-            onClick={() => handleNavigation('/dashboard')}
+            onClick={() => handleNavigation('/dashboard/admin')}
             sx={{
                 backgroundColor: isActive('/dashboard') ? '#e0f7fa' : 'transparent',
                 '&:hover': { backgroundColor: '#e0f7fa' },
@@ -216,25 +216,25 @@ const Sidebar = () => {
             <List component="div" disablePadding>
               <ListItem
                 button
-                onClick={() => handleNavigation('/reports/student')}
+                onClick={() => handleNavigation('student-report')}
                 sx={{
                   pl: 4,
-                  backgroundColor: isActive('/reports/student') ? '#e0f7fa' : 'transparent',
+                  backgroundColor: isActive('student-report') ? '#e0f7fa' : 'transparent',
                   '&:hover': { backgroundColor: '#e0f7fa' },
                 }}
               >
-                <ListItemText primary="Student Report" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('/reports/student') ? '#1976d2' : '#666' }} />
+                <ListItemText primary="Student Report" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('student-report') ? '#1976d2' : '#666' }} />
               </ListItem>
               <ListItem
                 button
-                onClick={() => handleNavigation('/reports/teacher')}
+                onClick={() => handleNavigation('teacher-report')}
                 sx={{
                   pl: 4,
-                  backgroundColor: isActive('/reports/teacher') ? '#e0f7fa' : 'transparent',
+                  backgroundColor: isActive('teacher-report') ? '#e0f7fa' : 'transparent',
                   '&:hover': { backgroundColor: '#e0f7fa' },
                 }}
               >
-                <ListItemText primary="Teacher Report" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('/reports/teacher') ? '#1976d2' : '#666' }} />
+                <ListItemText primary="Teacher Report" primaryTypographyProps={{ fontSize: '0.875rem', color: isActive('teacher-report') ? '#1976d2' : '#666' }} />
               </ListItem>
             </List>
           </Collapse>
@@ -242,24 +242,24 @@ const Sidebar = () => {
          
 
           {/* Static Links */}
-          <ListItem button onClick={() => handleNavigation('/purchases')} sx={{ backgroundColor: isActive('/purchases') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
+          <ListItem button onClick={() => handleNavigation('course-purchase-list')} sx={{ backgroundColor: isActive('course-purchase-list') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
                 paddingY:'10px' }}>
             <ListItemIcon sx={{ color: '#1976d2',minWidth: '35px' }}><ShoppingCart /></ListItemIcon>
-            <ListItemText primary="Purchases" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('/purchases') ? '#1976d2' : '#333' }} />
+            <ListItemText primary="Purchases" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('course-purchase-list') ? '#1976d2' : '#333' }} />
           </ListItem>
 
         
-          <ListItem button onClick={() => handleNavigation('/salesMentor')} sx={{ backgroundColor: isActive('/salesMentor') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' },paddingX:'20px',
+          <ListItem button onClick={() => handleNavigation('sales-mentor-list')} sx={{ backgroundColor: isActive('sales-mentor-list') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' },paddingX:'20px',
                 paddingY:'10px' }}>
             <ListItemIcon sx={{ color:  '#1976d2',minWidth: '35px' }}><AccountCircle /></ListItemIcon>
-            <ListItemText primary="Sales Mentor" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('/salesMentor') ? '#1976d2' : '#333' }} />
+            <ListItemText primary="Sales Mentor" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('sales-mentor-list') ? '#1976d2' : '#333' }} />
           </ListItem>
 
         
-          <ListItem button onClick={() => handleNavigation('/leadManager')} sx={{ backgroundColor: isActive('/leadManager') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
+          <ListItem button onClick={() => handleNavigation('lead-manager')} sx={{ backgroundColor: isActive('lead-manager') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
                 paddingY:'10px'}}>
             <ListItemIcon sx={{ color:  '#1976d2',minWidth: '35px' }}><Settings /></ListItemIcon>
-            <ListItemText primary="Lead Manager" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('/leadManager') ? '#1976d2' : '#333' }} />
+            <ListItemText primary="Lead Manager" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('lead-manager') ? '#1976d2' : '#333' }} />
           </ListItem>
 
          

@@ -18,6 +18,12 @@ import AddTeacher from '../pages/Admin/AddTeacher';
 import EditTeacher from '../pages/Admin/editTeacher';
 import Courses from '../pages/Admin/Courses';
 import AddCourse from '../pages/Admin/AddCourse';
+import EditCourse from '../pages/Admin/EditCourse';
+import StudentReport from '../pages/Admin/StudentReport';
+import TeacherReport from '../pages/Admin/TeacherReport';
+import CoursePurchaseList from '../pages/Admin/CoursePurchaseList';
+import SalesMentorList from '../pages/Admin/SaleMentorList';
+import LeadManager from '../pages/Admin/LeadManager';
 
 const router = createBrowserRouter([
   {
@@ -123,6 +129,48 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           AddCourse
+        ),
+      },
+      {
+        path: 'edit-course',
+        element: React.createElement(
+         
+          EditCourse
+        ),
+      },
+      {
+        path: 'student-report',
+        element: React.createElement(
+         
+          StudentReport
+        ),
+      },
+      {
+        path: 'teacher-report',
+        element: React.createElement(
+         
+          TeacherReport
+        ),
+      },
+      {
+        path: 'course-purchase-list',
+        element: React.createElement(
+         
+          CoursePurchaseList
+        ),
+      },
+      {
+        path: 'sales-mentor-list',
+        element: React.createElement(
+         
+          SalesMentorList
+        ),
+      },
+      {
+        path: 'lead-manager',
+        element: React.createElement(
+         
+          LeadManager
         ),
       },
     ],

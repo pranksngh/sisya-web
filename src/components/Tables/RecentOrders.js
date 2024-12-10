@@ -36,7 +36,7 @@ function RecentOrders() {
 
   return (
     <Paper elevation={0} variant="elevation" sx={{ padding: '16px', alignSelf:'center', justifyContent:'center',justifyItems:'center' }}>
-      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>Recent Transactions</Typography>
+      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>Recent Purchases</Typography>
       <TableContainer>
         <Table>
           <TableHead>

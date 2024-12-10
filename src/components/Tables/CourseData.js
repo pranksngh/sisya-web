@@ -4,11 +4,12 @@ import AddBoardDialog from '../DialogBoxes/AddBoardDialog';
 import { addBoardFunction } from '../../Functions/AddBoard';
 import DeleteBoardDialog from '../DialogBoxes/DeleteBoardDialog';
 import EditBoardDialog from '../DialogBoxes/EditBoardDialog';
+import { useNavigate } from 'react-router-dom';
 
 
 
 function CourseData() {
-
+  const navigate = useNavigate();
   const [courses, setCourses ] = useState([]);
 
   const [open, setOpen] = useState(false);
@@ -232,7 +233,7 @@ function CourseData() {
       <Button
         variant="outlined"
         color="secondary"
-        onClick={() => handleEditModalOpen(row)}
+        onClick={() => navigate('/dashboard/edit-course', { state: { course: row } })}
         sx={{
           textTransform: 'capitalize',
           fontWeight: 'bold',
