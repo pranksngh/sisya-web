@@ -47,7 +47,7 @@ function CourseData() {
 
   const handleSubmit = async() => {
     // Add your submission logic here
-    console.log('Form Data Submitted:', formData);
+    console.log('Form Data Submitte:', formData);
 
     try {
         const response = await fetch('https://sisyabackend.in/rkadmin/add_board', {
