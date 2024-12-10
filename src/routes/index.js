@@ -25,6 +25,8 @@ import CoursePurchaseList from '../pages/Admin/CoursePurchaseList';
 import SalesMentorList from '../pages/Admin/SaleMentorList';
 import LeadManager from '../pages/Admin/LeadManager';
 import Doubts from '../pages/Admin/Doubts';
+import Enquiry from '../pages/Admin/Enquiry';
+import Banners from '../pages/Admin/Banners';
 
 const router = createBrowserRouter([
   {
@@ -179,6 +181,20 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           Doubts
+        ),
+      },
+      {
+        path: 'enquiry',
+        element: React.createElement(
+         
+          Enquiry
+        ),
+      },
+      {
+        path: 'banners',
+        element: React.createElement(
+         
+          Banners
         ),
       },
     ],

@@ -270,32 +270,32 @@ const Sidebar = () => {
           </ListItem>
 
           
-          <ListItem button onClick={() => handleNavigation('/enquiries')} sx={{ backgroundColor: isActive('/enquiries') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' },paddingX:'20px',
+          <ListItem button onClick={() => handleNavigation('enquiry')} sx={{ backgroundColor: isActive('enquiry') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' },paddingX:'20px',
                 paddingY:'10px' }}>
             <ListItemIcon sx={{ color: '#1976d2',minWidth: '35px' }}><Notifications /></ListItemIcon>
-            <ListItemText primary="Enquiries" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('/enquiries') ? '#1976d2' : '#333' }} />
+            <ListItemText primary="Enquiries" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('/enquiry') ? '#1976d2' : '#333' }} />
           </ListItem>
 
         
-          <ListItem button onClick={() => handleNavigation('/banners')} sx={{ backgroundColor: isActive('/banners') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
+          <ListItem button onClick={() => handleNavigation('banners')} sx={{ backgroundColor: isActive('banners') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
                 paddingY:'10px' }}>
             <ListItemIcon sx={{ color: '#1976d2',minWidth: '35px' }}><CalendarToday /></ListItemIcon>
-            <ListItemText primary="Banners" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('/banners') ? '#1976d2' : '#333' }} />
+            <ListItemText primary="Banners" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('banners') ? '#1976d2' : '#333' }} />
           </ListItem>
 
         
-          <ListItem button onClick={() => handleNavigation('/pushNotification')} sx={{ backgroundColor: isActive('/pushNotification') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
+          <ListItem button onClick={() => null} sx={{ backgroundColor: isActive('/pushNotification') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
                 paddingY:'10px' }}>
             <ListItemIcon sx={{ color:  '#1976d2',minWidth: '35px' }}><Notifications /></ListItemIcon>
             <ListItemText primary="Push Notification" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('/pushNotification') ? '#1976d2' : '#333' }} />
           </ListItem>
 
         
-          <ListItem button onClick={() => handleNavigation('/settings')} sx={{ backgroundColor: isActive('/settings') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
+          {/* <ListItem button onClick={() => handleNavigation('/settings')} sx={{ backgroundColor: isActive('/settings') ? '#e0f7fa' : 'transparent', '&:hover': { backgroundColor: '#e0f7fa' }, paddingX:'20px',
                 paddingY:'10px' }}>
             <ListItemIcon sx={{ color: isActive('/settings') ? '#1976d2' : '#333',minWidth: '35px' }}><Settings /></ListItemIcon>
             <ListItemText primary="Settings" primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: '500', color: isActive('/settings') ? '#1976d2' : '#333' }} />
-          </ListItem>
+          </ListItem> */}
         </List>
       </Box>
 
