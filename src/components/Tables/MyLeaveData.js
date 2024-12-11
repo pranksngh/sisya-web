@@ -158,7 +158,7 @@ function LeaveRequestData() {
             {leaveRequests.map((row, index) => (
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{mentors[row.mentorId] || 'Loading...'}</TableCell>
+                <TableCell>{mentors[row.mentorId] || 'Load...'}</TableCell>
                 <TableCell>{row.startDate}</TableCell>
                 <TableCell>{row.endDate}</TableCell>
                 <TableCell>{row.status}</TableCell>
