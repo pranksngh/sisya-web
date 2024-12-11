@@ -28,6 +28,9 @@ import Doubts from '../pages/Admin/Doubts';
 import Enquiry from '../pages/Admin/Enquiry';
 import Banners from '../pages/Admin/Banners';
 import PushNotification from '../pages/Admin/PushNotification';
+import Admin from '../pages/Admin';
+import EnrolledCourses from '../pages/Teacher/EnrolledCourses';
+import CourseDetails from '../pages/Teacher/CourseDetails';
 
 const router = createBrowserRouter([
   {
@@ -42,7 +45,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: '',
-        element: React.createElement(DashboardPage), // Default dashboard content
+        element: React.createElement(Admin), // Default dashboard content
       },
       {
         path: 'teacher',
@@ -203,6 +206,20 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           PushNotification
+        ),
+      },
+      {
+        path: 'enrolled-courses',
+        element: React.createElement(
+         
+          EnrolledCourses
+        ),
+      },
+      {
+        path: 'course-details',
+        element: React.createElement(
+         
+          CourseDetails
         ),
       },
     ],
