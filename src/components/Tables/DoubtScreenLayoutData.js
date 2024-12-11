@@ -111,9 +111,44 @@ const DoubtScreenLayoutData = () => {
     };
   }, [handleNewMessage, fromUUID]);
 
+  const fetchConversation = async (doubt) => {
+    const toUUID = doubt.asker.uuid;
+    setUnreadCounts((prevCounts) => {
+      const newCounts = { ...prevCounts };
+      delete newCounts[doubt.id]; // Clear unread count for this specific doubt
+      return newCounts;
+    });
+
+    setDoubtStatus(doubt.status); // Set the current doubt status
+
+    const response = await fetch('https://sisyabackend.in/student/get_conversation', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ toUUID, fromUUID })
+    });
+    const result = await response.json();
+    const messages = result.chat || [];
+
+    if (messages.length > 0) {
+      const filteredMessages = messages.filter(msg => msg.type === `doubt-${doubt.id}`); // Only show 'doubt' messages
+      const sortedMessages = filteredMessages.sort((a, b) =>
+        new Date(a.createdOn).getTime() - new Date(b.createdOn).getTime()
+      );
+      setMessages(sortedMessages);
+      setTimeout(() => {
+        lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      setMessages([]);
+    }
+  };
+
   const handleUserClick = (doubt) => {
     setSelectedUser(doubt.asker);
     setToUUID(doubt.asker.uuid);
+    fetchConversation(doubt);
     setdoubtid(doubt.id);
     setdoubtinfo(doubt);
     setUnreadCounts(prevCounts => {
@@ -137,6 +172,34 @@ const DoubtScreenLayoutData = () => {
       socketService.emit('send_message', newMessage);
       handleNewMessage(newMessage);
       setMessage('');
+    }
+  };
+
+  const renderMessageContent = (message) => {
+    let content = message.content;
+    content = content.replace("data:image/jpeg;base64,","");
+    const prefixRegex = /^(data:(.*?);name=.*?;base64,).*?(data:(.*?);base64,)/;
+    const sanitizedContent = content.replace(prefixRegex, '$3');
+    const regex = /data:(.*?);name=(.*?);base64,(.*)/;
+    const matches = sanitizedContent.match(regex);
+
+    if (matches) {
+      const mimeType = matches[1];
+      const fileName = matches[2];
+      
+    console.log("mime type is " + mimeType);
+      if (mimeType.startsWith('image/')) {
+       
+        return <img src={content} alt={fileName} className="message-image" style={{width:150,}} />;
+      } else {
+        return (
+          <a href={content} download={fileName}>
+            Download {fileName}
+          </a>
+        );
+      }
+    } else {
+      return <p>{message.content}</p>;
     }
   };
 
@@ -239,7 +302,7 @@ const DoubtScreenLayoutData = () => {
                 borderRadius={1}
                 display="inline-block"
               >
-                {message.content}
+                {renderMessageContent(message)}
               </Typography>
             </Box>
           ))}
