@@ -151,6 +151,13 @@ const sidebarConfig = [
       roles: ["teacher"], // Only for admin
       expandable: false,
     },
+    {
+      label: "My Leaves",
+      icon: "Notifications",
+      path: "myleaves",
+      roles: ["teacher"], // Only for admin
+      expandable: false,
+    },
     
   ];
   

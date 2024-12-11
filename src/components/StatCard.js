@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box } from '@mui/material';
-import { Bar } from 'react-chartjs-2';
 
 function StatCard({ title, value, percentage, chartData, color }) {
   const options = {
@@ -37,9 +36,7 @@ function StatCard({ title, value, percentage, chartData, color }) {
         >
           {percentage > 0 ? `+${percentage}%` : `${percentage}%`}
         </Typography>
-        <Box sx={{ width: '100%', height: 60 }}>
-          <Bar data={chartData} options={options} />
-        </Box>
+      
       </CardContent>
     </Card>
   );

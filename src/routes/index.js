@@ -36,6 +36,7 @@ import AddClass from '../pages/Teacher/AddClass';
 import ChatLayout from '../pages/Teacher/ChatLayout';
 import GroupChatLayout from '../pages/Teacher/GroupChatLayout';
 import DoubtScreen from '../pages/Teacher/DoubtScreen';
+import MyLeaves from '../pages/Teacher/MyLeaves';
 
 const router = createBrowserRouter([
   {
@@ -260,6 +261,13 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           DoubtScreen
+        ),
+      },
+      {
+        path: 'myleaves',
+        element: React.createElement(
+         
+          MyLeaves
         ),
       }
     ],
