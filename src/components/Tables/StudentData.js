@@ -125,7 +125,7 @@ function StudentData() {
         
       
       } else {
-        console.log('Failed to add student', result.error);
+        console.log('Failed to add students', result.error);
       //  handleClose();
       
       }
