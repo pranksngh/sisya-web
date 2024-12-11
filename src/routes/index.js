@@ -31,6 +31,11 @@ import PushNotification from '../pages/Admin/PushNotification';
 import Admin from '../pages/Admin';
 import EnrolledCourses from '../pages/Teacher/EnrolledCourses';
 import CourseDetails from '../pages/Teacher/CourseDetails';
+import AddHomeWork from '../pages/Teacher/AddHomeWork';
+import AddClass from '../pages/Teacher/AddClass';
+import ChatLayout from '../pages/Teacher/ChatLayout';
+import GroupChatLayout from '../pages/Teacher/GroupChatLayout';
+import DoubtScreen from '../pages/Teacher/DoubtScreen';
 
 const router = createBrowserRouter([
   {
@@ -222,6 +227,41 @@ const router = createBrowserRouter([
           CourseDetails
         ),
       },
+      {
+        path: 'add-homework',
+        element: React.createElement(
+         
+          AddHomeWork
+        ),
+      },
+      {
+        path: 'add-class',
+        element: React.createElement(
+         
+          AddClass
+        ),
+      },
+      {
+        path: 'Chats',
+        element: React.createElement(
+         
+          ChatLayout
+        ),
+      },
+      {
+        path: 'group-chat',
+        element: React.createElement(
+         
+          GroupChatLayout
+        ),
+      },
+      {
+        path: 'doubtscreen',
+        element: React.createElement(
+         
+          DoubtScreen
+        ),
+      }
     ],
   },
 ]);

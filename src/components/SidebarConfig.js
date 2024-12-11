@@ -17,7 +17,7 @@ const sidebarConfig = [
       label: "Boards",
       icon: "PieChart",
       path: "/dashboard/boards",
-      roles: ["teacher"], // Only for admin
+      roles: ["admin"], // Only for admin
       expandable: false,
     },
     {
@@ -120,6 +120,34 @@ const sidebarConfig = [
       label: "Assigned Courses",
       icon: "Notifications",
       path: "enrolled-courses",
+      roles: ["teacher"], // Only for admin
+      expandable: false,
+    },
+    {
+      label: "Add Class",
+      icon: "Notifications",
+      path: "add-class",
+      roles: ["teacher"], // Only for admin
+      expandable: false,
+    },
+    {
+      label: "Chats",
+      icon: "Notifications",
+      path: "Chats",
+      roles: ["teacher"], // Only for admin
+      expandable: false,
+    },
+    {
+      label: "Group Chats",
+      icon: "Notifications",
+      path: "group-chat",
+      roles: ["teacher"], // Only for admin
+      expandable: false,
+    },
+    {
+      label: "Doubts",
+      icon: "Notifications",
+      path: "doubtscreen",
       roles: ["teacher"], // Only for admin
       expandable: false,
     },
