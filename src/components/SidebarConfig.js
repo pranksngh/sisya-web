@@ -13,6 +13,13 @@ const sidebarConfig = [
         roles: ["teacher"], // Accessible to both
         expandable: false,
       },
+      {
+        label: "Dashboard",
+        icon: "Dashboard",
+        path: "/dashboard/mentor",
+        roles: ["mentor"], // Accessible to both
+        expandable: false,
+      },
     {
       label: "Boards",
       icon: "PieChart",
