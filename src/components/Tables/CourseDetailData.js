@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Grid, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, Tabs, Tab, Dialog, DialogActions, DialogContent, DialogTitle, Chip, Paper, Card, CardContent } from '@mui/material';
+import { Grid, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, Tabs, Tab, Dialog, DialogActions, DialogContent, DialogTitle, Chip, Paper, Card, CardContent, Box } from '@mui/material';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { getUser } from '../../Functions/Login';
 import HomeworkQuestionsModal from '../DialogBoxes/ViewHomeWorkDialog';
@@ -549,78 +549,76 @@ const CourseDetailsData = () => {
                 </TableContainer>
             </TabPanel>
             <TabPanel value={tabValue} index={4}>
-                {/* Content for Course Tests Tab */}
-                <TableContainer component={Paper}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>ID</TableCell>
-                                <TableCell>Class Name</TableCell>
-                                <TableCell>Start Time</TableCell>
-                                <TableCell>End Time</TableCell>
-                                <TableCell>Duration</TableCell>
-                                <TableCell>Submissions</TableCell>
-                         
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-      {course.ctest.length > 0 ? (
-        course.ctest.map((test, index) => (
-          <TableRow key={index} hover>
-            <TableCell>
-              <Typography variant="body2" fontWeight="bold">
-                {index + 1}
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography variant="body2">{test.title}</Typography>
-            </TableCell>
-            <TableCell>
-              <Typography variant="body2" color="text.secondary">
-                {test.startDate}
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography variant="body2" color="text.secondary">
-                {test.endDate}
-              </Typography>
-            </TableCell>
-            <TableCell>
-            {test.Duration || 0} Mins
-            </TableCell>
-            <TableCell>
-            {0}
-            </TableCell>
-            {/* <TableCell>
-           
-                 <Button
-                 variant="contained"
-                 color={session.isDone ? "success" : "primary"}
-                 size="small"
-                 onClick={() => viewRecords(session.atendeeList)}
-             
-               >
-               View Records
-               </Button>
-                                          
-                                    
-           
-            </TableCell> */}
-          </TableRow>
-        ))
-      ) : (
+  {/* Content for Course Tests Tab */}
+  <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+    <Typography variant="h6" component="div">
+      Course Tests
+    </Typography>
+    <Button
+      variant="contained"
+      color="primary"
+      size="small"
+      onClick={() =>{
+       console.log("course data is", JSON.stringify(course));
+   //   navigate("../add-test",{state:{course}})
+    
+    }}
+    >
+      Add Test
+    </Button>
+  </Box>
+  <TableContainer component={Paper}>
+    <Table>
+      <TableHead>
         <TableRow>
-          <TableCell colSpan={6} align="center">
-            <Typography variant="body1" color="text.secondary">
-              No Classes Found
-            </Typography>
-          </TableCell>
+          <TableCell>ID</TableCell>
+          <TableCell>Class Name</TableCell>
+          <TableCell>Start Time</TableCell>
+          <TableCell>End Time</TableCell>
+          <TableCell>Duration</TableCell>
+          <TableCell>Submissions</TableCell>
         </TableRow>
-      )}
-    </TableBody>
-                    </Table>
-                </TableContainer>
-            </TabPanel>
+      </TableHead>
+      <TableBody>
+        {course.ctest.length > 0 ? (
+          course.ctest.map((test, index) => (
+            <TableRow key={index} hover>
+              <TableCell>
+                <Typography variant="body2" fontWeight="bold">
+                  {index + 1}
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography variant="body2">{test.title}</Typography>
+              </TableCell>
+              <TableCell>
+                <Typography variant="body2" color="text.secondary">
+                  {test.startDate}
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography variant="body2" color="text.secondary">
+                  {test.endDate}
+                </Typography>
+              </TableCell>
+              <TableCell>{test.Duration || 0} Mins</TableCell>
+              <TableCell>{0}</TableCell>
+            </TableRow>
+          ))
+        ) : (
+          <TableRow>
+            <TableCell colSpan={6} align="center">
+              <Typography variant="body1" color="text.secondary">
+                No Classes Found
+              </Typography>
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  </TableContainer>
+</TabPanel>
+
             <HomeworkQuestionsModal
         selectedSessionTest={selectedSessionTest}
         open={homeworkModalOpen}

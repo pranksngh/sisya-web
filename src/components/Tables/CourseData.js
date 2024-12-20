@@ -205,7 +205,7 @@ function CourseData() {
           <TableBody>
             {courses.map((row, index) => (
               <TableRow key={index}>
-                <TableCell>{index+1}</TableCell>
+                <TableCell>{row.id}</TableCell>
                 <TableCell>{row.name}</TableCell>
             
                 <TableCell>

@@ -37,6 +37,7 @@ import ChatLayout from '../pages/Teacher/ChatLayout';
 import GroupChatLayout from '../pages/Teacher/GroupChatLayout';
 import DoubtScreen from '../pages/Teacher/DoubtScreen';
 import MyLeaves from '../pages/Teacher/MyLeaves';
+import AddTest from '../pages/Teacher/AddTest';
 
 const router = createBrowserRouter([
   {
@@ -233,6 +234,13 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           AddHomeWork
+        ),
+      },
+      {
+        path: 'add-test',
+        element: React.createElement(
+          AddTest
+          
         ),
       },
       {
