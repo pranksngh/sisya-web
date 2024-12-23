@@ -7,7 +7,7 @@ import { Formik } from 'formik';
 import Logo from '../assets/images/logo.png';
 import BackgroundImage from '../assets/images/loginBackground.jpg';
 import { useNavigate } from 'react-router-dom';
-import { login, mentorlogin, teacherlogin } from '../Functions/Login';
+import { hrlogin, login, mentorlogin, teacherlogin } from '../Functions/Login';
 export default function AuthLogin() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [checked, setChecked] = React.useState(false);
@@ -37,6 +37,8 @@ export default function AuthLogin() {
       teacherLogin(username,password);
     }else if(selectedRole === "mentor"){
       mentorLogin(username,password);
+    }else if(selectedRole ==="hr"){
+      HRlogin(username,password)
     }
    
 
@@ -92,7 +94,18 @@ export default function AuthLogin() {
     }
 
   }
+  const HRlogin = async(username,password)=>{
+    const response = await hrlogin(username,password);
 
+    if(response.success){
+      setLoading(false);
+     return navigate('/dashboard/hr');
+    }else{
+      console.log("HR Login Error: ", response.error);
+      setLoading(false);
+    }
+
+  }
 
   return (
     <Grid container sx={{ minHeight: '100vh' }}>
@@ -267,12 +280,12 @@ export default function AuthLogin() {
                       value={selectedRole}
                       onChange={handleRoleChange}
                     >
-                      {['admin', 'teacher', 'mentor'].map((role) => (
+                      {['admin', 'teacher', 'mentor','hr'].map((role) => (
                         <FormControlLabel
                           key={role}
                           value={role}
                           control={<Radio color="primary" />}
-                          label={role === "admin"? "Admin": role ==="teacher"?"Teacher":"Mentor"}
+                          label={role === "admin"? "Admin": role ==="teacher"?"Teacher":role ==="mentor"?"Mentor":"HR"}
                         />
                       ))}
                     </RadioGroup>

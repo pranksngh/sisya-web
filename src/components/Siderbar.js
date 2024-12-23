@@ -4,8 +4,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import * as Icons from '@mui/icons-material';
 import sidebarConfig from './SidebarConfig'; // Your sidebar config file
-
+import { getUser } from '../Functions/Login';
 const Sidebar = ({ userRole }) => {
+  const user = getUser();
   const [open, setOpen] = useState({});
   const location = useLocation();
   const navigate = useNavigate();
@@ -96,10 +97,10 @@ const Sidebar = ({ userRole }) => {
 
       {/* Profile Section */}
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center', borderTop: '1px solid #e0e0e0' }}>
-        <Avatar sx={{ mr: 2, backgroundColor: '#1976d2' }}>U</Avatar>
+        <Avatar sx={{ mr: 2, backgroundColor: '#1976d2' }}></Avatar>
         <Box>
-          <Typography variant="body1" sx={{ fontWeight: '500' }}>JWT User</Typography>
-          <Typography variant="body2" color="textSecondary">UI/UX Designer</Typography>
+          <Typography variant="body1" sx={{ fontWeight: '500' }}>{userRole ==="admin"?"Admin": userRole ==="teacher"?user.mentor.name: userRole ==="mentor"?user.salesman.name:""}</Typography>
+          <Typography variant="body2" color="textSecondary">{userRole ==="teacher"? user.mentor.email: userRole ==="mentor"? user.salesman.email:""}</Typography>
         </Box>
       </Box>
     </Box>

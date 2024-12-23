@@ -38,6 +38,13 @@ import GroupChatLayout from '../pages/Teacher/GroupChatLayout';
 import DoubtScreen from '../pages/Teacher/DoubtScreen';
 import MyLeaves from '../pages/Teacher/MyLeaves';
 import AddTest from '../pages/Teacher/AddTest';
+import TeachersList from '../pages/HR/teachers';
+import TeacherProfile from '../pages/HR/teachersProfile';
+import MentorList from '../pages/HR/mentors';
+import MentorProfile from '../pages/HR/mentorProfile';
+import MentorLeaves from '../pages/HR/MentorLeaves';
+import MentorLeaveRequest from '../pages/Mentor/MentorLeaveRequest';
+import TeacherLeaves from '../pages/HR/TeacherLeaves';
 
 const router = createBrowserRouter([
   {
@@ -65,7 +72,7 @@ const router = createBrowserRouter([
         path: 'hr',
         element: React.createElement(
           
-          React.createElement(HrPage)
+        HrPage
         ),
       },
       {
@@ -276,6 +283,55 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           MyLeaves
+        ),
+      },
+      {
+        path: 'teachersList',
+        element: React.createElement(
+         
+          TeachersList
+        ),
+      },
+      {
+        path: 'teacherInfo',
+        element: React.createElement(
+         
+          TeacherProfile
+        ),
+      },
+      {
+        path: 'mentorInfo',
+        element: React.createElement(
+         
+          MentorProfile
+        ),
+      },
+      {
+        path: 'mentorList',
+        element: React.createElement(
+         
+          MentorList
+        ),
+      },
+      {
+        path: 'mentorLeaves',
+        element: React.createElement(
+         
+          MentorLeaves
+        ),
+      },
+      {
+        path: 'teacherLeaves',
+        element: React.createElement(
+         
+          TeacherLeaves
+        ),
+      },
+      {
+        path: 'mentorLeaveRequest',
+        element: React.createElement(
+         
+          MentorLeaveRequest
         ),
       }
     ],

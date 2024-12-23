@@ -20,6 +20,13 @@ const sidebarConfig = [
         roles: ["mentor"], // Accessible to both
         expandable: false,
       },
+      {
+        label: "Dashboard",
+        icon: "Dashboard",
+        path: "/dashboard/hr",
+        roles: ["hr"], // Accessible to both
+        expandable: false,
+      },
     {
       label: "Boards",
       icon: "PieChart",
@@ -165,6 +172,51 @@ const sidebarConfig = [
       roles: ["teacher"], // Only for admin
       expandable: false,
     },
+    {
+      label: "Teachers List",
+      icon: "Notifications",
+      path: "teachersList",
+      roles: ["hr"], // Only for admin
+      expandable: false,
+    },
+    {
+      label: "Mentor List",
+      icon: "Notifications",
+      path: "mentorList",
+      roles: ["hr"], // Only for admin
+      expandable: false,
+    },
+
+    {
+      label: "Mentor Leaves",
+      icon: "Notifications",
+      path: "mentorLeaves",
+      roles: ["hr"], // Only for admin
+      expandable: false,
+    },
+    {
+      label: "Teacher Leaves",
+      icon: "Notifications",
+      path: "teacherLeaves",
+      roles: ["hr"], // Only for admin
+      expandable: false,
+    },
+    {
+      label: "My Leaves",
+      icon: "Notifications",
+      path: "mentorLeaveRequest",
+      roles: ["mentor"], // Only for admin
+      expandable: false,
+    },
+    
+    {
+      label: "Logout",
+      icon: "Notifications",
+      path: "/",
+      roles: ["teacher","admin","mentor","hr"], // Only for admin
+      expandable: false,
+    },
+    
     
   ];
   
