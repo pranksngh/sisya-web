@@ -53,7 +53,7 @@ const AddClassData = () => {
         setCourseList(result.courses || []);
       }
     } catch (error) {
-      console.error('Error fetching courses:', error);
+      console.error('Error fetching course:', error);
     }
   };
 
