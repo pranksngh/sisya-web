@@ -21,14 +21,16 @@ const AddTestData = () => {
   const user = getUser();
   const navigate = useNavigate();
   const location = useLocation();
-  const { session } = location.state || {};
+  const { course } = location.state || {};
   const [homeworkData, setHomeworkData] = useState({
-    // startTime: session.startTime,
-    // endTime: session.endTime,
-    // duration: 60, // Duration in minutes
-    // sessionId: session.id,
-    // mentorId: user.mentor.id,
-    // questions: [],
+    title:"",
+    ctestQuestions: [],
+    startDate: "", // Initialize startDate
+    endDate: "",   // Initialize endDate
+    Duration:30,
+    bigCourseId: 0,
+    subjectId: 0,
+    mentorId: user.mentor.id,
   });
 
   const [questionType, setQuestionType] = useState("multipleChoice");
@@ -38,7 +40,24 @@ const AddTestData = () => {
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log("my course data is ", JSON.stringify(session));
+    const matchingTeachIntro = course.TeachIntro.find(
+      (intro) => intro.mentorId === user.mentor.id
+    );
+    console.log(matchingTeachIntro);
+   
+      setHomeworkData({
+        ...homeworkData,
+        bigCourseId: matchingTeachIntro.bigCourseId,
+        subjectId: matchingTeachIntro.subjectId,
+        mentorId: user.mentor.id,
+        
+      })
+    
+
+   
+
+
+  //  console.log("my course data is ", JSON.stringify(session));
     if (questionType === "trueFalse") {
       setOptions(["True", "False"]);
     } else {
@@ -50,6 +69,21 @@ const AddTestData = () => {
     setQuestionType(e.target.value);
     setCorrectResponse(""); // Reset correct response for new question type
   };
+
+  const handleChange = (field, value) => {
+    let formattedValue = value;
+  
+    // Convert date fields to ISO string format
+    if (field === "startDate" || field === "endDate") {
+      formattedValue = new Date(value).toISOString();
+    }
+  
+    setHomeworkData((prevData) => ({
+      ...prevData,
+      [field]: formattedValue,
+    }));
+  };
+  
 
   const handleQuestionChange = (e) => {
     setQuestion(e.target.value);
@@ -77,15 +111,33 @@ const AddTestData = () => {
     };
     setHomeworkData({
       ...homeworkData,
-      questions: [...homeworkData.questions, newQuestion],
+      ctestQuestions: [...homeworkData.ctestQuestions, newQuestion],
     });
     setQuestion("");
     setOptions(questionType === "trueFalse" ? ["True", "False"] : ["", "", "", ""]);
     setCorrectResponse("");
   };
 
-  const submitHomework = async () => {
-    const response = await fetch("https://sisyabackend.in/teacher/add_session_test", {
+  const submitTestCreation = async () => {
+
+    const matchingTeachIntro = course.TeachIntro.find(
+      (intro) => intro.mentorId === user.mentor.id
+    );
+    console.log(matchingTeachIntro);
+   
+      setHomeworkData({
+        ...homeworkData,
+        bigCourseId: matchingTeachIntro.bigCourseId,
+        subjectId: matchingTeachIntro.subjectId,
+        mentorId: user.mentor.id,
+        
+      })
+    
+    
+    
+
+    console.log("coursetest data is ", JSON.stringify(homeworkData));
+    const response = await fetch("https://sisyabackend.in/rkadmin/insert_ctest", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -95,10 +147,10 @@ const AddTestData = () => {
 
     const result = await response.json();
     if (result.success) {
-      console.log("Homework Added Successfully");
+      console.log("Ctest Added Successfully");
       navigate("/homework");
     } else {
-      console.log("Homework Addition Failed");
+      console.log("Course Test Addition Failed", JSON.stringify(result));
     }
   };
 
@@ -117,11 +169,37 @@ const AddTestData = () => {
   return (
     <Box sx={{ padding: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Add Homework
+        Add Test
       </Typography>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="subtitle1">Course Name: {session.courseName}</Typography>
-        <Typography variant="subtitle1">Session Name: {session.detail}</Typography>
+      <Box sx={{ mb: 4, }}>
+        <Typography variant="subtitle1">Course Name: {course.name}</Typography>
+        <Box sx={{ mb: 2 , mt:5}}>
+          <TextField
+            label="Title"
+            fullWidth
+            value={homeworkData.title}
+            onChange={(e) => handleChange("title", e.target.value)}
+            sx={{ mb: 2 }}
+          />
+        </Box>
+        <Box sx={{ display: "flex", gap: 2, mb: 2, mt:5 }}>
+          <TextField
+            label="Start Date"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+            value={homeworkData.startDate}
+            onChange={(e) => handleChange("startDate", e.target.value)}
+          />
+          <TextField
+            label="End Date"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+            value={homeworkData.endDate}
+            onChange={(e) => handleChange("endDate", e.target.value)}
+          />
+        </Box>
       </Box>
       <Paper elevation={3} sx={{ padding: 4 }}>
         <RadioGroup
@@ -190,11 +268,11 @@ const AddTestData = () => {
           </Grid>
           <Grid item>
             <Button variant="outlined" onClick={openPreviewModal}>
-              Preview Questions ({homeworkData.questions.length})
+              Preview Questions ({homeworkData.ctestQuestions.length})
             </Button>
           </Grid>
           <Grid item>
-            <Button variant="contained" color="success" onClick={submitHomework}>
+            <Button variant="contained" color="success" onClick={submitTestCreation}>
               Submit Homework
             </Button>
           </Grid>
@@ -209,10 +287,10 @@ const AddTestData = () => {
           <Typography variant="h5" gutterBottom>
             Preview Questions
           </Typography>
-          {homeworkData.questions.length === 0 ? (
+          {homeworkData.ctestQuestions.length === 0 ? (
             <Typography>No questions added yet.</Typography>
           ) : (
-            homeworkData.questions.map((q, index) => (
+            homeworkData.ctestQuestions.map((q, index) => (
               <Box key={index} sx={{ mb: 2 }}>
                 <Typography variant="subtitle1">Q: {q.question}</Typography>
                 {q.option1 && <Typography>1. {q.option1}</Typography>}

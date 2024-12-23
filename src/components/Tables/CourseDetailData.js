@@ -560,7 +560,7 @@ const CourseDetailsData = () => {
       size="small"
       onClick={() =>{
        console.log("course data is", JSON.stringify(course));
-   //   navigate("../add-test",{state:{course}})
+     navigate("../add-test",{state:{course}})
     
     }}
     >

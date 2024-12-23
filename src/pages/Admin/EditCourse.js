@@ -362,6 +362,7 @@ const EditCourse = () => {
    // e.preventDefault();
 
     const finalData = {
+      id:courseInfo.id,
       name: courseInfo.name,
       description:courseInfo.description,
       price: parseFloat(courseInfo.price),
@@ -394,7 +395,7 @@ const EditCourse = () => {
     console.log(JSON.stringify(finalData));
   
     try {
-      const response = await fetch('https://sisyabackend.in/rkadmin/create_big_course', {
+      const response = await fetch('https://sisyabackend.in/rkadmin/update_course', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -405,7 +406,7 @@ const EditCourse = () => {
       const result = await response.json();
 
       if (result.success) {
-         console.log("Course Added Successfully");
+         console.log("Course Updated Successfully");
          alert("Course Added Successfully");
       } else {
         console.log("Course Addition Failed");

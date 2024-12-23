@@ -425,7 +425,7 @@ const AddTeacher = () => {
                       select
                       label="Select Subject"
                       name="selectedSubject"
-                      value={formData.selectedSubject || ""}
+                      value={formData.selectedSubject?.id || ""}
                       onChange={(e) => {
                         const selectedId = e.target.value; // Get the selected subject ID
                         const selectedSubject = subjectOptions.find(subject => subject.id === parseInt(selectedId)); // Find the subject object

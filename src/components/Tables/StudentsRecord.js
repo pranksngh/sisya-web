@@ -11,31 +11,31 @@ import {
   Box,
   Button,
 } from '@mui/material';
-import { fetchPurchases } from '../../Functions/purchases';
+import { fetchStudentList } from '../../Functions/students';
 
-function RecentOrders() {
-  const [purchases, setPurchases] = useState([]);
-  const [visibleTransactions, setVisibleTransactions] = useState(15);
+function StudentRecords() {
+  const [students, setStudents] = useState([]);
+  const [visibleStudents, setVisibleStudents] = useState(15);
 
   useEffect(() => {
-    purchaseList();
+    studentList();
   }, []);
 
-  const purchaseList = async () => {
+  const studentList = async () => {
     try {
-      const result = await fetchPurchases();
+      const result = await fetchStudentList();
       if (result.success) {
-        setPurchases(result.subs);
+        setStudents(result.studentList);
       } else {
-        console.log('Purchase Issue', JSON.stringify(result));
+        console.log('Student List Issue', JSON.stringify(result));
       }
     } catch (error) {
-      console.log('Purchase Error', JSON.stringify(error));
+      console.log('Student List Error', JSON.stringify(error));
     }
   };
 
   const handleShowMore = () => {
-    setVisibleTransactions((prev) => prev + 8);
+    setVisibleStudents((prev) => prev + 8);
   };
 
   return (
@@ -47,7 +47,7 @@ function RecentOrders() {
       }}
     >
       <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>
-        Recent Purchases
+        Student Records
       </Typography>
       <TableContainer
         sx={{
@@ -63,41 +63,39 @@ function RecentOrders() {
           <TableHead sx={{ backgroundColor: '#f0f4f8' }}>
             <TableRow>
               <TableCell sx={{ fontWeight: 'bold', color: '#37474f' }}>
-                ORDER ID
+                Student ID
               </TableCell>
               <TableCell sx={{ fontWeight: 'bold', color: '#37474f' }}>
-                Course Name
+                Name
               </TableCell>
               <TableCell sx={{ fontWeight: 'bold', color: '#37474f' }}>
                 Class
               </TableCell>
               <TableCell sx={{ fontWeight: 'bold', color: '#37474f' }}>
-                Amount
+                Phone
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {purchases.slice(0, visibleTransactions).map((row, index) => (
+            {students.slice(0, visibleStudents).map((row, index) => (
               <TableRow
                 key={index}
                 sx={{
-                  '&:nth-of-type(odd)': { backgroundColor: '#fafafa' }, // Subtle gray for odd rows
-                  '&:nth-of-type(even)': { backgroundColor: '#ffffff' }, // White for even rows
-                  '&:hover': { backgroundColor: '#e3e9ef' }, // Light blue-gray for hover
+                  '&:nth-of-type(odd)': { backgroundColor: '#fafafa' },
+                  '&:nth-of-type(even)': { backgroundColor: '#ffffff' },
+                  '&:hover': { backgroundColor: '#e3e9ef' },
                 }}
               >
-                <TableCell sx={{ color: '#616161' }}>{row.OrderId}</TableCell>
-                <TableCell sx={{ color: '#616161' }}>{row.course.name}</TableCell>
-                <TableCell sx={{ color: '#616161' }}>{row.course.grade}</TableCell>
-                <TableCell sx={{ color: '#1e88e5', fontWeight: 'bold' }}>
-                ₹{row.PurchasePrice.toFixed(2)}
-                </TableCell>
+                <TableCell sx={{ color: '#616161' }}>{row.id}</TableCell>
+                <TableCell sx={{ color: '#616161' }}>{row.name}</TableCell>
+                <TableCell sx={{ color: '#616161' }}>{row.grade}</TableCell>
+                <TableCell sx={{ color: '#616161' }}>{row.phone}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      {visibleTransactions < purchases.length && (
+      {visibleStudents < students.length && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
           <Button
             variant="contained"
@@ -113,4 +111,4 @@ function RecentOrders() {
   );
 }
 
-export default RecentOrders;
+export default StudentRecords;
