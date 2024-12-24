@@ -45,11 +45,19 @@ import MentorProfile from '../pages/HR/mentorProfile';
 import MentorLeaves from '../pages/HR/MentorLeaves';
 import MentorLeaveRequest from '../pages/Mentor/MentorLeaveRequest';
 import TeacherLeaves from '../pages/HR/TeacherLeaves';
+import LiveClassRoom from '../pages/Teacher/LiveClassRoom';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: React.createElement(LoginPage), // Use React.createElement for consistency
+  },
+  {
+    path: 'liveclassroom',
+    element: React.createElement(
+     
+      LiveClassRoom
+    ),
   },
   {
     path: '/dashboard',
@@ -333,7 +341,8 @@ const router = createBrowserRouter([
          
           MentorLeaveRequest
         ),
-      }
+      },
+      
     ],
   },
 ]);

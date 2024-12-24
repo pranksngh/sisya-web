@@ -146,7 +146,7 @@ function Hr() {
   
  
     return (
-      <Box sx={{pb:10, maxWidth:'1200px'}}>
+      <Box sx={{pb:10, }}>
       
         {/* Other components like the StatCard components can be placed below */}
         <Box sx={{ display: 'flex', gap: '16px', marginTop: '20px',justifyContent: 'center', }}>

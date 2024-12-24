@@ -90,9 +90,37 @@ const CourseDetailsData = () => {
     };
 
     const startSession = async (sessionId) => {
-        // Your session start logic...
-    };
+      setLoading(true);
 
+      try {
+          const response = await fetch('https://sisyabackend.in/teacher/start_session', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ mentorId, sessionId })
+          });
+
+          const result = await response.json();
+          setLoading(false);
+
+          if (result.success) {
+              const streamInfo = result.streamInfo;
+              navigate('../../liveclassroom', {
+                  state: {
+                      streamInfo,
+                      mentorId,
+                  }
+              });
+          } else {
+              alert('Failed to start session');
+          }
+      } catch (error) {
+          setLoading(false);
+          console.error('Error starting session:', error);
+          alert('Error starting session');
+      }
+  };
     const closeModal = () => {
         setSelectedSessionTest(null);
         setIsUserListModalOpen(false);

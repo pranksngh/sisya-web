@@ -29,7 +29,9 @@
     "recharts": "^2.14.1",
     "socket.io-client": "^4.8.1",
     "web-vitals": "^2.1.4",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "zego-express-engine-webrtc": "^3.6.0"
+
   },
   "scripts": {
     "start": "react-scripts start",
