@@ -345,7 +345,7 @@ export default function LiveClassRoom() {
       console.log('Left room and stopped publishing' + roomID);
       socketService.emit("class:end",{token: roomID, data:{isClosed:true}});
       socketService.emit("class:end",{token: streamInfo.Token, data:{isClosed:true}});
-      navigate("/teacherDashboard");
+      navigate("../dashboard/teacher");
 
     }
   };
