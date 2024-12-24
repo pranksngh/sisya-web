@@ -95,7 +95,7 @@ const AddHomeworkData = () => {
     const result = await response.json();
     if (result.success) {
       console.log("Homework Added Successfully");
-      navigate("/homework");
+      navigate("../teacher");
     } else {
       console.log("Homework Addition Failed");
     }
