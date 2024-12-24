@@ -103,7 +103,7 @@ function Hr() {
     const result = await fetchSalesmenData();
     
     if(result.success){
-      const salesman = result.salesman;
+      const salesman = result.salesmen;
       setTotalSalesManCount(salesman.length);
       setSalesman(salesman);
       console.log("Fetched Salesman List Successfully");
