@@ -12,7 +12,7 @@ export default function LiveClassRoom() {
   const userInfo = getUser();
   const location = useLocation();
   const navigate = useNavigate();
-  const { streamInfo, mentorId } = location.state || {};
+  const { streamInfo, mentorId,sessionId } = location.state || {};
   const appID = 1500762473; // Your App ID
   const serverSecret = "175fa0e5958efde603f2ec805c7d6120"; // Your Server Secret
   const userName = userInfo.mentor.name;
@@ -333,19 +333,39 @@ export default function LiveClassRoom() {
       screenVideoElement.innerHTML = `<div class="no-screen-share"><FaDesktop class="no-screen-icon" /> <p>Start sharing your screen</p></div>`;
     }
   };
-
-  const leaveRoom = () => {
-    if (zegoEngine) {
-      zegoEngine.stopPublishingStream(videostreamID);
-      if (screenStream) {
-        zegoEngine.stopPublishingStream(screenStreamID);
-      }
+   const endSession = async()=>{
+    try{
+      const response = await fetch('https://sisyabackend.in/student/edit_session', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: sessionId,isGoingOn:false,isDone:true }) // Send bigCourseId as expected
+    });
+    const result = await response.json();
+    if(result.success){
       zegoEngine.logoutRoom(streamInfo.roomId);
       zegoEngine.destroyEngine();
       console.log('Left room and stopped publishing' + roomID);
       socketService.emit("class:end",{token: roomID, data:{isClosed:true}});
       socketService.emit("class:end",{token: streamInfo.Token, data:{isClosed:true}});
       navigate("../dashboard/teacher");
+    }else{
+      console.log("update session failed");
+    }
+    }catch(error){
+      console.log("error updating session", error);
+    }
+   }
+  const leaveRoom = () => {
+    if (zegoEngine) {
+      zegoEngine.stopPublishingStream(videostreamID);
+      if (screenStream) {
+        zegoEngine.stopPublishingStream(screenStreamID);
+      }
+
+      endSession();
+     
 
     }
   };

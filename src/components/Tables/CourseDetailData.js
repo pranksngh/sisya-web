@@ -110,6 +110,7 @@ const CourseDetailsData = () => {
                   state: {
                       streamInfo,
                       mentorId,
+                      sessionId
                   }
               });
           } else {
