@@ -18,9 +18,11 @@ import {
   duration,
   Alert,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 const defaultUserImage = "https://via.placeholder.com/100?text=User";
 
 const AddCourse = () => {
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const steps = ["Course Banner", "Course Info", "Subjects", "Teachers"];
 
@@ -368,7 +370,8 @@ const AddCourse = () => {
 
       if (result.success) {
          console.log("Course Added Successfully");
-         alert("Course Added Successfully");
+       //  alert("Course Added Successfully");
+       navigate('../courses');
       } else {
         console.log("Course Addition Failed");
         alert(JSON.stringify(result.error));

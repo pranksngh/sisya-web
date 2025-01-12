@@ -79,13 +79,11 @@ function CourseData() {
   const ChangeBoardStatus= async() =>{
 
     const data = {
-      educationBoardId: selectedBoard.id,
-      name: selectedBoard.name,
-      country:selectedBoard.country,
+      id: selectedBoard.id,
       isActive:!selectedBoard.isActive
     };
     try {
-      const updateboardResponse = await fetch('https://sisyabackend.in/rkadmin/update_board', {
+      const updateboardResponse = await fetch('https://sisyabackend.in/rkadmin/update_course', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

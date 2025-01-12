@@ -251,7 +251,7 @@ function TeacherData() {
       <Button
         variant="contained"
         color="primary"
-        onClick={handleOpen}
+        onClick={()=> navigate('../addTeacher')}
         sx={{
           textTransform: 'capitalize',
           fontWeight: 'bold',
@@ -347,7 +347,7 @@ function TeacherData() {
       >
         Edit
       </Button>
-      <Button
+      {/* <Button
         variant="contained"
         color="primary"
         onClick={()=> handleViewModalOpen(row)}
@@ -363,7 +363,7 @@ function TeacherData() {
         }}
       >
        View
-      </Button>
+      </Button> */}
       <EditStudentDialog
           open={openEditModal}
           onClose={handleEditModalClose}

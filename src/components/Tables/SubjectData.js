@@ -113,7 +113,7 @@ function SubjectData() {
         educationBoardId: parseInt(selectedSubject.educationBoardId, 10), // Ensure it's a number
         gradeLevel: parseInt(selectedSubject.gradeLevel, 10), // Ensure it's a number
         subjectId: selectedSubject ? selectedSubject.id : undefined,
-        isActive: selectedSubject.isActive === true? false:true,
+        isActive: !selectedSubject.isActive,
       };
       console.log(JSON.stringify(payload));
     try {

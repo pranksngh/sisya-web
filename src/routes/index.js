@@ -62,12 +62,16 @@ const router = createBrowserRouter([
   {
     path: '/dashboard',
     element: React.createElement(
-      DashboardLayout
+      ProtectedRoute,
+      { allowedRoles: [ROLES.ADMIN, ROLES.HR, ROLES.TEACHER, ROLES.MENTOR] },
+      React.createElement(DashboardLayout)
     ),// Wrap in React.createElement
     children: [
       {
         path: '',
-        element: React.createElement(Admin), // Default dashboard content
+        element: React.createElement(ProtectedRoute,
+          { allowedRoles: [ROLES.ADMIN] },
+          React.createElement(AdminPage)), // Default dashboard content
       },
       {
         path: 'teacher',
