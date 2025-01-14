@@ -40,7 +40,7 @@ export default function LiveClassRoom() {
     console.log("token is " + tokenvalue);
     console.log('Initializing socket...');
     socketService.initializeSocket(tokenvalue, fromUUID);
-
+   
     socketService.on('connect', () => {
       socketService.emit('join', { roomId: roomID });
       socketService.emit('join:session', { token: roomID });
@@ -154,15 +154,18 @@ export default function LiveClassRoom() {
                   const controlIcons = document.createElement('div');
                   controlIcons.className = 'controls';
         
-                  const micIcon = document.createElement('button');
-                  micIcon.className = 'mic-icon'; // Add styles to show mic icon
-                  controlIcons.appendChild(micIcon);
+                 
         
                   const cameraIcon = document.createElement('button');
+                  cameraIcon.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" height="24" viewBox="0 0 24 24" width="24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`;
                   cameraIcon.className = 'camera-icon'; // Add styles to show camera icon
+                 cameraIcon.style.cursor = 'pointer';
+              //   cameraIcon.onclick = () => toggleUserMic(user.userID);
                   controlIcons.appendChild(cameraIcon);
-        
+           
                   remoteDiv.appendChild(controlIcons);
+        
+               
         
                   console.log(`User stream added with ID: ${stream.streamID}`);
                 }
@@ -455,6 +458,23 @@ export default function LiveClassRoom() {
             <Typography>Start sharing your screen</Typography>
           </Box>
         )}
+
+<Box
+    id="remoteStreams"
+    className="stream-cards-container"
+    sx={{
+      position: 'absolute', // Position relative to the parent container
+      bottom: 20, // Slight margin from the bottom
+      left: '50%', // Center horizontally
+      transform: 'translateX(-50%)', // Adjust for perfect centering
+      display: 'flex',
+      flexWrap: 'nowrap', // Ensure streams are in a single row
+      gap: 10, // Add some spacing between streams
+      padding: 2,
+    //  backgroundColor: 'rgba(0, 0, 0, 0.5)', // Optional: semi-transparent background
+      borderRadius: 4, // Optional: rounded corners
+    }}
+  ></Box>
       </Box>
   
       {/* Right Panel */}
@@ -472,22 +492,7 @@ export default function LiveClassRoom() {
           
           }}
         ></video>
-       <Box
-    id="remoteStreams"
-    className="stream-cards-container"
-    sx={{
-      position: 'absolute', // Position relative to the parent container
-      bottom: 20, // Slight margin from the bottom
-      left: '50%', // Center horizontally
-      transform: 'translateX(-50%)', // Adjust for perfect centering
-      display: 'flex',
-      flexWrap: 'nowrap', // Ensure streams are in a single row
-      gap: 10, // Add some spacing between streams
-      padding: 2,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Optional: semi-transparent background
-      borderRadius: 4, // Optional: rounded corners
-    }}
-  ></Box>
+      
   
         {isUserListVisible ? (
           <Paper

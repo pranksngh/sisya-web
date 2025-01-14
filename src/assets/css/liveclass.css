@@ -6,7 +6,7 @@
     align-items: flex-end; /* Aligns items to the bottom */
     gap: 10px; /* Spacing between cards */
     padding: 10px; /* Padding inside the container */
-    background-color: rgba(0, 0, 0, 0.5); /* Optional: semi-transparent background */
+     /* Optional: semi-transparent background */
     border-radius: 8px; /* Optional: rounded corners */
     position: absolute; /* Allows positioning relative to parent */
     bottom: 20px; /* Positions container near the bottom */
