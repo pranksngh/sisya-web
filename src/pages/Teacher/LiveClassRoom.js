@@ -7,7 +7,7 @@ import { Box, Button, IconButton, Paper, TextField, Typography } from '@mui/mate
 import { Campaign, DesktopWindows, ExitToApp, Group, MailOutline, Mic, MicOff, Send, Videocam, VideocamOff } from '@mui/icons-material';
 import { getUser } from '../../Functions/Login';
 import socketService from '../../Sockets/socketConfig';
-
+import '../../assets/css/liveclass.css';
 export default function LiveClassRoom() {
   const userInfo = getUser();
   const location = useLocation();
@@ -432,15 +432,22 @@ export default function LiveClassRoom() {
     >
       {/* Left Panel */}
       <Box
-        className="left-panel"
-        sx={{ flex: 5, display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#e0e0e0' }}
-      >
+  className="left-panel"
+  sx={{
+    flex: 5,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#e0e0e0',
+    position: 'relative', // Set the container to relative
+  }}
+>
         <video
           className={`screen-video`}
           autoPlay
           muted
           id="screenVideo"
-          style={{ display: isScreenShared ? 'block' : 'none', width: '100%' }}
+          style={{ display: isScreenShared ? 'block' : 'none', width: '100%',  height:'100%',objectFit:'fill' }}
         ></video>
         {!isScreenShared && (
           <Box className="no-screen-share" sx={{ textAlign: 'center', color: '#757575' }}>
@@ -457,22 +464,41 @@ export default function LiveClassRoom() {
           autoPlay
           muted
           id="hostVideo"
-          style={{ display: isCameraEnabled ? 'block' : 'none', width: '100%' }}
+          style={{
+            display: isCameraEnabled ? 'block' : 'none',
+            width: '100%',
+            height: '300px', // Fixed height for the host video
+            objectFit: 'cover', // Ensures the video scales properly within the fixed height
+          
+          }}
         ></video>
-        <Box
-          id="remoteStreams"
-          className="stream-cards-container"
-          sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, marginTop: 2 }}
-        ></Box>
+       <Box
+    id="remoteStreams"
+    className="stream-cards-container"
+    sx={{
+      position: 'absolute', // Position relative to the parent container
+      bottom: 20, // Slight margin from the bottom
+      left: '50%', // Center horizontally
+      transform: 'translateX(-50%)', // Adjust for perfect centering
+      display: 'flex',
+      flexWrap: 'nowrap', // Ensure streams are in a single row
+      gap: 10, // Add some spacing between streams
+      padding: 2,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Optional: semi-transparent background
+      borderRadius: 4, // Optional: rounded corners
+    }}
+  ></Box>
   
         {isUserListVisible ? (
           <Paper
             className="user-list"
             sx={{
-              padding: 2,
+            
+              display: 'flex',
+              flexDirection: 'column',
               marginTop: 2,
-              height: '300px', // Fixed height
-              overflowY: 'auto', // Scrollable content
+              height: '280px', // Fixed height
+              overflow:'auto'
             }}
           >
             {userList.map((user, index) => (
@@ -488,10 +514,12 @@ export default function LiveClassRoom() {
           <Paper
             className="speak-request-list"
             sx={{
-              padding: 2,
+            
+              display: 'flex',
+              flexDirection: 'column',
               marginTop: 2,
-              height: '300px', // Fixed height
-              overflowY: 'auto', // Scrollable content
+              height: '280px', // Fixed height
+              overflow:'auto'
             }}
           >
             {speakRequests.map((request, index) => (
@@ -523,17 +551,17 @@ export default function LiveClassRoom() {
           <Paper
             className="chat-section"
             sx={{
-              flex: 1,
+            
               display: 'flex',
               flexDirection: 'column',
               marginTop: 2,
-              height: '200px', // Fixed height
+              height: '280px', // Fixed height
             }}
           >
             <Box
               className="messages"
               sx={{
-                flex: 1,
+                flex:1,
                 overflowY: 'auto', // Scrollable content
                 padding: 2,
               }}

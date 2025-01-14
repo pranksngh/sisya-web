@@ -74,49 +74,50 @@ const AddCourse = () => {
         }
         break;
   
-      case 1:
-        // Validate Step 1 (Course Information)
-        if (!courseInfo.name.trim()) {
-          setValidationError("Course name is required.");
-          return;
-        }
-        if (!courseInfo.description.trim()) {
-          setValidationError("Course description is required.");
-          return;
-        }
-        if (!courseInfo.currentPrice || courseInfo.currentPrice <= 0) {
-          setValidationError("Please provide a valid current price.");
-          return;
-        }
-        if (!courseInfo.price || courseInfo.price <= 0) {
-          setValidationError("Please provide a valid MRP.");
-          return;
-        }
-        if (!courseInfo.courseType) {
-          setValidationError("Please select a course type.");
-          return;
-        }
-        if (!courseInfo.duration || courseInfo.duration <= 0) {
-          setValidationError("Please provide a valid course duration.");
-          return;
-        }
-        if (!courseInfo.grade) {
-          setValidationError("Please select a grade.");
-          return;
-        }
-        if (!courseInfo.startDate) {
-          setValidationError("Please select a start date.");
-          return;
-        }
-        if (!courseInfo.endDate) {
-          setValidationError("Please select an end date.");
-          return;
-        }
-        if (new Date(courseInfo.startDate) > new Date(courseInfo.endDate)) {
-          setValidationError("Start date cannot be later than end date.");
-          return;
-        }
-        break;
+        case 1:
+          // Validate Step 1 (Course Information)
+          if (!courseInfo.name.trim()) {
+            setValidationError("Course name is required.");
+            return;
+          }
+          if (!courseInfo.description.trim()) {
+            setValidationError("Course description is required.");
+            return;
+          }
+          if (courseInfo.courseType !== "free" && (!courseInfo.currentPrice || courseInfo.currentPrice <= 0)) {
+            setValidationError("Please provide a valid current price.");
+            return;
+          }
+          if (courseInfo.courseType !== "free" && (!courseInfo.price || courseInfo.price <= 0)) {
+            setValidationError("Please provide a valid MRP.");
+            return;
+          }
+          if (!courseInfo.courseType) {
+            setValidationError("Please select a course type.");
+            return;
+          }
+          if (!courseInfo.duration || courseInfo.duration <= 0) {
+            setValidationError("Please provide a valid course duration.");
+            return;
+          }
+          if (!courseInfo.grade) {
+            setValidationError("Please select a grade.");
+            return;
+          }
+          if (!courseInfo.startDate) {
+            setValidationError("Please select a start date.");
+            return;
+          }
+          if (!courseInfo.endDate) {
+            setValidationError("Please select an end date.");
+            return;
+          }
+          if (new Date(courseInfo.startDate) > new Date(courseInfo.endDate)) {
+            setValidationError("Start date cannot be later than end date.");
+            return;
+          }
+          break;
+        
   
       case 2:
         // Validate Step 2 (Subjects)

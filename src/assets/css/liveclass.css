@@ -1,0 +1,73 @@
+/* Container for remote streams */
+#remoteStreams {
+    display: flex;
+    flex-wrap: nowrap; /* Ensures streams are aligned in a single row */
+    justify-content: center; /* Centers the row horizontally */
+    align-items: flex-end; /* Aligns items to the bottom */
+    gap: 10px; /* Spacing between cards */
+    padding: 10px; /* Padding inside the container */
+    background-color: rgba(0, 0, 0, 0.5); /* Optional: semi-transparent background */
+    border-radius: 8px; /* Optional: rounded corners */
+    position: absolute; /* Allows positioning relative to parent */
+    bottom: 20px; /* Positions container near the bottom */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjusts position for centering */
+    overflow-x: auto; /* Enables horizontal scrolling if content exceeds width */
+    max-width: 100%; /* Prevents overflow beyond parent container */
+  }
+  
+  /* Style for individual user cards */
+  .user-card {
+    display: flex;
+    flex-direction: column; /* Aligns content vertically */
+    align-items: center; /* Centers content horizontally */
+    width: 120px; /* Fixed width for consistency */
+    height: 150px; /* Fixed height */
+    background-color: #fff; /* Card background color */
+    border-radius: 8px; /* Rounded corners for the card */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    overflow: hidden; /* Ensures no content overflows the card */
+    position: relative; /* For positioning child elements */
+  }
+  
+  /* Style for the video element */
+  .user-card video {
+    width: 100%; /* Occupies full width of the card */
+    height: 100%; /* Occupies full height */
+    object-fit: cover; /* Ensures the video scales properly */
+    border-bottom: 1px solid #ddd; /* Optional: separator line between video and controls */
+  }
+  
+  /* Control icons container */
+  .user-card .controls {
+    display: flex;
+    justify-content: space-around; /* Space out controls evenly */
+    align-items: center; /* Align icons in the center */
+    padding: 5px; /* Padding for better spacing */
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background for contrast */
+    position: absolute; /* Position above the video */
+    bottom: 0; /* Aligns to the bottom of the card */
+    width: 100%; /* Matches the width of the card */
+  }
+  
+  /* Style for mic and camera icons */
+  .user-card .controls .mic-icon,
+  .user-card .controls .camera-icon {
+    width: 30px; /* Fixed width */
+    height: 30px; /* Fixed height */
+    background-color: #fff; /* Icon background */
+    border: none; /* Removes default button border */
+    border-radius: 50%; /* Circular icons */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer; /* Pointer cursor on hover */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  }
+  
+  /* Optional: Add hover effects for controls */
+  .user-card .controls .mic-icon:hover,
+  .user-card .controls .camera-icon:hover {
+    background-color: #e0e0e0; /* Slightly lighter background on hover */
+  }
+  
