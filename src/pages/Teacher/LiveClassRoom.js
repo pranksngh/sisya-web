@@ -3,7 +3,7 @@ import { ZegoExpressEngine } from "zego-express-engine-webrtc";
 import { FaMicrophoneSlash, FaMicrophone, FaVideo, FaVideoSlash, FaUsers, FaSignOutAlt, FaPaperPlane, FaDesktop, FaBullhorn, FaEnvelope } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { Box, Button, IconButton, Paper, TextField, Typography } from '@mui/material';
+import { Badge, Box, Button, IconButton, Paper, TextField, Typography } from '@mui/material';
 import { Campaign, DesktopWindows, ExitToApp, Group, MailOutline, Mic, MicOff, Send, Videocam, VideocamOff } from '@mui/icons-material';
 import { getUser } from '../../Functions/Login';
 import socketService from '../../Sockets/socketConfig';
@@ -619,8 +619,10 @@ export default function LiveClassRoom() {
         <DesktopWindows />
       </IconButton>
       <IconButton color="default" onClick={toggleUserList}>
+      <Badge badgeContent={userList.length} color="primary">
         <Group />
-      </IconButton>
+      </Badge>
+    </IconButton>
       <IconButton color="default" onClick={toggleSpeakRequestList}>
         <Campaign />
       </IconButton>
