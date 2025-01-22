@@ -92,12 +92,12 @@ function CourseData() {
       });
       const updateboardResult = await updateboardResponse.json();
 
-      if (updateboardResult.sucess) {
+      if (updateboardResult.success) {
         fetchCourses();
         handleDeleteModalClose();
-        console.log("Boards Deleted successfully");
+      //  console.log("Boards Deleted successfully");
       } else {
-        console.error("Failed to update boards");
+        alert("Failed to Update Course");
       }
     } catch (error) {
       console.error("Error updating boards:", error);

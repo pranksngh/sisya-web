@@ -67,12 +67,25 @@ const EnrolledCoursesData = () => {
   const renderTableData = () => {
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    return filteredData.slice(indexOfFirstItem, indexOfLastItem).map((item) => (
-      <TableRow key={item.id} sx={{ '&:hover': { backgroundColor: '#f5f5f5' } }}>
+    return filteredData.slice(indexOfFirstItem, indexOfLastItem).map((item) => {
+      const now = new Date();
+    const startDate = new Date(item.startDate);
+      return (
+      <TableRow key={item.id} sx={{ 
+        '&:hover': { backgroundColor: '#f5f5f5' },
+        ...(now < startDate ? { backgroundColor: '#ffcccb' } : {}) 
+      }}>
         <TableCell>{item.id}</TableCell>
         <TableCell>{item.isLongTerm ? "Long Term" : "Short Term"}</TableCell>
         <TableCell>
-          <a href="#" onClick={() => handleViewCourseDetails(item.id)} style={{ textDecoration: 'none', color: '#1976d2', fontWeight: 'bold' }}>
+          <a href="#" onClick={() => {
+            
+            if (now < startDate) {
+              alert('You cannot enroll before the course starts.');
+            } else {
+              handleViewCourseDetails(item.id);
+            }
+          }} style={{ textDecoration: 'none', color: '#1976d2', fontWeight: 'bold' }}>
             {item.name}
           </a>
         </TableCell>
@@ -86,7 +99,8 @@ const EnrolledCoursesData = () => {
           </span>
         </TableCell>
       </TableRow>
-    ));
+    )
+  });
   };
 
   return (

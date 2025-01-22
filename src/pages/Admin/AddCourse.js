@@ -17,6 +17,10 @@ import {
   CardContent,
   duration,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 const defaultUserImage = "https://via.placeholder.com/100?text=User";
@@ -25,7 +29,8 @@ const AddCourse = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const steps = ["Course Banner", "Course Info", "Subjects", "Teachers"];
-
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
   // Step 1 States
   const [banner, setBanner] = useState(null);
   const [mainImage, setMainImage] = useState(null);
@@ -372,19 +377,26 @@ const AddCourse = () => {
       if (result.success) {
          console.log("Course Added Successfully");
        //  alert("Course Added Successfully");
-       navigate('../courses');
+       setSuccessModalOpen(true);
       } else {
         console.log("Course Addition Failed");
-        alert(JSON.stringify(result.error));
+        setErrorModalOpen(true);
       }
     } catch (error) {
-      console.error("Error adding course:", error);
-      alert("Course Addition Error", error);
+      console.log("Error adding course:", error);
+      setErrorModalOpen(true);
     }
 
    // setResultModalOpen(true); // Open the result modal
   };
   
+  const closeSuccessModal = () => {
+    setSuccessModalOpen(false);
+  };
+
+  const closeErrorModal = () => {
+    setErrorModalOpen(false);
+  };
 
 
   const renderStepContent = (step) => {
@@ -431,7 +443,8 @@ const AddCourse = () => {
                   ) : (
                     <>
                       <Typography variant="body1" style={{ color: "#888" }}>
-                        Click to upload a banner
+                        Click to upload a banner <br /> Dimensions : 1024 x 500 px<br/>
+                        Banner Picture will be used on detail page
                       </Typography>
                       <input
                         accept="image/*"
@@ -486,7 +499,8 @@ const AddCourse = () => {
                   ) : (
                     <>
                       <Typography variant="body1" style={{ color: "#888" }}>
-                        Click to upload a main image
+                        Click to upload a main image<br /> Dimensions : 1024 x 1024 px<br/>
+                        Main picture will be shown on the front page of dashboard
                       </Typography>
                       <input
                         accept="image/*"
@@ -730,6 +744,52 @@ const AddCourse = () => {
         >
           {activeStep === steps.length - 1 ? "Finish" : "Next"}
         </Button>
+
+         {/* Success Modal */}
+      <Dialog open={successModalOpen} onClose={closeSuccessModal}>
+        <DialogTitle>
+          <Typography variant="h5" color="green">
+            Course Added Successfully
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            The course details have been added successfully.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={()=>navigate('../courses')}
+            variant="contained"
+            color="primary"
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Error Modal */}
+      <Dialog open={errorModalOpen} onClose={closeErrorModal}>
+        <DialogTitle>
+          <Typography variant="h5" color="red">
+            Course Addition Failed
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            There was an error adding the course. Please try again later.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={closeErrorModal}
+            variant="contained"
+            color="secondary"
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
       </div>
     </div>
   );

@@ -17,23 +17,30 @@ import {
   CardContent,
   duration,
   Alert,
+  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 const defaultUserImage = "https://via.placeholder.com/100?text=User";
 
 const EditCourse = () => {
   const [activeStep, setActiveStep] = useState(0);
   const steps = ["Course Banner", "Course Info", "Subjects", "Teachers"];
-
+   const navigate = useNavigate();
   const location = useLocation();
   const courseData = location.state?.course || {};
  // console.log("Edit Course Data", JSON.stringify(courseData));
   // Step 1 States
-  const [banner, setBanner] = useState(null);
-  const [mainImage, setMainImage] = useState(null);
-
+  const [banner, setBanner] = useState(`https://sisyabackend.in/student/thumbs/courses/${courseData.id}.jpg`);
+  const [mainImage, setMainImage] = useState(`https://sisyabackend.in/student/thumbs/mcourses/${courseData.id}.jpg`);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
   // Step 2 States
   const [courseInfo, setCourseInfo] = useState({
+    id:courseData.id,
     name: courseData.name,
     description: courseData.description,
     currentPrice: courseData.currentPrice,
@@ -63,45 +70,86 @@ const EditCourse = () => {
   const [validationError, setValidationError] = useState("");
 
 
-  useEffect(()=>{
-     if(courseData.grade){
-    fetchSubjects(parseInt(courseData.grade));
-    fetchTeacherList(courseData.grade);
-     }
-     
-   },[]);
-
-   const fetchSelectedTeachers = (available) =>{
-    if(courseData.mentorList) {
-        courseData.mentorList.forEach((mentor)=>{
-          console.log("my selected mentors are", mentor);
-          const matchingMentor = available.find((m)=>m.id === mentor);
-          if(matchingMentor){
-            selectedTeachers.push(matchingMentor);
-          }
-        })
+  useEffect(() => {
+    if (courseData.grade) {
+      fetchSubjects(parseInt(courseData.grade));
+      fetchTeacherList(courseData.grade);
     }
+  }, [courseData.grade]);
+
+  useEffect(() => {
+    if (availableTeachers.length > 0 && courseData.TeachIntro) {
+      fetchSelectedTeachers();
+    }
+  }, [availableTeachers]); 
+
+  useEffect(() => {
+    // Convert and set Banner image
+    if (banner) {
+      fetchImageAsBase64(banner, setBannerImageData);
+    }
+  
+    // Convert and set Main image
+    if (mainImage) {
+      fetchImageAsBase64(mainImage, setMainImageData);
+    }
+  }, [banner, mainImage]);
+
+  const fetchImageAsBase64 = async (url, setState) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const file = new File([blob], "image.jpg", { type: blob.type });
+  
+      const base64 = await convertToBase64(file);
+      setState(base64);
+    } catch (error) {
+      console.error("Error fetching and converting image:", error);
+    }
+  };
+
+  const closeSuccessModal = () => {
+    setSuccessModalOpen(false);
+  };
+
+  const closeErrorModal = () => {
+    setErrorModalOpen(false);
+  };
+   const fetchSelectedTeachers = () =>{
+    
+    courseData.TeachIntro.forEach((mentor)=>{
+   //   console.log("my selected mentors are", JSON.stringify(mentor));
+      handleSubjectChange(mentor.mentorId, mentor.subjectId);
+     
+     const teacher =  availableTeachers.find((teacher) => teacher.id === mentor.mentorId);
+  //   console.log("selected techer", JSON.stringify(teacher));
+
+     const subjectId = selectedSubjectsForTeachers[teacher.id];
+   
+     const subject = selectedSubjects.find((subject) => subject.id === parseInt(subjectId));
+     const updatedTeacher = { ...teacher, assignedSubject: subject, subjectId:subjectId };   
+  
+    //   const final = { ...updatedTeacher, subjectId: subject.id };
+     setSelectedTeachers([...selectedTeachers, updatedTeacher]);
+     //  selectedTeachers.push(updatedTeacher);
+      
+    
+     
+      
+    });
+    console.log("my teachers", JSON.stringify(courseData.TeachIntro));
    }
 
 
-   const fetchSelectedSubjects = (available)=>{
-         
-        if (courseData.subjectList) {
-         courseData.subjectList.forEach((subject) => {
-             console.log("my selected subject id is ", subject);
-           // Find the matching subject in availableSubjects
-           const matchingSubject = available.find((s) => s.id === subject);
-       
-           // If a match is found, add it to selectedSubjects
-           if (matchingSubject) {
-             selectedSubjects.push(matchingSubject);
-           }
-         });
-
-         console.log("selected subjects list", JSON.stringify(selectedSubjects));
-       
-     }
-   }
+   const fetchSelectedSubjects = (available) => {
+    if (courseData.subjectList) {
+      const selected = courseData.subjectList
+        .map((subjectId) => available.find((s) => s.id === subjectId))
+        .filter(Boolean); // Filter out nulls for non-matching subjects
+      setSelectedSubjects(selected); // Use setState here
+      console.log("Selected subjects list", JSON.stringify(selected));
+    }
+  };
 
   const handleNext = () => {
     // Reset validation error
@@ -123,10 +171,7 @@ const EditCourse = () => {
           setValidationError("Please provide a valid current price.");
           return;
         }
-        if (!courseInfo.price || courseInfo.price <= 0) {
-          setValidationError("Please provide a valid MRP.");
-          return;
-        }
+       
         if (!courseInfo.courseType) {
           setValidationError("Please select a course type.");
           return;
@@ -256,9 +301,10 @@ const EditCourse = () => {
     const subjectId = selectedSubjects.find(subject => subject.id === teacher.assignedSubject.id);
     if (subjectId) {
       const updatedTeacher = { ...teacher, subjectId: subjectId.id };
-      setSelectedTeachers([...selectedTeachers, updatedTeacher]);
-
-      console.log("selected teachers", JSON.stringify(selectedTeachers))
+   setSelectedTeachers([...selectedTeachers, updatedTeacher]);
+     //  selectedTeachers.push(updatedTeacher);
+     console.log("selectd teachers length", JSON.stringify(selectedTeachers.length))
+      console.log("selectd teachers", JSON.stringify(selectedTeachers))
     } else {
       alert("Subject ID not found!");
     }
@@ -266,29 +312,23 @@ const EditCourse = () => {
   };
 
   const fetchSubjects = async (grade) => {
-    console.log(grade);
+    if (!grade) return; // Avoid unnecessary calls
     try {
-      const subjectResponse = await fetch('https://sisyabackend.in/student/get_subjects_by_grade', {
+      const response = await fetch('https://sisyabackend.in/student/get_subjects_by_grade', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ grade: parseInt(grade, 10) })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grade: parseInt(grade, 10) }),
       });
-      const subjectResult = await subjectResponse.json();
-
-      if (subjectResult.success) {
-        setAvailableSubjects(subjectResult.subjects);
+      const result = await response.json();
+      if (result.success) {
+        setAvailableSubjects(result.subjects);
         console.log("Subjects fetched successfully");
-        fetchSelectedSubjects(subjectResult.subjects);
-      } else {
-        console.error("Failed to fetch Subjects", subjectResult.error);
+        fetchSelectedSubjects(result.subjects); // Only once
       }
     } catch (error) {
       console.error("Error fetching Subjects:", error);
     }
   };
-
   const fetchTeacherList = async (selectedGrade) => {
     console.log("selected grade is " , selectedGrade);
     try {
@@ -305,11 +345,14 @@ const EditCourse = () => {
         const filteredMentors = mentorResult.mentors.filter(mentor =>
           mentor.Grades.includes(selectedGrade.toString())
         );
+        
 
         
         setAvailableTeachers(filteredMentors); // Set the filtered mentors in the state
 
-        console.log("Mentors fetched and filtered successfully");
+       
+
+        console.log("Mentors fetched and filtered successfully",);
       } else {
         console.error("Failed to fetch Mentors");
       }
@@ -334,6 +377,7 @@ const EditCourse = () => {
 
 
   const handleAssignSubject = (teacher) => {
+    
     const subjectId = selectedSubjectsForTeachers[teacher.id];
     const subject = selectedSubjects.find(subject => subject.id === parseInt(subjectId));
 
@@ -362,7 +406,7 @@ const EditCourse = () => {
    // e.preventDefault();
 
     const finalData = {
-      id:courseInfo.id,
+       id:courseInfo.id,
       name: courseInfo.name,
       description:courseInfo.description,
       price: parseFloat(courseInfo.price),
@@ -407,19 +451,18 @@ const EditCourse = () => {
 
       if (result.success) {
          console.log("Course Updated Successfully");
-         alert("Course Added Successfully");
+         setSuccessModalOpen(true); 
       } else {
-        console.log("Course Addition Failed");
-        alert(JSON.stringify(result.error));
+        setErrorModalOpen(true);
+       // alert(JSON.stringify(result.error));
       }
     } catch (error) {
-      console.error("Error adding course:", error);
-      alert("Course Addition Error", error);
+      console.log("Error adding course:", error);
+      setErrorModalOpen(true);
     }
 
    // setResultModalOpen(true); // Open the result modal
-  };
-  
+  }; 
 
 
   const renderStepContent = (step) => {
@@ -597,7 +640,7 @@ const EditCourse = () => {
             </FormControl>
             <TextField
             type="number"
-              label="Duration"
+              label="Duration Per Course(MIN)"
               name="duration"
               fullWidth
               margin="normal"
@@ -618,26 +661,26 @@ const EditCourse = () => {
           ))}
         </Select>
       </FormControl>
-            <TextField
-              label="Start Date"
-              name="startDate"
-              type="date"
-              fullWidth
-              margin="normal"
-              InputLabelProps={{ shrink: true }}
-              value={courseInfo.startDate}
-              onChange={handleCourseInfoChange}
-            />
-            <TextField
-              label="End Date"
-              name="endDate"
-              type="date"
-              fullWidth
-              margin="normal"
-              InputLabelProps={{ shrink: true }}
-              value={courseInfo.endDate}
-              onChange={handleCourseInfoChange}
-            />
+      <Box display="flex" gap={2} marginY={2}>
+        <TextField
+          label="Start Date"
+          name="startDate"
+          type="date"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+          value={courseInfo.startDate}
+          onChange={handleCourseInfoChange}
+        />
+        <TextField
+          label="End Date"
+          name="endDate"
+          type="date"
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+          value={courseInfo.endDate}
+          onChange={handleCourseInfoChange}
+        />
+      </Box>
           </div>
         );
       case 2:
@@ -765,6 +808,51 @@ const EditCourse = () => {
         >
           {activeStep === steps.length - 1 ? "Finish" : "Next"}
         </Button>
+         {/* Success Modal */}
+      <Dialog open={successModalOpen} onClose={closeSuccessModal}>
+        <DialogTitle>
+          <Typography variant="h5" color="green">
+            Course Updated Successfully
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            The course details have been updated successfully.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={()=>navigate('../courses')}
+            variant="contained"
+            color="primary"
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Error Modal */}
+      <Dialog open={errorModalOpen} onClose={closeErrorModal}>
+        <DialogTitle>
+          <Typography variant="h5" color="red">
+            Course Updation Failed
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            There was an error updating the course. Please try again later.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={closeErrorModal}
+            variant="contained"
+            color="secondary"
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
       </div>
     </div>
   );

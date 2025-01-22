@@ -23,12 +23,12 @@ const DeleteBoardDialog = ({ open, handleClose, handleDelete, boardInfo }) => {
       }}
     >
       <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.5rem', textAlign: 'center' }}>
-      {boardInfo.isActive ? "Deactivate":"Activate"} Board
+      {boardInfo.isActive ? "Deactivate":"Activate"} Course
       </DialogTitle>
 
       <DialogContent>
         <DialogContentText sx={{ textAlign: 'center', fontSize: '1rem', color: 'text.secondary' }}>
-          Are you sure you want to {boardInfo.isActive ? "Deactivate":"Activate"} the board <strong>{boardInfo.name}</strong>? This action cannot
+          Are you sure you want to {boardInfo.isActive ? "Deactivate":"Activate"} the course <strong>{boardInfo.name}</strong>? This action cannot
           be undone.
         </DialogContentText>
       </DialogContent>
