@@ -407,28 +407,28 @@ const EditCourse = () => {
 
     const finalData = {
        id:courseInfo.id,
-      name: courseInfo.name,
-      description:courseInfo.description,
-      price: parseFloat(courseInfo.price),
-      currentPrice:parseFloat(courseInfo.currentPrice),
-      startDate: courseInfo.startDate,
-      endDate:courseInfo.endDate,
-      duration: parseInt(courseInfo.duration),
-      grade: courseInfo.grade.toString(),
-      searchTags: selectedSubjects.map(subject => subject.name.toLowerCase()),
-      prerequisites: [],
-      syllabus: [],
-      category: "Not Available",
-      level: "Advanced",
-      isLongTerm: courseInfo.courseType === "long" ? true : false,
-      isFree: courseInfo.courseType === "free" ? true : false,
-      averageRating: 4.8,
-      thumbnailUrl: "http://example.com/thumbnail.jpg",
-      language: "English",
-      subjectList: selectedSubjects.map(subject => subject.id),
-      mentorList: selectedTeachers.map(teacher => teacher.id),
-      mainImageData: MainImageData,
-      imageData:BannerImageData,
+      // name: courseInfo.name,
+      // description:courseInfo.description,
+      // price: parseFloat(courseInfo.price),
+      // currentPrice:parseFloat(courseInfo.currentPrice),
+      // startDate: courseInfo.startDate,
+      // endDate:courseInfo.endDate,
+      // duration: parseInt(courseInfo.duration),
+      // grade: courseInfo.grade.toString(),
+      // searchTags: selectedSubjects.map(subject => subject.name.toLowerCase()),
+      // prerequisites: [],
+      // syllabus: [],
+      // category: "Not Available",
+      // level: "Advanced",
+      // isLongTerm: courseInfo.courseType === "long" ? true : false,
+      // isFree: courseInfo.courseType === "free" ? true : false,
+      // averageRating: 4.8,
+      // thumbnailUrl: "http://example.com/thumbnail.jpg",
+      // language: "English",
+      // subjectList: selectedSubjects.map(subject => subject.id),
+      // mentorList: selectedTeachers.map(teacher => teacher.id),
+      // mainImageData: MainImageData,
+      // imageData:BannerImageData,
       TeachIntroData: selectedTeachers.map(teacher => ({
         comment: "Not Available",
         mentorId: teacher.id,
@@ -438,28 +438,28 @@ const EditCourse = () => {
 
     console.log(JSON.stringify(finalData));
   
-    try {
-      const response = await fetch('https://sisyabackend.in/rkadmin/update_course', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(finalData)
-      });
+    // try {
+    //   const response = await fetch('https://sisyabackend.in/rkadmin/update_course', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify(finalData)
+    //   });
 
-      const result = await response.json();
+    //   const result = await response.json();
 
-      if (result.success) {
-         console.log("Course Updated Successfully");
-         setSuccessModalOpen(true); 
-      } else {
-        setErrorModalOpen(true);
-       // alert(JSON.stringify(result.error));
-      }
-    } catch (error) {
-      console.log("Error adding course:", error);
-      setErrorModalOpen(true);
-    }
+    //   if (result.success) {
+    //      console.log("Course Updated Successfully");
+    //      setSuccessModalOpen(true); 
+    //   } else {
+    //     setErrorModalOpen(true);
+    //    // alert(JSON.stringify(result.error));
+    //   }
+    // } catch (error) {
+    //   console.log("Error adding course:", error);
+    //   setErrorModalOpen(true);
+    // }
 
    // setResultModalOpen(true); // Open the result modal
   }; 
