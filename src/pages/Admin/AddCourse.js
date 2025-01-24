@@ -330,7 +330,15 @@ const AddCourse = () => {
 
   const handleSubmit = async (e) => {
    // e.preventDefault();
-
+   if (!selectedTeachers || selectedTeachers.length === 0) {
+    alert("Kindly select at least one teacher to proceed.");
+    return; // Stop further execution
+  }
+  if (!selectedSubjects || selectedSubjects.length === 0) {
+    alert("Kindly select at least one subject to proceed.");
+    return; // Stop further execution
+  }
+  
     const finalData = {
       name: courseInfo.name,
       description:courseInfo.description,
