@@ -12,6 +12,10 @@ import {
   Avatar,
   IconButton,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -22,13 +26,15 @@ const EditTeacher = () => {
   const [activeStep, setActiveStep] = useState(0);
   const location = useLocation();
   const teacherData = location.state?.teacher || {};
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: teacherData.name,
     email: teacherData.email,
     phone: teacherData.phone,
     profilePicture: teacherData.imageData,
     classes: teacherData.Grades,
-    qualification: "",
+    qualifications: teacherData.qualifications,
     selectedSubjects: teacherData.subjectRecord.map((record, index) => ({
       id: record.id, // Unique ID based on the current list length (index starts from 0)
       class: record.subject.gradeLevel, // Assuming `gradeLevel` corresponds to `class`
@@ -108,13 +114,15 @@ const EditTeacher = () => {
   
         const result = await response.json();
         if (result.success) {
-          navigate('../teachers');
+          setSuccessModalOpen(true);
         } else {
-          alert("Teacher addition failed", result.error);
+      //   alert("Teacher addition failed", result.error);
+      setErrorModalOpen(true);
         }
       } catch (error) {
         console.log("Error adding teacher:", error);
-        alert("An error occurred while adding the teacher.");
+      //  alert("An error occurred while adding the teacher.");
+      setErrorModalOpen(true);
       }
   
     console.log("Form Data Submitted:", payload);
@@ -143,6 +151,14 @@ const EditTeacher = () => {
     } catch (error) {
       console.log("Error fetching Subjects:", error);
     }
+  };
+
+  const closeSuccessModal = () => {
+    setSuccessModalOpen(false);
+  };
+
+  const closeErrorModal = () => {
+    setErrorModalOpen(false);
   };
 
   const renderStepContent = (step) => {
@@ -349,7 +365,10 @@ const EditTeacher = () => {
           
                 <Stack spacing={2}>
                   {/* Displaying the added qualifications */}
-                  {(formData.qualifications || []).map((qual, index) => (
+                  {(formData.qualifications || []).map((qual, index) => {
+                    const date = new Date(qual.year);
+                    const year = date.getFullYear();
+                    return (
                     <Paper
                       key={index}
                       elevation={0}
@@ -366,7 +385,7 @@ const EditTeacher = () => {
                           {qual.name}
                         </Typography>
                         <Typography variant="body2">
-                          {qual.institution} ({qual.year}) - Level: {qual.level}
+                          {qual.institution} ({year})
                         </Typography>
                       </Box>
                       {/* Delete Button for qualifications */}
@@ -385,7 +404,9 @@ const EditTeacher = () => {
                         Delete
                       </Button>
                     </Paper>
-                  ))}
+                  )
+                
+    })}
                 </Stack>
               </Box>
             );
@@ -581,7 +602,53 @@ const EditTeacher = () => {
           </Button>
         )}
       </Box>
+      <Dialog open={successModalOpen} onClose={closeSuccessModal}>
+        <DialogTitle>
+          <Typography variant="h5" color="green">
+           Teacher Updated Successfully
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            Teacher detail have been updated successfully.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={()=>navigate('../teachers')}
+            variant="contained"
+            color="primary"
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Error Modal */}
+      <Dialog open={errorModalOpen} onClose={closeErrorModal}>
+        <DialogTitle>
+          <Typography variant="h5" color="red">
+           Teacher Update Failed
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            Please try again later.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={closeErrorModal}
+            variant="contained"
+            color="secondary"
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
+
+    
   );
 };
 

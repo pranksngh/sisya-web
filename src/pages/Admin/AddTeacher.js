@@ -12,6 +12,10 @@ import {
   Avatar,
   IconButton,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
 } from "@mui/material";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { useNavigate } from "react-router-dom";
@@ -26,11 +30,12 @@ const AddTeacher = () => {
     phone: "",
     profilePicture: null,
     classes: [],
-    qualification: "",
+    qualifications: [],
     subjects: [],
   });
   const [subjectOptions, setSubjectOptions] = useState([]);
-
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
   const handleNext = () => setActiveStep((prev) => prev + 1);
   const handleBack = () => setActiveStep((prev) => prev - 1);
   const navigate = useNavigate();
@@ -95,13 +100,15 @@ const AddTeacher = () => {
   
         const result = await response.json();
         if (result.success) {
-          navigate('../teachers');
+          setSuccessModalOpen(true);
         } else {
-          alert("Teacher addition failed", result.error);
+         // alert("Teacher addition failed", result.error);
+         setErrorModalOpen(true);
         }
       } catch (error) {
-        console.error("Error adding teacher:", error);
-        alert("An error occurred while adding the teacher.");
+        console.log("Error adding teacher:", error);
+     //   alert("An error occurred while adding the teacher.");
+     setErrorModalOpen(true);
       }
   
     console.log("Form Data Submitted:", payload);
@@ -131,7 +138,13 @@ const AddTeacher = () => {
       console.log("Error fetching Subjects:", error);
     }
   };
+  const closeSuccessModal = () => {
+    setSuccessModalOpen(false);
+  };
 
+  const closeErrorModal = () => {
+    setErrorModalOpen(false);
+  };
   const renderStepContent = (step) => {
     switch (step) {
         case 0:
@@ -567,6 +580,50 @@ const AddTeacher = () => {
           </Button>
         )}
       </Box>
+      <Dialog open={successModalOpen} onClose={closeSuccessModal}>
+        <DialogTitle>
+          <Typography variant="h5" color="green">
+           Teacher Added Successfully
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            Teacher detail have been added successfully.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={()=>navigate('../teachers')}
+            variant="contained"
+            color="primary"
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Error Modal */}
+      <Dialog open={errorModalOpen} onClose={closeErrorModal}>
+        <DialogTitle>
+          <Typography variant="h5" color="red">
+           Teacher Addition Failed
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            Please try again later.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={closeErrorModal}
+            variant="contained"
+            color="secondary"
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   );
 };
