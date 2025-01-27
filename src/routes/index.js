@@ -46,6 +46,7 @@ import MentorLeaves from '../pages/HR/MentorLeaves';
 import MentorLeaveRequest from '../pages/Mentor/MentorLeaveRequest';
 import TeacherLeaves from '../pages/HR/TeacherLeaves';
 import LiveClassRoom from '../pages/Teacher/LiveClassRoom';
+import VideoCallPage from '../pages/Teacher/videocall';
 
 const router = createBrowserRouter([
   {
@@ -57,6 +58,15 @@ const router = createBrowserRouter([
     element: React.createElement(
      
       LiveClassRoom
+    ),
+  },
+
+  {
+    path: '/videocall',
+    element: React.createElement(
+      ProtectedRoute,
+      { allowedRoles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.MENTOR, ROLES.HR] },
+      React.createElement(VideoCallPage)
     ),
   },
   {
@@ -346,6 +356,7 @@ const router = createBrowserRouter([
           MentorLeaveRequest
         ),
       },
+      
       
     ],
   },

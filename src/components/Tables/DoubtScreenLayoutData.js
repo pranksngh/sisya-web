@@ -20,6 +20,7 @@ import {
 } from '@mui/icons-material';
 import { getUser } from '../../Functions/Login';
 import socketService from '../../Sockets/socketConfig';
+import { useNavigate } from 'react-router-dom';
 
 
 const DoubtScreenLayoutData = () => {
@@ -37,6 +38,7 @@ const DoubtScreenLayoutData = () => {
   const [doubtList, setDoubtList] = useState([]);
   const [doubtStatus, setDoubtStatus] = useState(null);
   const lastMessageRef = useRef(null);
+  const navigate = useNavigate();
 
   const fetchDoubtList = async () => {
     fetch('https://sisyabackend.in/teacher/get_assigned_doubts_list', {
@@ -159,7 +161,7 @@ const DoubtScreenLayoutData = () => {
     setDoubtStatus(doubt.status);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (message.trim()) {
       const newMessage = {
         type: `doubt-${doubtid}`,
@@ -172,6 +174,54 @@ const DoubtScreenLayoutData = () => {
       socketService.emit('send_message', newMessage);
       handleNewMessage(newMessage);
       setMessage('');
+      if (messages.filter(msg => msg.fromUUID === fromUUID).length === 0) {
+        try {
+          const response = await fetch('https://sisyabackend.in/teacher/update_doubt', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: doubtid,
+              status: 1,
+            }),
+          });
+
+          const result = await response.json();
+          if (result.success) {
+            console.log('Doubt status updated successfully');
+
+            const notificationResponse = await fetch('https://sisyabackend.in/rkadmin/send_notif2', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                notification: {
+                  title: "You Doubt Status is Changed, Teacher Responded",
+                  body: "Your doubt has been marked as 'In Progress'."
+                },
+                data: {
+                  type: "general",
+                 
+                },
+                tokens: [dobutinfo.asker.deviceId],  // From doubt.asker.deviceId
+              })
+            });
+  
+            const notificationResult = await notificationResponse.json();
+            if (notificationResult.success) {
+              console.log("Notification sent successfully");
+            } else {
+              console.error("Failed to send notification:", notificationResult.message);
+            }
+          } else {
+            console.error('Failed to update doubt status:', result.message);
+          }
+        } catch (error) {
+          console.error('Error updating doubt status:', error);
+        }
+      }
     }
   };
 
@@ -202,6 +252,52 @@ const DoubtScreenLayoutData = () => {
       return <p>{message.content}</p>;
     }
   };
+
+
+  const initiateCall = async (userData)=>{
+    try {
+
+      // const data = {
+      //   notification:{
+      //     title: `${user.mentor.name} is calling` ,
+      //     body: "Doubt Call",
+      //   },
+      //   data:{
+      //    type: 'video_call',
+      //    callerName: user.mentor.name
+      //   },
+        
+      //   // imageData: imageFile
+      //   //   ? {
+      //   //       name: imageFile.name,
+      //   //       content: base64Image,
+      //   //     }
+      //   //   : null,
+      //   tokens: [userData.deviceId],
+      // };
+      // const response = await   fetch('https://sisyabackend.in/rkadmin/send_notif2', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(data),
+      // });
+
+      // const result = await response.json();
+      //  if(result.success){
+
+        navigate("/videocall",{
+          state: {
+              userData,
+              
+          }
+      });
+      //  }
+    
+    } catch (error) {
+      console.log('JSON Stringify Eror:', error);
+    }
+  }
 
   return (
     <Box display="flex" height="90vh">
@@ -255,19 +351,31 @@ const DoubtScreenLayoutData = () => {
       <Box flex={1} display="flex" flexDirection="column" border={1} borderColor="#eee">
         {selectedUser ? (
           <Box p={2} borderBottom={1} borderColor="divider">
-            <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Box display="flex" alignItems="center" justifyContent="flex-start" flex={0.5}>
               <Box display="flex" alignItems="center">
                 <Avatar src="https://via.placeholder.com/150" />
                 <Typography variant="h6" ml={2}>
                   {selectedUser.name}
                 </Typography>
               </Box>
-
+              <Box display="flex" justifyContent="flex-end" flex={1}>
+             
+                    <IconButton onClick={()=>initiateCall(selectedUser)}><VideoIcon /></IconButton>
+                    <IconButton onClick={()=>initiateCall(selectedUser)}><PhoneIcon /></IconButton>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => console.log('End Doubt')}
+                    >
+                      End Doubt
+                    </Button>
+                 
+              </Box>
               <Box>
                 {doubtStatus === 1 && (
                   <>
-                    <IconButton><VideoIcon /></IconButton>
-                    <IconButton><PhoneIcon /></IconButton>
+                    <IconButton onClick={()=>initiateCall(selectedUser)} ><VideoIcon /></IconButton>
+                    <IconButton onClick={()=>initiateCall(selectedUser)} ><PhoneIcon /></IconButton>
                     <Button
                       variant="contained"
                       color="secondary"
