@@ -67,7 +67,7 @@ const AddTeacher = () => {
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-
+     
     const payload = {
         name: formData.name,
         email: formData.email,
@@ -184,6 +184,7 @@ const AddTeacher = () => {
                   onChange={handleChange}
                   sx={{ mb: 2 }}
                   required
+                  
                 />
                 <TextField
                   fullWidth

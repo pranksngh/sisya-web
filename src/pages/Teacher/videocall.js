@@ -11,11 +11,11 @@ export default function VideoCallPage() {
   const userInfo = getUser();
   const location = useLocation();
   const navigate = useNavigate();
-   const { userData } = location.state || {};
+   const { userData,user, videotoken, roomid,userId  } = location.state || {};
   const appID = 1500762473; // Your App ID
   const serverSecret = "175fa0e5958efde603f2ec805c7d6120"; // Your Server Secret
-  const userName = "Kapil Verma";
-  const roomID = "videoRoom";
+  const userName = user.mentor.name;
+  const roomID = roomid;
   const videostreamID = "hostvideo_"+uuidv4(); 
   const screenStreamID = "hostscreen_"+uuidv4();
   const [zegoEngine, setZegoEngine] = useState(null);
@@ -61,10 +61,10 @@ export default function VideoCallPage() {
           return;
         }
 
-        const userID = "prashant706966";
-        const token = "04AAAAAGcscDIAEG50MHBrZDFzOXowOG4yemsAgFQGsWrAjKKgMd96Kh4Xg8KBnl/QI8wr1HtAn4Uf9ZJZHADrbZRNImDyQlsiPRw3yYg86tKa6rABaBFKfaqs+xQMA4zpkT7kh18op8opbgDPxioE3F4A2bv3hKej4pW17vDdtcKm9/Pxcpd24TcNMYH08AulBiyw0J40OPJYyy9g";
+     
+        const token = videotoken;
 
-        zg.loginRoom(roomID, token, { userID, userName }, { userUpdate: true });
+        zg.loginRoom(roomID, token, { userId, userName }, { userUpdate: true });
 
         zg.setDebugVerbose(false);
 
@@ -403,7 +403,7 @@ const endCall = async()=>{
       console.log('Left room and stopped publishing' + roomID);
       // socketService.emit("class:end",{token: roomID, data:{isClosed:true}});
       // socketService.emit("class:end",{token: streamInfo.Token, data:{isClosed:true}});
-      navigate("/teacherDashboard");
+      navigate("../teacher");
 
     }
   };

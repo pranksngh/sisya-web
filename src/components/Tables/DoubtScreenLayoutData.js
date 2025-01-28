@@ -253,46 +253,78 @@ const DoubtScreenLayoutData = () => {
     }
   };
 
+const generateVideoToken = async(userData, roomid)=>{
 
+  const username = user.mentor.name; // Replace with dynamic username if needed
+  const randomNumber = Math.floor(1000 + Math.random() * 9000); // Generate a random 4-digit number
+  const userId = `${username}_${randomNumber}`;
+
+  const data = {
+    userId: userId,
+  };
+  try{
+    const response = await   fetch('https://sisyabackend.in/student/get_token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if(response.success){
+      const videotoken = response.token;
+      navigate("/videocall",{
+        state: {
+            userData,
+            user, // here user means mentor info
+            videotoken,
+            roomid,
+            userId
+
+        }
+    });
+    }
+  }catch(error){
+    console.log("something went wrong", error);
+  }
+}
   const initiateCall = async (userData)=>{
+
+    const randomRoomId = Math.random().toString(36).substring(2, 10); // Generate a random 8-character alphanumeric string
+
     try {
 
-      // const data = {
-      //   notification:{
-      //     title: `${user.mentor.name} is calling` ,
-      //     body: "Doubt Call",
-      //   },
-      //   data:{
-      //    type: 'video_call',
-      //    callerName: user.mentor.name
-      //   },
+      const data = {
+        notification:{
+          title: `${user.mentor.name} is calling` ,
+          body: "Doubt Call",
+        },
+        data:{
+         type: 'video_call',
+         callerName: user.mentor.name,
+         roomId: randomRoomId
+        },
         
-      //   // imageData: imageFile
-      //   //   ? {
-      //   //       name: imageFile.name,
-      //   //       content: base64Image,
-      //   //     }
-      //   //   : null,
-      //   tokens: [userData.deviceId],
-      // };
-      // const response = await   fetch('https://sisyabackend.in/rkadmin/send_notif2', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(data),
-      // });
-
-      // const result = await response.json();
-      //  if(result.success){
-
-        navigate("/videocall",{
-          state: {
-              userData,
-              
-          }
+        // imageData: imageFile
+        //   ? {
+        //       name: imageFile.name,
+        //       content: base64Image,
+        //     }
+        //   : null,
+        tokens: [userData.deviceId],
+      };
+      const response = await   fetch('https://sisyabackend.in/rkadmin/send_notif2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
       });
-      //  }
+
+      const result = await response.json();
+       if(result.success){
+        generateVideoToken(userData, randomRoomId);
+       
+       }
     
     } catch (error) {
       console.log('JSON Stringify Eror:', error);
