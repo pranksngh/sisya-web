@@ -4,6 +4,8 @@ import AddStudentDialog from '../DialogBoxes/AddStudentDialog';
 import EditStudentDialog from '../DialogBoxes/EditStudentDialog';
 import ViewStudentDialog from '../DialogBoxes/ViewStudentModal';
 import { useNavigate } from 'react-router-dom';
+import DeleteBoardDialog from '../DialogBoxes/DeleteBoardDialog';
+import UpdateTeacherDialog from '../DialogBoxes/UpdateTeacherDialog';
 
 
 
@@ -12,6 +14,7 @@ function TeacherData() {
   const [boards, setBoards] = useState([]);
   const [teachers, setTeacherList] = useState([]);
   const [open, setOpen] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openViewModal, setOpenViewModal] = useState(false);
   const navigate = useNavigate();
@@ -24,12 +27,19 @@ function TeacherData() {
     educationBoardId: '', // Add educationBoardId to form data as a number
     imageData: '' // Key for the image will be imageData
   });
-  const [selectedStudent, setSelectedStudent] = useState({});
+  const [selectedTeacher, setselectedTeacher] = useState({});
    
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const handleDeleteModalOpen = (teacher) => {
+    setOpenDeleteModal(true);
+    setselectedTeacher(teacher);
+
+  }
+  const handleDeleteModalClose = () => setOpenDeleteModal(false);
  const handleEditModalOpen = (student)=> {
-    setSelectedStudent(student);
+    setselectedTeacher(student);
     setFormData({ name: student.name,
       email: student.email,
       phone:student.phone,
@@ -45,7 +55,7 @@ function TeacherData() {
  }
 
  const handleViewModalOpen = (student)=> {
-  setSelectedStudent(student);
+  setselectedTeacher(student);
   setFormData({ type:'student', name: student.name,
     email: student.email,
     phone:student.phone,
@@ -152,7 +162,7 @@ function TeacherData() {
         headers: {
           'Content-Type': 'application/json'
         },
-       body:JSON.stringify({...formData, id:selectedStudent.id }),
+       body:JSON.stringify({...formData, id:selectedTeacher.id }),
       });
       const result = await response.json();
 
@@ -233,8 +243,40 @@ function TeacherData() {
       reader.readAsDataURL(file);
     }
   };
+  const ChangeTeacherStatus= async() =>{
 
+    const data = {
+      ...selectedTeacher,
+      isActive: !selectedTeacher.isActive,
+    };
+    try {
+      const updateTeacherResponse = await fetch('https://sisyabackend.in/rkadmin/update_mentor', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body:JSON.stringify(data)
+      });
+      const updateTeacherdResult = await updateTeacherResponse.json();
 
+      if (updateTeacherdResult.success) {
+        fetchTeacherData();
+        handleDeleteModalClose();
+      //  console.log("Boards Deleted successfully");
+      } else {
+        alert("Failed to Update Course");
+      }
+    } catch (error) {
+      console.error("Error updating boards:", error);
+    }
+       
+  }
+
+  const handleDelete = async()=>{
+
+    console.log("Selected Teacher is " + JSON.stringify(selectedTeacher));
+    ChangeTeacherStatus();
+  }
   return (
     <Paper elevation={0} variant="elevation" sx={{ padding: '10px' }}>
          <Box 
@@ -347,23 +389,27 @@ function TeacherData() {
       >
         Edit
       </Button>
-      {/* <Button
-        variant="contained"
-        color="primary"
-        onClick={()=> handleViewModalOpen(row)}
-        sx={{
-          textTransform: 'capitalize',
-          fontWeight: 'normal',
-          borderRadius: 2,
-          boxShadow: '0 3px 6px rgba(0,0,0,0.1)',
-          mx: 1, // Add horizontal margin between buttons
-          px: 1, // Padding inside the button for a balanced look
-          minWidth: '40px',
-          marginY: '10px'
-        }}
-      >
-       View
-      </Button> */}
+       <Button
+             variant="contained"
+             color="primary"
+             onClick={()=> handleDeleteModalOpen(row)}
+             sx={{
+               textTransform: 'capitalize',
+               fontWeight: 'normal',
+               borderRadius: 2,
+               boxShadow: '0 3px 6px rgba(0,0,0,0.1)',
+               mx: 0.5, // Add horizontal margin between buttons
+               px: 0.8, // Padding inside the button for a balanced look
+             }}
+           >
+             {row.isActive === true ? "Inactive":"Active"}
+           </Button>
+           <UpdateTeacherDialog
+        open={openDeleteModal}
+        handleClose={handleDeleteModalClose}
+        handleDelete={handleDelete}
+        teacherInfo={selectedTeacher}
+      />
       <EditStudentDialog
           open={openEditModal}
           onClose={handleEditModalClose}
