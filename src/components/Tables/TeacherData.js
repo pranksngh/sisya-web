@@ -53,6 +53,21 @@ function TeacherData() {
     setOpenEditModal(true);
 
  }
+ function formatDate(isoDateString) {
+  const date = new Date(isoDateString);
+
+  const day = date.getUTCDate();
+  const month = date.toLocaleString('en-US', { month: 'short' }); // Short month name (e.g., "Jan")
+  const year = date.getUTCFullYear();
+
+  // Determine the ordinal suffix for the day
+  const suffix =
+    day === 11 || day === 12 || day === 13
+      ? "th"
+      : ["st", "nd", "rd"][(day % 10) - 1] || "th";
+
+  return `${day}${suffix} ${month} ${year}`;
+}
 
  const handleViewModalOpen = (student)=> {
   setselectedTeacher(student);
@@ -349,7 +364,7 @@ function TeacherData() {
                 <TableCell>{row.name}</TableCell>
                 <TableCell> {row.email}</TableCell>
                 <TableCell>{row.phone}</TableCell>
-                <TableCell>{row.createdOn}</TableCell>
+                <TableCell>{formatDate(row.createdOn)}</TableCell>
              
                 <TableCell>
                   <Box

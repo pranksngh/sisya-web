@@ -105,6 +105,23 @@ function SubjectData() {
    
   };
 
+  function formatDate(isoDateString) {
+    const date = new Date(isoDateString);
+  
+    const day = date.getUTCDate();
+    const month = date.toLocaleString('en-US', { month: 'short' }); // Short month name (e.g., "Jan")
+    const year = date.getUTCFullYear();
+  
+    // Determine the ordinal suffix for the day
+    const suffix =
+      day === 11 || day === 12 || day === 13
+        ? "th"
+        : ["st", "nd", "rd"][(day % 10) - 1] || "th";
+  
+    return `${day}${suffix} ${month} ${year}`;
+  }
+  
+
   const ChangeSubjectStatus= async() =>{
 
     const payload = {
@@ -290,9 +307,9 @@ function SubjectData() {
                 <TableCell>Class {row.gradeLevel}</TableCell>
                 <TableCell>
                  
-                  {row.createdAt}
+                  {formatDate(row.createdAt)}
                 </TableCell>
-                <TableCell>{row.updatedAt}</TableCell>
+                <TableCell>{formatDate(row.updatedAt)}</TableCell>
                 <TableCell>
                   <Box
                     component="span"
