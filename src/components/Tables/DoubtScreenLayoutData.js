@@ -160,6 +160,59 @@ const DoubtScreenLayoutData = () => {
     });
     setDoubtStatus(doubt.status);
   };
+  const handleEndDoubt = async () => {
+    try {
+      const response = await fetch('https://sisyabackend.in/teacher/update_doubt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: doubtid,
+          status: 2, // Set status to 2, indicating the doubt is resolved
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setDoubtStatus(2); // Update local status to 2
+        console.log('Doubt status updated to resolved');
+
+        // Refresh the doubt list after resolving
+        fetchDoubtList();
+
+        const notificationResponse = await fetch('https://sisyabackend.in/rkadmin/send_notif2', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            notification: {
+              title: "Demo Notification Sent",
+              body: "Write a review for your teacher"
+            },
+            data: {
+              type: "feedback",
+              mentorId: user.mentor.id.toString(),  // You already have mentorId
+              userId: dobutinfo.asker.id.toString()      // From doubt.asker.id
+            },
+            tokens: [dobutinfo.asker.deviceId],  // From doubt.asker.deviceId
+          })
+        });
+
+        const notificationResult = await notificationResponse.json();
+        if (notificationResult.success) {
+          console.log("Notification sent successfully");
+        } else {
+          console.error("Failed to send notification:", notificationResult.message);
+        }
+      } else {
+        console.error('Failed to update doubt status:', result.message);
+      }
+    } catch (error) {
+      console.error('Error updating doubt status:', error);
+    }
+  };
 
   const handleSendMessage = async () => {
     if (message.trim()) {
@@ -203,6 +256,7 @@ const DoubtScreenLayoutData = () => {
                 },
                 data: {
                   type: "general",
+                  doubt:"1"
                  
                 },
                 tokens: [dobutinfo.asker.deviceId],  // From doubt.asker.deviceId
@@ -333,7 +387,9 @@ const generateVideoToken = async(userData, roomid)=>{
 
   return (
     <Box display="flex" height="90vh">
-      <Box width="30%" bgcolor="grey.100" p={2}>
+      <Box width="30%" bgcolor="grey.100" p={2} display="flex"
+  flexDirection="column"
+  sx={{ height: '86.4vh' }}>
         <TextField
           variant="outlined"
           fullWidth
@@ -345,7 +401,12 @@ const generateVideoToken = async(userData, roomid)=>{
             startAdornment: <SearchIcon />,
           }}
         />
-      <List sx={{ mt: 2 }}>
+      <List sx={{
+      flex: 1, // Takes remaining space
+      mt: 2,
+      overflowY: 'auto', // Enables scrolling
+      maxHeight: '80vh', // Prevents overflow
+    }}>
   {filteredDoubtList.map((doubt) => (
     <ListItem
       button
@@ -390,20 +451,8 @@ const generateVideoToken = async(userData, roomid)=>{
                   {selectedUser.name}
                 </Typography>
               </Box>
-              <Box display="flex" justifyContent="flex-end" flex={1}>
              
-                    <IconButton onClick={()=>initiateCall(selectedUser)}><VideoIcon /></IconButton>
-                    <IconButton onClick={()=>initiateCall(selectedUser)}><PhoneIcon /></IconButton>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => console.log('End Doubt')}
-                    >
-                      End Doubt
-                    </Button>
-                 
-              </Box>
-              <Box>
+              <Box display="flex" justifyContent="flex-end" flex={1}>
                 {doubtStatus === 1 && (
                   <>
                     <IconButton onClick={()=>initiateCall(selectedUser)} ><VideoIcon /></IconButton>
@@ -411,7 +460,7 @@ const generateVideoToken = async(userData, roomid)=>{
                     <Button
                       variant="contained"
                       color="secondary"
-                      onClick={() => console.log('End Doubt')}
+                      onClick={() => handleEndDoubt()}
                     >
                       End Doubt
                     </Button>

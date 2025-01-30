@@ -1,224 +1,219 @@
 const sidebarConfig = [
-    {
-      label: "Dashboard",
-      icon: "Dashboard",
-      path: "/dashboard/admin",
-      roles: ["admin"], // Accessible to both
-      expandable: false,
-    },
-    {
-        label: "Dashboard",
-        icon: "Dashboard",
-        path: "/dashboard/teacher",
-        roles: ["teacher"], // Accessible to both
-        expandable: false,
-      },
-      {
-        label: "Dashboard",
-        icon: "Dashboard",
-        path: "/dashboard/mentor",
-        roles: ["mentor"], // Accessible to both
-        expandable: false,
-      },
-      {
-        label: "Dashboard",
-        icon: "Dashboard",
-        path: "/dashboard/hr",
-        roles: ["hr"], // Accessible to both
-        expandable: false,
-      },
-    {
-      label: "Boards",
-      icon: "PieChart",
-      path: "/dashboard/boards",
-      roles: ["admin"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Subjects",
-      icon: "BarChart",
-      path: "/dashboard/subjects",
-      roles: ["admin"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Students",
-      icon: "Group",
-      roles: ["admin"], // Only for admin
-      expandable: true,
-      subItems: [
-        { label: "List Students", path: "students" },
-        { label: "Add Student", path: "addStudent" },
-      ],
-    },
-    {
-      label: "Teachers",
-      icon: "AccountCircle",
-      roles: ["admin"], // Only for admin
-      expandable: true,
-      subItems: [
-        { label: "List Teachers", path: "teachers" },
-        { label: "Add Teacher", path: "addTeacher" },
-      ],
-    },
-    {
-      label: "Courses",
-      icon: "BarChart",
-      roles: ["admin"], // Only for admin
-      expandable: true,
-      subItems: [
-        { label: "List Courses", path: "courses" },
-        { label: "Add Course", path: "addCourse" },
-      ],
-    },
-    {
-      label: "Reports",
-      icon: "BarChart",
-      roles: ["admin"], // Only for admin
-      expandable: true,
-      subItems: [
-        { label: "Student Report", path: "student-report" },
-        { label: "Teacher Report", path: "teacher-report" },
-      ],
-    },
-    {
-      label: "Purchases",
-      icon: "ShoppingCart",
-      path: "course-purchase-list",
-      roles: ["admin"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Sales Mentor",
-      icon: "AccountCircle",
-      path: "sales-mentor-list",
-      roles: ["admin"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Lead Manager",
-      icon: "Settings",
-      path: "lead-manager",
-      roles: ["admin"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Doubts",
-      icon: "Chat",
-      path: "doubts",
-      roles: ["admin"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Enquiries",
-      icon: "Notifications",
-      path: "enquiry",
-      roles: ["admin"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Banners",
-      icon: "CalendarToday",
-      path: "banners",
-      roles: ["admin"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Push Notification",
-      icon: "Notifications",
-      path: "pushNotification",
-      roles: ["admin"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Assigned Courses",
-      icon: "Notifications",
-      path: "enrolled-courses",
-      roles: ["teacher"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Add Class",
-      icon: "Notifications",
-      path: "add-class",
-      roles: ["teacher"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Chats",
-      icon: "Notifications",
-      path: "Chats",
-      roles: ["teacher"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Group Chats",
-      icon: "Notifications",
-      path: "group-chat",
-      roles: ["teacher"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Doubts",
-      icon: "Notifications",
-      path: "doubtscreen",
-      roles: ["teacher"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "My Leaves",
-      icon: "Notifications",
-      path: "myleaves",
-      roles: ["teacher"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Teachers List",
-      icon: "Notifications",
-      path: "teachersList",
-      roles: ["hr"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Mentor List",
-      icon: "Notifications",
-      path: "mentorList",
-      roles: ["hr"], // Only for admin
-      expandable: false,
-    },
+  {
+    label: "Dashboard",
+    icon: "Home",
+    path: "/dashboard/admin",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
+    label: "Dashboard",
+    icon: "School",
+    path: "/dashboard/teacher",
+    roles: ["teacher"],
+    expandable: false,
+  },
+  {
+    label: "Dashboard",
+    icon: "SupervisorAccount",
+    path: "/dashboard/mentor",
+    roles: ["mentor"],
+    expandable: false,
+  },
+  {
+    label: "Dashboard",
+    icon: "Work",
+    path: "/dashboard/hr",
+    roles: ["hr"],
+    expandable: false,
+  },
+  {
+    label: "Boards",
+    icon: "ViewComfy",
+    path: "/dashboard/boards",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
+    label: "Subjects",
+    icon: "School",
+    path: "/dashboard/subjects",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
+    label: "Students",
+    icon: "People",
+    roles: ["admin"],
+    expandable: true,
+    subItems: [
+      { label: "List Students", path: "students" },
+      { label: "Add Student", path: "addStudent" },
+    ],
+  },
+  {
+    label: "Teachers",
+    icon: "Person",
+    roles: ["admin"],
+    expandable: true,
+    subItems: [
+      { label: "List Teachers", path: "teachers" },
+      { label: "Add Teacher", path: "addTeacher" },
+    ],
+  },
+  {
+    label: "Courses",
+    icon: "LibraryBooks",
+    roles: ["admin"],
+    expandable: true,
+    subItems: [
+      { label: "List Courses", path: "courses" },
+      { label: "Add Course", path: "addCourse" },
+    ],
+  },
+  {
+    label: "Reports",
+    icon: "Assessment",
+    roles: ["admin"],
+    expandable: true,
+    subItems: [
+      { label: "Student Report", path: "student-report" },
+      { label: "Teacher Report", path: "teacher-report" },
+    ],
+  },
+  {
+    label: "Purchases",
+    icon: "ShoppingCart",
+    path: "course-purchase-list",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
+    label: "Sales Mentor",
+    icon: "PeopleOutline",
+    path: "sales-mentor-list",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
+    label: "Lead Manager",
+    icon: "Settings",
+    path: "lead-manager",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
+    label: "Doubts",
+    icon: "Chat",
+    path: "doubts",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
+    label: "Enquiries",
+    icon: "Notifications",
+    path: "enquiry",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
+    label: "Banners",
+    icon: "Image",
+    path: "banners",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
+    label: "Push Notification",
+    icon: "NotificationsActive",
+    path: "pushNotification",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
+    label: "Assigned Courses",
+    icon: "LibraryBooks",
+    path: "enrolled-courses",
+    roles: ["teacher"],
+    expandable: false,
+  },
+  {
+    label: "Add Class",
+    icon: "AddCircle",
+    path: "add-class",
+    roles: ["teacher"],
+    expandable: false,
+  },
+  {
+    label: "Chats",
+    icon: "ChatBubble",
+    path: "Chats",
+    roles: ["teacher"],
+    expandable: false,
+  },
+  {
+    label: "Group Chats",
+    icon: "Group",
+    path: "group-chat",
+    roles: ["teacher"],
+    expandable: false,
+  },
+  {
+    label: "Doubts",
+    icon: "LiveHelp",
+    path: "doubtscreen",
+    roles: ["teacher"],
+    expandable: false,
+  },
+  {
+    label: "My Leaves",
+    icon: "EventAvailable",
+    path: "myleaves",
+    roles: ["teacher"],
+    expandable: false,
+  },
+  {
+    label: "Teachers List",
+    icon: "GroupWork",
+    path: "teachersList",
+    roles: ["hr"],
+    expandable: false,
+  },
+  {
+    label: "Mentor List",
+    icon: "SupervisorAccount",
+    path: "mentorList",
+    roles: ["hr"],
+    expandable: false,
+  },
+  {
+    label: "Mentor Leaves",
+    icon: "EventBusy",
+    path: "mentorLeaves",
+    roles: ["hr"],
+    expandable: false,
+  },
+  {
+    label: "Teacher Leaves",
+    icon: "EventBusy",
+    path: "teacherLeaves",
+    roles: ["hr"],
+    expandable: false,
+  },
+  {
+    label: "My Leaves",
+    icon: "EventAvailable",
+    path: "mentorLeaveRequest",
+    roles: ["mentor"],
+    expandable: false,
+  },
+  {
+    label: "Logout",
+    icon: "ExitToApp",
+    path: "/",
+    roles: ["teacher", "admin", "mentor", "hr"],
+    expandable: false,
+  },
+];
 
-    {
-      label: "Mentor Leaves",
-      icon: "Notifications",
-      path: "mentorLeaves",
-      roles: ["hr"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "Teacher Leaves",
-      icon: "Notifications",
-      path: "teacherLeaves",
-      roles: ["hr"], // Only for admin
-      expandable: false,
-    },
-    {
-      label: "My Leaves",
-      icon: "Notifications",
-      path: "mentorLeaveRequest",
-      roles: ["mentor"], // Only for admin
-      expandable: false,
-    },
-    
-    {
-      label: "Logout",
-      icon: "Notifications",
-      path: "/",
-      roles: ["teacher","admin","mentor","hr"], // Only for admin
-      expandable: false,
-    },
-    
-    
-  ];
-  
-  export default sidebarConfig;
-  
+export default sidebarConfig;

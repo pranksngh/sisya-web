@@ -37,7 +37,7 @@ const EditSubjectDialog = ({
       }}
     >
       <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
-        Add a New Subject
+        Edit Subject
       </DialogTitle>
 
       <DialogContent>
