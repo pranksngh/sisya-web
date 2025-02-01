@@ -32,7 +32,11 @@ export default function LiveClassRoom() {
   const [speakRequests, setSpeakRequests] = useState([]);
   const [isSpeakRequestVisible, setIsSpeakRequestVisible] = useState(false);
   const [remoteStreams, setRemoteStreams] = useState([]);
+  const messagesEndRef = useRef(null);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
   useEffect(() => {
     const tokenvalue = localStorage.getItem('token');
     const token = 'YOUR_AUTH_TOKEN';
@@ -584,6 +588,7 @@ export default function LiveClassRoom() {
                   </Typography>
                 ))
               )}
+               <div ref={messagesEndRef} />
             </Box>
             <Box className="chat-input" sx={{ display: 'flex', padding: 2 }}>
               <TextField
@@ -594,6 +599,11 @@ export default function LiveClassRoom() {
                 variant="outlined"
                 size="small"
                 sx={{ marginRight: 1 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    sendMessage();
+                  }
+                }}
               />
               <IconButton color="primary" onClick={sendMessage}>
                 <Send />
