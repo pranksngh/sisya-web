@@ -8,6 +8,7 @@ import { getUser } from '../Functions/Login';
 
 const Sidebar = ({ userRole }) => {
   const user = getUser();
+  console.log(JSON.stringify(user));
   const [open, setOpen] = useState({});
   const location = useLocation();
   const navigate = useNavigate();

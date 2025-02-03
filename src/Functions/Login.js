@@ -19,6 +19,7 @@ export const login = async (user, password) => {
     }
 
     const data = await response.json();
+   // console.log("my data is ",data);
     if (data.success) {
       localStorage.setItem('token', data.token);
       localStorage.setItem('role', "admin");

@@ -87,9 +87,14 @@ export default function AuthLogin() {
   const teacherLogin = async (username, password) => {
     const response = await teacherlogin(username, password);
     setLoading(false);
-
+     
     if (response.success) {
-      navigate('/dashboard/teacher');
+      if(response.mentor.isActive){
+        navigate('/dashboard/teacher');
+      }else{
+        showToast("Teacher is not activated");
+      }
+      
     } else {
       showToast(response.error || 'Teacher Login Failed.');
     }

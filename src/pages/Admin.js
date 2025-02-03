@@ -12,9 +12,13 @@ import StudentRecords from '../components/Tables/StudentsRecord';
 import DoubtsRecord from '../components/Tables/DoubtsRecord';
 import DoubtAnalysis from '../components/Tables/DoubtAnalysis';
 import MentorRecord from '../components/Tables/MentorRecord';
+import { getUser } from '../Functions/Login';
 
 function Admin() {
- 
+  const user = getUser();
+ useEffect(()=>{
+console.log(user);
+ },[])
   const [totalStudentCount, setTotalStudentCount] = useState(0);
   const [students, setStudents] = useState([]);
   const [totalTeacherCount, setTotalTeacherCount] = useState(0);
@@ -65,7 +69,7 @@ function Admin() {
       const students = result.studentList;
       setTotalStudentCount(students.length);
       setStudents(students);
-      console.log("fetched Student List Successfully");
+    //  console.log("fetched Student List Successfully");
 
     }else{
       console.log("Student List Error : ", JSON.stringify(result));
@@ -86,7 +90,7 @@ function Admin() {
       const teachers = result.mentors;
        setTotalTeacherCount(teachers.length);
        setTeachers(teachers);
-      console.log("Fetched Teacher List Successfully");
+    //  console.log("Fetched Teacher List Successfully");
 
     }else{
       console.log("Teacher List Error : ", JSON.stringify(result));
@@ -106,7 +110,7 @@ function Admin() {
       const salesman = result.salesmen;
       setTotalSalesManCount(salesman.length);
       setSalesman(salesman);
-      console.log("Fetched Salesman List Successfully");
+    //  console.log("Fetched Salesman List Successfully");
 
     }else{
       console.log("Salesman List Error : ", JSON.stringify(result));
@@ -122,7 +126,7 @@ function Admin() {
       const result = await fetchPurchases();
        if(result.success){
         const purchases = result.subs;
-        console.log("total purchases are", JSON.stringify(result));
+       // console.log("total purchases are", JSON.stringify(result));
         const totalEarning = purchases.reduce((sum,item)=> sum + item.PurchasePrice, 0);
          setTotalPurchasePrice(totalEarning.toFixed(2));
          setPurchases(purchases);
