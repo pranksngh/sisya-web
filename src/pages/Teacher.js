@@ -127,7 +127,7 @@ function Admin() {
       const result = await fetchPurchases();
        if(result.success){
         const purchases = result.subs;
-        console.log("total purchases are", JSON.stringify(result));
+      //  console.log("total purchases are", JSON.stringify(result));
         const totalEarning = purchases.reduce((sum,item)=> sum + item.PurchasePrice, 0);
          setTotalPurchasePrice(totalEarning.toFixed(2));
          setPurchases(purchases);
@@ -152,15 +152,27 @@ function Admin() {
  
     return (
       <Box sx={{pb:10}}>
-      
+        <Box sx={{ display: 'flex', gap: '24px', marginTop: '40px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <Grid container spacing={3} sx={{ marginTop: '20px', justifyContent:'center' }}>
+        {/* Recent Orders Table - 60% Width */}
+        <Grid item xs={12} md={6} lg={11}>
+          <TimeTable />
+        </Grid>
+
+        {/* Analytics Report - 30% Width */}
+        
+      </Grid>
+     
+     
+      </Box>
         {/* Other components like the StatCard components can be placed below */}
         <Grid container spacing={3} sx={{ marginTop: '20px', justifyContent:'center' }}>
         {/* Recent Orders Table - 60% Width */}
        
-        <Grid item xs={12} md={6} lg={6}>
+        {/* <Grid item xs={12} md={6} lg={6}>
          <LeaveCalendar/>
-        </Grid>
-        <Grid item xs={12} md={6} lg={5.5}>
+        </Grid> */}
+        <Grid item xs={12} md={6} lg={11}>
          <UpcomingClasses/>
         </Grid>
         
@@ -183,19 +195,7 @@ function Admin() {
      
      
       </Box>
-      <Box sx={{ display: 'flex', gap: '24px', marginTop: '40px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <Grid container spacing={3} sx={{ marginTop: '20px', justifyContent:'center' }}>
-        {/* Recent Orders Table - 60% Width */}
-        <Grid item xs={12} md={6} lg={11}>
-          <TimeTable />
-        </Grid>
-
-        {/* Analytics Report - 30% Width */}
-        
-      </Grid>
-     
-     
-      </Box>
+    
 
       </Box>
     );

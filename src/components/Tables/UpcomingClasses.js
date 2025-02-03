@@ -9,6 +9,7 @@ import {
   Typography,
   Paper,
   CircularProgress,
+  Button,
 } from '@mui/material';
 import { getUser } from '../../Functions/Login';
 import { useNavigate } from 'react-router-dom';
@@ -18,9 +19,10 @@ function UpcomingClasses() {
   const [myCourses, setMyCourses] = useState([]);
   const [loadingCourses, setLoadingCourses] = useState(true);
   const [sessions, setSessions] = useState([]);
+  const mentorId = user.mentor.id.toString();
   const [visibleClasses, setVisibleClasses] = useState(10);
   const navigate = useNavigate();
-
+   const [loading, setLoading] = useState(false);
   useEffect(() => {
     fetchTecherCourses();
   }, []);
@@ -78,6 +80,8 @@ function UpcomingClasses() {
         courseId: course.id,
         subjectId: await getSubjectById(session.subjectId),
         status: session.isDone ? 'Complete' : 'Not Started Yet',
+        isDone:session.isDone
+
       })));
     }));
 
@@ -104,6 +108,41 @@ function UpcomingClasses() {
     };
   };
 
+
+  const startSession = async (sessionId) => {
+    setLoading(true);
+
+    try {
+        const response = await fetch('https://sisyabackend.in/teacher/start_session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ mentorId, sessionId })
+        });
+
+        const result = await response.json();
+        setLoading(false);
+
+        if (result.success) {
+            const streamInfo = result.streamInfo;
+            navigate('../../liveclassroom', {
+                state: {
+                    streamInfo,
+                    mentorId,
+                    sessionId
+                }
+            });
+        } else {
+            alert('Failed to start session');
+        }
+    } catch (error) {
+        setLoading(false);
+        console.error('Error starting session:', error);
+        alert('Error starting session');
+    }
+};
+
   return (
     <>
       <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>
@@ -126,8 +165,8 @@ function UpcomingClasses() {
                 <TableCell>ID</TableCell>
                 <TableCell>Title</TableCell>
                 <TableCell>Start Time</TableCell>
-                <TableCell>End Time</TableCell>
                 <TableCell>Status</TableCell>
+                <TableCell>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -149,8 +188,19 @@ function UpcomingClasses() {
                     <TableCell>{item.id}</TableCell>
                     <TableCell>{item.detail}</TableCell>
                     <TableCell>{formatDateTime(item.startTime)}</TableCell>
-                    <TableCell>{formatDateTime(item.endTime)}</TableCell>
+                    
                     <TableCell>{item.status}</TableCell>
+                    <TableCell>
+              <Button
+                variant="contained"
+                color={item.isDone ? "success" : "primary"}
+                size="small"
+                onClick={() => startSession(item.id)}
+                disabled={item.isDone}
+              >
+                {item.isDone ? "Completed" : "Join"}
+              </Button>
+            </TableCell>
                   </TableRow>
                 ))
               ) : (
