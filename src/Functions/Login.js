@@ -49,9 +49,11 @@ export const teacherlogin = async (phone, password) => {
 
     const data = await response.json();
     if (data.success) {
+      if(data.mentor.isActive){
       localStorage.setItem('token', data.token);
       localStorage.setItem('role', "teacher");
       localStorage.setItem('user', JSON.stringify(data));
+      }
     }
     return data;
   } catch (error) {
