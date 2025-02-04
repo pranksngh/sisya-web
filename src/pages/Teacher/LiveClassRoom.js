@@ -34,6 +34,21 @@ export default function LiveClassRoom() {
   const [remoteStreams, setRemoteStreams] = useState([]);
   const messagesEndRef = useRef(null);
   const [openDialog, setOpenDialog] = useState(false);
+
+
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = ""; // Standard way to trigger warning
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+  
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
