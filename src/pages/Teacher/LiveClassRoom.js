@@ -3,7 +3,7 @@ import { ZegoExpressEngine } from "zego-express-engine-webrtc";
 import { FaMicrophoneSlash, FaMicrophone, FaVideo, FaVideoSlash, FaUsers, FaSignOutAlt, FaPaperPlane, FaDesktop, FaBullhorn, FaEnvelope } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { Badge, Box, Button, IconButton, Paper, TextField, Typography } from '@mui/material';
+import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Paper, TextField, Typography } from '@mui/material';
 import { Campaign, DesktopWindows, ExitToApp, Group, MailOutline, Mic, MicOff, Send, Videocam, VideocamOff } from '@mui/icons-material';
 import { getUser } from '../../Functions/Login';
 import socketService from '../../Sockets/socketConfig';
@@ -33,11 +33,12 @@ export default function LiveClassRoom() {
   const [isSpeakRequestVisible, setIsSpeakRequestVisible] = useState(false);
   const [remoteStreams, setRemoteStreams] = useState([]);
   const messagesEndRef = useRef(null);
-
+  const [openDialog, setOpenDialog] = useState(false);
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
   useEffect(() => {
+    
     const tokenvalue = localStorage.getItem('token');
     const token = 'YOUR_AUTH_TOKEN';
     const fromUUID = userInfo.mentor.uuid;
@@ -259,6 +260,12 @@ export default function LiveClassRoom() {
       }
     }
   };
+
+
+  const confirmLeaveRoom = () => {
+    setOpenDialog(false);
+    leaveRoom();
+  };
   const toggleCamera = () => {
     if (localStream) {
       const videoTrack = localStream.getVideoTracks()[0];  // Get the video track
@@ -365,6 +372,8 @@ export default function LiveClassRoom() {
     }
    }
   const leaveRoom = () => {
+
+    
     if (zegoEngine) {
       zegoEngine.stopPublishingStream(videostreamID);
       if (screenStream) {
@@ -636,10 +645,22 @@ export default function LiveClassRoom() {
       <IconButton color="default" onClick={toggleSpeakRequestList}>
         <Campaign />
       </IconButton>
-      <Button variant="contained" color="error" onClick={leaveRoom} startIcon={<ExitToApp />}>
+      <Button variant="contained" color="error" onClick={()=>setOpenDialog(true)} startIcon={<ExitToApp />}>
         Leave Room
       </Button>
     </Box>
+
+     {/* Confirmation Dialog */}
+     <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Confirm Leave</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Are you sure you want to leave the class?</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="primary">No</Button>
+          <Button onClick={confirmLeaveRoom} color="error">Yes</Button>
+        </DialogActions>
+      </Dialog>
   </Box>
   
   );
