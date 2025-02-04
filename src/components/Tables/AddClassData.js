@@ -144,6 +144,7 @@ const AddClassData = () => {
       subjectId: selectedSubject,
       startTime: formattedStartTime,
       endTime: formattedEndTime,
+      description:formData.description
     };
 
     try {
@@ -221,7 +222,15 @@ const AddClassData = () => {
               </Select>
             </FormControl>
 
-
+            <TextField
+          label="Description"
+          name="description"
+          value={formData.description}
+          onChange={handleInputChange}
+          fullWidth
+          margin="normal"
+          required
+        />
             <TextField
               label="Start Time"
               type="datetime-local"
