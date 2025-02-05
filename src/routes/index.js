@@ -47,6 +47,7 @@ import MentorLeaveRequest from '../pages/Mentor/MentorLeaveRequest';
 import TeacherLeaves from '../pages/HR/TeacherLeaves';
 import LiveClassRoom from '../pages/Teacher/LiveClassRoom';
 import VideoCallPage from '../pages/Teacher/videocall';
+import EditClass from '../pages/Teacher/EditClass';
 
 const router = createBrowserRouter([
   {
@@ -354,6 +355,13 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           MentorLeaveRequest
+        ),
+      },
+      {
+        path: 'edit-session',
+        element: React.createElement(
+         
+          EditClass
         ),
       },
       

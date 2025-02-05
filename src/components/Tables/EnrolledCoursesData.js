@@ -18,7 +18,7 @@ const EnrolledCoursesData = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ mentorId: 1 }) // Replace with actual user ID
+    
       });
       const result = await response.json();
       if (result.success) {

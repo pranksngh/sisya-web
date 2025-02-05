@@ -394,6 +394,18 @@ const CourseDetailsData = () => {
               >
                 {session.isDone ? "Completed" : "Join Now"}
               </Button>
+              {(session.isDone === false && session.isGoingOn === false) ? ( <Button
+              sx={{
+                marginLeft:'4px;'
+              }}
+                variant="contained"
+                color={session.isDone ? "success" : "primary"}
+                size="small"
+                onClick={() => navigate('/dashboard/edit-session', { state: { sessionInfo: session, courseInfo: course } })}
+             
+              >
+               Edit
+              </Button>):('') }
             </TableCell>
           </TableRow>
         ))
