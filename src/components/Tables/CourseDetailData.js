@@ -48,6 +48,8 @@ const CourseDetailsData = () => {
                 if (courseData.session && courseData.session.length > 0) {
                     fetchAttendanceData(courseData.session); // Fetch attendance for sessions
                 }
+
+                console.log("course data is " + JSON.stringify(courseData));
             } else {
                 setCourse({});
             }
