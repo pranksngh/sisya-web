@@ -111,7 +111,7 @@ export default function LiveClassRoom() {
 
         zg.loginRoom(roomID, token, { userID, userName }, { userUpdate: true });
 
-        zg.setDebugVerbose(true);
+        zg.setDebugVerbose(false);
 
         const stream = await zg.createStream({
           camera: {
