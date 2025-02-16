@@ -32,7 +32,7 @@ const EditCourse = () => {
    const navigate = useNavigate();
   const location = useLocation();
   const courseData = location.state?.course || {};
- // console.log("Edit Course Data", JSON.stringify(courseData));
+  console.log("Edit Course Data", courseData.id);
   // Step 1 States
   const [banner, setBanner] = useState(`https://sisyabackend.in/student/thumbs/courses/${courseData.id}.jpg`);
   const [mainImage, setMainImage] = useState(`https://sisyabackend.in/student/thumbs/mcourses/${courseData.id}.jpg`);
@@ -78,7 +78,9 @@ const EditCourse = () => {
   }, [courseData.grade]);
 
   useEffect(() => {
+  //  console.log("teach intro issue", JSON.stringify(courseData.TeachIntro))
     if (availableTeachers.length > 0 && courseData.TeachIntro) {
+      console.log("available teachers", JSON.stringify(availableTeachers));
       fetchSelectedTeachers();
     }
   }, [availableTeachers]); 
@@ -116,28 +118,42 @@ const EditCourse = () => {
     setErrorModalOpen(false);
   };
    const fetchSelectedTeachers = () =>{
-    
-    courseData.TeachIntro.forEach((mentor)=>{
-   //   console.log("my selected mentors are", JSON.stringify(mentor));
-      handleSubjectChange(mentor.mentorId, mentor.subjectId);
-     
-     const teacher =  availableTeachers.find((teacher) => teacher.id === mentor.mentorId);
-  //   console.log("selected techer", JSON.stringify(teacher));
+    console.log("default teacher", courseData.TeachIntro.length);
 
-     const subjectId = selectedSubjectsForTeachers[teacher.id];
-   
-     const subject = selectedSubjects.find((subject) => subject.id === parseInt(subjectId));
-     const updatedTeacher = { ...teacher, assignedSubject: subject, subjectId:subjectId };   
-  
-    //   const final = { ...updatedTeacher, subjectId: subject.id };
-     setSelectedTeachers([...selectedTeachers, updatedTeacher]);
-     //  selectedTeachers.push(updatedTeacher);
-      
+    setSelectedTeachers([]);
+    courseData.TeachIntro.forEach((mentor) => {
+      // Handle subject change
     
      
-      
-    });
-    console.log("my teachers", JSON.stringify(courseData.TeachIntro));
+      // Find teacher from available teachers
+      const teacher = availableTeachers.find((teacher) => teacher.id === mentor.mentorId);
+   
+      // Check if teacher is found
+      if (teacher) {
+        handleSubjectChange(mentor.mentorId, mentor.subjectId);
+         console.log("Selected teacher", JSON.stringify(teacher));
+   
+         // Get the subject for the teacher
+         const subjectId = selectedSubjectsForTeachers[teacher.id];
+   
+         // Find the subject by id
+         const subject = selectedSubjects.find((subject) => subject.id === parseInt(subjectId));
+   
+         // Update teacher with assigned subject
+         const updatedTeacher = { ...teacher, assignedSubject: subject, subjectId: subjectId };
+   
+         // Add updated teacher to selected teachers
+         setSelectedTeachers((prevSelectedTeachers) => [
+            ...prevSelectedTeachers,
+            updatedTeacher
+         ]);
+      } else {
+         // Handle case where teacher is not found
+         console.log(`Teacher with id ${mentor.mentorId} not found`);
+      }
+   });
+   
+  //  console.log("my teachers", JSON.stringify(courseData.TeachIntro));
    }
 
 
@@ -331,6 +347,7 @@ const EditCourse = () => {
   };
   const fetchTeacherList = async (selectedGrade) => {
     console.log("selected grade is " , selectedGrade);
+    
     try {
       const mentorResponse = await fetch('https://sisyabackend.in/rkadmin/get_mentors', {
         method: 'POST',
@@ -432,14 +449,16 @@ const EditCourse = () => {
       mentorList: selectedTeachers.map(teacher => teacher.id),
       mainImageData: MainImageData,
       imageData:BannerImageData,
-      TeachIntroData: selectedTeachers.map(teacher => ({
+      TiArr: selectedTeachers.map(teacher => ({
         comment: "Not Available",
         mentorId: teacher.id,
-        subjectId: teacher.subjectId || (selectedSubjects.length > 0 ? selectedSubjects[0].id : null)
+        subjectId: teacher.subjectId || (selectedSubjects.length > 0 ? selectedSubjects[0].id : null),
+        bigCourseId: courseInfo.id,
+     
       }))
     };
 
-    console.log(JSON.stringify(finalData));
+    console.log("selected teacher length", JSON.stringify(finalData));
   
     try {
       const response = await fetch('https://sisyabackend.in/rkadmin/update_course', {
@@ -464,7 +483,7 @@ const EditCourse = () => {
       setErrorModalOpen(true);
     }
 
- //  setResultModalOpen(true); // Open the result modal
+ // setResultModalOpen(true); // Open the result modal
   }; 
 
 
