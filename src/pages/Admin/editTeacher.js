@@ -91,15 +91,17 @@ const EditTeacher = () => {
         searchTags: "",
         languages: "",
         Grades: formData.classes, // Submit the array of grades
-        qualifications: formData.qualifications.map(q => ({
+        qualificationList: formData.qualifications.map(q => ({
           name: q.name,
           level: q.level,
           institution: q.institution,
-          year: new Date(q.year).toISOString() // Format the date as ISO 8601
+          year: new Date(q.year).toISOString(), // Format the date as ISO 8601
+          mentorId: teacherData.id
         })),
-        subjectRecords: formData.selectedSubjects.map(s => ({
+        subjectRecordList: formData.selectedSubjects.map(s => ({
           comment: s.comment,
-          subjectId: s.id // Assuming subjectId is the index
+          subjectId: s.id, // Assuming subjectId is the index
+          mentorId: teacherData.id
         })),
         ...(formData.imageData && { imageData: formData.imageData }),
       };
