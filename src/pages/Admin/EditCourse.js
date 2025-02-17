@@ -183,8 +183,12 @@ const EditCourse = () => {
           setValidationError("Course description is required.");
           return;
         }
-        if (!courseInfo.currentPrice || courseInfo.currentPrice <= 0) {
+        if (courseInfo.courseType !== "free" && (!courseInfo.currentPrice || courseInfo.currentPrice <= 0)) {
           setValidationError("Please provide a valid current price.");
+          return;
+        }
+        if (courseInfo.courseType !== "free" && (!courseInfo.price || courseInfo.price <= 0)) {
+          setValidationError("Please provide a valid MRP.");
           return;
         }
        
