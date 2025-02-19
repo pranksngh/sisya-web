@@ -48,6 +48,8 @@ import TeacherLeaves from '../pages/HR/TeacherLeaves';
 import LiveClassRoom from '../pages/Teacher/LiveClassRoom';
 import VideoCallPage from '../pages/Teacher/videocall';
 import EditClass from '../pages/Teacher/EditClass';
+import ClassRoom from '../pages/Teacher/ClassRoom';
+import ChangePassword from '../pages/Teacher/changePassword';
 
 const router = createBrowserRouter([
   {
@@ -59,6 +61,13 @@ const router = createBrowserRouter([
     element: React.createElement(
      
       LiveClassRoom
+    ),
+  },
+  {
+    path: 'classroom',
+    element: React.createElement(
+     
+      ClassRoom
     ),
   },
 
@@ -362,6 +371,13 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           EditClass
+        ),
+      },
+      {
+        path: 'change-password',
+        element: React.createElement(
+         
+          ChangePassword
         ),
       },
       

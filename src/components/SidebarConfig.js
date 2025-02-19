@@ -208,12 +208,20 @@ const sidebarConfig = [
     expandable: false,
   },
   {
+    label: "Change Password",
+    icon: "Lock",
+    path: "change-password",
+    roles: ["teacher"],
+    expandable: false,
+  },
+  {
     label: "Logout",
     icon: "ExitToApp",
     path: "/",
     roles: ["teacher", "admin", "mentor", "hr"],
     expandable: false,
   },
+ 
 ];
 
 export default sidebarConfig;
