@@ -310,7 +310,7 @@ function StudentData() {
               <TableCell>ID</TableCell>
               <TableCell>Name</TableCell>
     
-              <TableCell>Email</TableCell>
+            
               <TableCell>Phone</TableCell>
               <TableCell>Grade</TableCell>
             
@@ -324,7 +324,6 @@ function StudentData() {
               <TableRow key={index}>
                 <TableCell>{index+1}</TableCell>
                 <TableCell>{row.name}</TableCell>
-                <TableCell> {row.email}</TableCell>
                 <TableCell>{row.phone}</TableCell>
                 <TableCell>{row.grade}</TableCell>
                 <TableCell>{formatDate(row.createdOn)}</TableCell>
