@@ -104,7 +104,7 @@ const TeacherLeavesData = () => {
       }
     } catch (error) {
       toast.error('Error approving leave.');
-      console.error('Error approving leave:', error);
+     // console.error('Error approving leave:', error);
     }
   };
 

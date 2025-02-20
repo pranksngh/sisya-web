@@ -97,7 +97,7 @@ export default function VideoCallPage() {
                   // Add icons for mute/unmute and other controls (like the mic and camera shown in the image)
                 
         
-                  console.log(`User stream added with ID: ${videostreamID}`);
+                 // console.log(`User stream added with ID: ${videostreamID}`);
                 }
                 document.getElementById(`video_${videostreamID}`).srcObject = stream;
 
@@ -168,7 +168,7 @@ export default function VideoCallPage() {
         });
 
         zg.on('roomUserUpdate', (roomID, updateType, userList) => {
-          console.log("Usertype is " + JSON.stringify(updateType));
+      //    console.log("Usertype is " + JSON.stringify(updateType));
           if (updateType === 'ADD') {
             setUserList((prevList) => [...prevList, ...userList].map(e=>{e.isMuted=true; return e}));
             userList.forEach(user => {
@@ -452,7 +452,7 @@ const endCall = async()=>{
   };
 
   const handleDeclineSpeakRequest = (userID) => {
-    console.log('Declined speak request for user:', userID);
+  //  console.log('Declined speak request for user:', userID);
    // socketService.emit('toggle:mic:teacher', { token: roomID, data: { userID, isMuted: true, raisedRequest: true } });
     setUserList(prevList =>
       prevList.map(user =>

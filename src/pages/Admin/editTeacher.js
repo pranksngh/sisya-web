@@ -133,7 +133,7 @@ const EditTeacher = () => {
 
   const fetchSubjects = async(grade) => {
     const sgrade = parseInt(grade, 10);
-    console.log(sgrade);
+   // console.log(sgrade);
     try {
       const subjectResponse = await fetch('https://sisyabackend.in/student/get_subjects_by_grade', {
         method: 'POST',
@@ -465,7 +465,7 @@ const EditTeacher = () => {
                       onChange={(e) => {
                         const selectedId = e.target.value; // Get the selected subject ID
                         const selectedSubject = subjectOptions.find(subject => subject.id === parseInt(selectedId)); // Find the subject object
-                        console.log("Selected subject is: ", JSON.stringify(selectedSubject));
+                     //   console.log("Selected subject is: ", JSON.stringify(selectedSubject));
                         setFormData({ ...formData, selectedSubject })
                       
                       }}

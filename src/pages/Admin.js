@@ -17,7 +17,7 @@ import { getUser } from '../Functions/Login';
 function Admin() {
   const user = getUser();
  useEffect(()=>{
-console.log(user);
+// console.log(user);
  },[])
   const [totalStudentCount, setTotalStudentCount] = useState(0);
   const [students, setStudents] = useState([]);

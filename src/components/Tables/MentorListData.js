@@ -124,7 +124,7 @@ const MentorListData = () => {
 
   const handleClassSelection = (classNumber) => {
     setSelectedClass(classNumber);
-    console.log(`Class ${classNumber} selected`);
+   // console.log(`Class ${classNumber} selected`);
   };
 
   const handleDateChange = (e) => {

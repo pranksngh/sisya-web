@@ -133,7 +133,7 @@ const SalesMentorListData = () => {
         toast.error('Operation failed. Please try again');
       }
     } catch (error) {
-      console.error('Error:', error);
+   //   console.error('Error:', error);
       toast.error('An error occurred!');
     } finally {
       setLoading(false);

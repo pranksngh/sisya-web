@@ -32,7 +32,7 @@ const EditCourse = () => {
    const navigate = useNavigate();
   const location = useLocation();
   const courseData = location.state?.course || {};
-  console.log("Edit Course Data", courseData.id);
+ // console.log("Edit Course Data", courseData.id);
   // Step 1 States
   const [banner, setBanner] = useState(`https://sisyabackend.in/student/thumbs/courses/${courseData.id}.jpg`);
   const [mainImage, setMainImage] = useState(`https://sisyabackend.in/student/thumbs/mcourses/${courseData.id}.jpg`);

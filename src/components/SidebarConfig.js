@@ -124,6 +124,13 @@ const sidebarConfig = [
     expandable: false,
   },
   {
+    label: "Registration",
+    icon: "Image",
+    path: "registration",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
     label: "Push Notification",
     icon: "NotificationsActive",
     path: "pushNotification",

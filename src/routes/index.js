@@ -50,6 +50,7 @@ import VideoCallPage from '../pages/Teacher/videocall';
 import EditClass from '../pages/Teacher/EditClass';
 import ClassRoom from '../pages/Teacher/ClassRoom';
 import ChangePassword from '../pages/Teacher/changePassword';
+import Registration from '../pages/Admin/Registrations';
 
 const router = createBrowserRouter([
   {
@@ -245,6 +246,13 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           Banners
+        ),
+      },
+      {
+        path: 'registration',
+        element: React.createElement(
+         
+          Registration
         ),
       },
       {

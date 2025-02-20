@@ -88,7 +88,7 @@ export default function LiveClassRoom() {
     });
 
     socketService.on('connect_error', (error) => {
-      console.log('Connection error:', error.message);
+    //  console.log('Connection error:', error.message);
       if (error.code === 1100002) {
       //  console.log('Network timeout detected, attempting to reconnect...');
         setTimeout(initZego, 5000);
@@ -223,7 +223,7 @@ export default function LiveClassRoom() {
         });
 
         zg.on('roomUserUpdate', (roomID, updateType, userList) => {
-          console.log("Usertype is " + JSON.stringify(userList));
+        //  console.log("Usertype is " + JSON.stringify(userList));
           if (updateType === 'ADD') {
             setUserList((prevList) => [...prevList, ...userList].map(e=>{e.isMuted=true; return e}));
             userList.forEach(user => {

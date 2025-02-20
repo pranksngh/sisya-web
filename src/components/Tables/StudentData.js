@@ -229,7 +229,7 @@ function StudentData() {
       const result = await response.json();
 
       if (result.success && result.studentList.length > 0) {
-        console.log("Student list: ", result.studentList);
+      //  console.log("Student list: ", result.studentList);
         setStudentList(result.studentList);
       } else {
         setStudentList([]);
