@@ -98,10 +98,10 @@ function SubjectData() {
         handleClose();
         fetchSubjectData();
       } else {
-        console.log("Add Subject Failed", JSON.stringify(result.error));
+      //  console.log("Add Subject Failed", JSON.stringify(result.error));
       }
     } catch (error) {
-      console.log("Error adding subject:", error);
+     // console.log("Error adding subject:", error);
     }
   };
 
@@ -125,12 +125,12 @@ function SubjectData() {
       if (result.success) {
         fetchSubjectData();
         handleUpdateCloseModal();
-        console.log("Subject Status Changed Successfully");
+     //   console.log("Subject Status Changed Successfully");
       } else {
-        console.log("Failed to update subject status");
+      //  console.log("Failed to update subject status");
       }
     } catch (error) {
-      console.log("Error updating subject:", error);
+    //  console.log("Error updating subject:", error);
     }
   };
 
@@ -157,12 +157,12 @@ function SubjectData() {
       if (result.success) {
         fetchSubjectData();
         handleEditModalClose();
-        console.log("Subject Updated Successfully");
+     //   console.log("Subject Updated Successfully");
       } else {
-        console.log("Failed to update subject");
+      //  console.log("Failed to update subject");
       }
     } catch (error) {
-      console.log("Error updating subject:", error);
+    //  console.log("Error updating subject:", error);
     }
   };
 
@@ -181,10 +181,10 @@ function SubjectData() {
       if (result.success) {
         setSubjects(result.subjects);
       } else {
-        console.error("Failed to fetch subjects");
+       // console.error("Failed to fetch subjects");
       }
     } catch (error) {
-      console.error("Error fetching subjects:", error);
+    //  console.error("Error fetching subjects:", error);
     }
   };
 
@@ -198,10 +198,10 @@ function SubjectData() {
       if (result.success) {
         setBoards(result.boards);
       } else {
-        console.error("Failed to fetch boards");
+       // console.error("Failed to fetch boards");
       }
     } catch (error) {
-      console.error("Error fetching boards:", error);
+     // console.error("Error fetching boards:", error);
     }
   };
 

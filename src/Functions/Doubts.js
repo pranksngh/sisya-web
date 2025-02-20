@@ -8,6 +8,6 @@ export const fetchDoubtList = async () => {
      return result;
       
     } catch (error) {
-      console.error('Error fetching doubts:', error);
+    //  console.error('Error fetching doubts:', error);
     }
   };

@@ -57,8 +57,8 @@ export default function LiveClassRoom() {
     const tokenvalue = localStorage.getItem('token');
     const token = 'YOUR_AUTH_TOKEN';
     const fromUUID = userInfo.mentor.uuid;
-    console.log("token is " + tokenvalue);
-    console.log('Initializing socket...');
+  //  console.log("token is " + tokenvalue);
+  //  console.log('Initializing socket...');
     socketService.initializeSocket(tokenvalue, fromUUID);
    
     socketService.on('connect', () => {
@@ -76,7 +76,7 @@ export default function LiveClassRoom() {
       }, 1000);
 
       socketService.on('request:mic:teacher', (data) => {
-        console.log("got new speak request from user " + JSON.stringify(data));
+    //    console.log("got new speak request from user " + JSON.stringify(data));
         setSpeakRequests((prevRequests) => [...prevRequests, data]);
       });
 
@@ -84,13 +84,13 @@ export default function LiveClassRoom() {
     });
 
     socketService.on('disconnect', () => {
-      console.log('Socket disconnected');
+    //  console.log('Socket disconnected');
     });
 
     socketService.on('connect_error', (error) => {
       console.log('Connection error:', error.message);
       if (error.code === 1100002) {
-        console.log('Network timeout detected, attempting to reconnect...');
+      //  console.log('Network timeout detected, attempting to reconnect...');
         setTimeout(initZego, 5000);
       }
     });
@@ -102,7 +102,7 @@ export default function LiveClassRoom() {
 
         const result = await zg.checkSystemRequirements();
         if (!result.webRTC) {
-          console.log("Browser does not support required WebRTC features.");
+       //   console.log("Browser does not support required WebRTC features.");
           return;
         }
 
@@ -130,20 +130,20 @@ export default function LiveClassRoom() {
 
         zg.on('publisherStateUpdate', (result) => {
           if (result.state === 'PUBLISHING') {
-            console.log('Publishing started');
+          //  console.log('Publishing started');
           } else if (result.state === 'NO_PUBLISH') {
-            console.log(`Publishing failed with error code: ${result.errorCode}`);
+         //   console.log(`Publishing failed with error code: ${result.errorCode}`);
           }
         });
 
         zg.on('roomStreamUpdate', async (roomID, updateType, streamList) => {
-          console.log("Room stream update type is " + JSON.stringify(streamList));
+        //  console.log("Room stream update type is " + JSON.stringify(streamList));
         
           if (updateType === 'ADD') {
             
             streamList.forEach(async (stream) => {
               
-              console.log("stream id is " + stream.streamID);
+         //     console.log("stream id is " + stream.streamID);
               const remoteStream = await zg.startPlayingStream(stream.streamID);
               setRemoteStreams((prevStreams) => [...prevStreams, remoteStream]);
         
@@ -187,7 +187,7 @@ export default function LiveClassRoom() {
         
                
         
-                  console.log(`User stream added with ID: ${stream.streamID}`);
+              //    console.log(`User stream added with ID: ${stream.streamID}`);
                 }
                 document.getElementById(`video_${stream.streamID}`).srcObject = remoteStream;
               }
@@ -197,14 +197,14 @@ export default function LiveClassRoom() {
               const streamDiv = document.getElementById(`remoteStream_${stream.streamID}`);
               if (streamDiv) {
                 streamDiv.remove();
-                console.log(`Removed user stream with ID: ${stream.streamID}`);
+            //    console.log(`Removed user stream with ID: ${stream.streamID}`);
               }
             });
         
             setRemoteStreams((prevStreams) =>
               prevStreams.filter(s => !streamList.find(st => st.streamID === s.streamID))
             );
-            console.log("Streams deleted:", streamList.map(s => s.streamID).join(", "));
+         //   console.log("Streams deleted:", streamList.map(s => s.streamID).join(", "));
           }
         });
         
@@ -237,14 +237,14 @@ export default function LiveClassRoom() {
         zg.on('streamExtraInfoUpdate', (roomID, streamList) => {
           streamList.forEach((stream) => {
             if (stream.extraInfo && stream.extraInfo.reason === '18') {
-              console.log('Stream refused to pull, reason: 18');
+          //    console.log('Stream refused to pull, reason: 18');
             }
           });
         });
         
       } catch (error) {
         if (error.message.includes('network timeout') || error.code === 1100002) {
-          console.log('Network timeout detected, attempting to reconnect...');
+        //  console.log('Network timeout detected, attempting to reconnect...');
           setTimeout(initZego, 5000);
         }
       }
@@ -297,12 +297,12 @@ export default function LiveClassRoom() {
         // Reattach the stream to the video element
         const videoElement = document.getElementById('hostVideo');
         if (videoElement) {
-          console.log("getting videoElement");
+      //    console.log("getting videoElement");
           videoElement.srcObject = null; // Clear the current stream
           videoElement.srcObject = localStream;  // Reattach the local stream
           videoElement.play();  // Play the video stream to ensure it's active
         }else{
-          console.log("not getting videoElement")
+      //    console.log("not getting videoElement")
         }
       }
     }
@@ -329,7 +329,7 @@ export default function LiveClassRoom() {
         if (screenVideoElement) {
           screenVideoElement.srcObject = screenStream;
         } else {
-          console.error("Screen video element not found in DOM");
+      //    console.error("Screen video element not found in DOM");
         }
   
         zegoEngine.startPublishingStream(screenStreamID, screenStream);
@@ -343,7 +343,7 @@ export default function LiveClassRoom() {
           stopScreenShare();
         };
       } catch (error) {
-        console.error('Error sharing screen:', error);
+     //   console.error('Error sharing screen:', error);
       }
     }
   };
@@ -375,15 +375,15 @@ export default function LiveClassRoom() {
     if(result.success){
       zegoEngine.logoutRoom(streamInfo.roomId);
       zegoEngine.destroyEngine();
-      console.log('Left room and stopped publishing' + roomID);
+   //   console.log('Left room and stopped publishing' + roomID);
       socketService.emit("class:end",{token: roomID, data:{isClosed:true}});
       socketService.emit("class:end",{token: streamInfo.Token, data:{isClosed:true}});
       navigate("../dashboard/teacher");
     }else{
-      console.log("update session failed");
+   //   console.log("update session failed");
     }
     }catch(error){
-      console.log("error updating session", error);
+    //  console.log("error updating session", error);
     }
    }
   const leaveRoom = () => {
@@ -407,7 +407,7 @@ export default function LiveClassRoom() {
         setMessages([...messages, { userID: mentorId, userName, message }]);
         setMessage("");
       }).catch(error => {
-        console.error("Failed to send message", error);
+     //   console.error("Failed to send message", error);
       });
     }
   };
@@ -434,7 +434,7 @@ export default function LiveClassRoom() {
   };
 
   const handleAcceptSpeakRequest = (userID) => {
-    console.log('Accepted speak request for user:', userID);
+   // console.log('Accepted speak request for user:', userID);
     socketService.emit('toggle:mic:teacher', { token: roomID, data: { userID, isMuted: false, raisedRequest: true } });
     setUserList(prevList =>
       prevList.map(user =>
@@ -445,7 +445,7 @@ export default function LiveClassRoom() {
   };
 
   const handleDeclineSpeakRequest = (userID) => {
-    console.log('Declined speak request for user:', userID);
+  //  console.log('Declined speak request for user:', userID);
     socketService.emit('toggle:mic:teacher', { token: roomID, data: { userID, isMuted: true, raisedRequest: true } });
     setUserList(prevList =>
       prevList.map(user =>

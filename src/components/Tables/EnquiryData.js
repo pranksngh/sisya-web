@@ -51,10 +51,10 @@ const EnquiryData = () => {
         setEnquiryList(result.inq);
         setFilteredData(result.inq);
       } else {
-        console.error("Failed to fetch boards");
+       // console.error("Failed to fetch boards");
       }
     } catch (error) {
-      console.error("Error fetching boards:", error);
+     // console.error("Error fetching boards:", error);
     }
   };
 
@@ -133,7 +133,7 @@ const EnquiryData = () => {
       }
     } catch (error) {
       setLoading(false);
-      console.error("Error updating/adding board:", error);
+     // console.error("Error updating/adding board:", error);
       setErrorMessage('An error occurred. Please try again.');
     }
   };

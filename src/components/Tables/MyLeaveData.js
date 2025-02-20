@@ -54,14 +54,14 @@ function LeaveRequestData() {
   
       if (result.success) {
         handleClose();  // Close the modal using the correct function
-        console.log("leave added successfully");
+      //  console.log("leave added successfully");
         toast.success('Leave requested successfully.');  // Show success toast
       } else {
         setLeaveErrorMessage(result.message || 'Something went wrong. Please try again.');
       }
     } catch (error) {
       setLeaveLoading(false);
-      console.error("Error requesting leave:", error);
+   //   console.error("Error requesting leave:", error);
       setLeaveErrorMessage('An error occurred. Please try again.');
     }
   };
@@ -84,10 +84,10 @@ function LeaveRequestData() {
         const uniqueMentorIds = [...new Set(result.leaves.map(item => item.mentorId))];
         uniqueMentorIds.forEach(fetchMentorDetails);
       } else {
-        console.error('Failed to fetch leaves');
+      //  console.error('Failed to fetch leaves');
       }
     } catch (error) {
-      console.error('Error fetching leaves:', error);
+    //  console.error('Error fetching leaves:', error);
     }
   };
 
@@ -110,7 +110,7 @@ function LeaveRequestData() {
         }));
       }
     } catch (error) {
-      console.error('Error fetching mentor details:', error);
+   //   console.error('Error fetching mentor details:', error);
     }
   };
 

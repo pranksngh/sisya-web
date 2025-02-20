@@ -7,6 +7,6 @@ export const fetchSalesmenData = async () => {
       const result = await response.json();
      return result;
     } catch (error) {
-      console.error('Error fetching salesmen:', error);
+    //  console.error('Error fetching salesmen:', error);
     }
   };

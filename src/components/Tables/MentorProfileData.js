@@ -104,10 +104,10 @@ const MentorProfileData = () => {
       if (result.success) {
         setMentorDetails(result.salesman); // Store mentor details in state
       } else {
-        console.error('Failed to fetch mentor details');
+       // console.error('Failed to fetch mentor details');
       }
     } catch (error) {
-      console.error('Error fetching mentor details:', error);
+     // console.error('Error fetching mentor details:', error);
     }
   };
 
@@ -135,10 +135,10 @@ const MentorProfileData = () => {
 
         setLeaves([...gazettedHolidays, ...acceptedLeaves]); // Combine gazetted holidays with accepted leaves
       } else {
-        console.error('Failed to fetch mentor leaves');
+      //  console.error('Failed to fetch mentor leaves');
       }
     } catch (error) {
-      console.error('Error fetching mentor leaves:', error);
+    //  console.error('Error fetching mentor leaves:', error);
     }
   };
   const fetchAttendanceRecords = async () => {
@@ -158,10 +158,10 @@ const MentorProfileData = () => {
       if (result.success) {
         setAttendanceRecords(result.records || []); // Set fetched attendance records
       } else {
-        console.error('Failed to fetch attendance data');
+       // console.error('Failed to fetch attendance data');
       }
     } catch (error) {
-      console.error('Error fetching attendance data:', error);
+     // console.error('Error fetching attendance data:', error);
     }
   };
 

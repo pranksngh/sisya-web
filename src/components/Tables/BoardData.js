@@ -62,7 +62,7 @@ function BoardData() {
 
   const handleSubmit = async() => {
     // Add your submission logic here
-    console.log('Form Data Submit:', formData);
+  //  console.log('Form Data Submit:', formData);
 
     try {
         const response = await fetch('https://sisyabackend.in/rkadmin/add_board', {
@@ -80,11 +80,11 @@ function BoardData() {
             //refresh board data
             fetchBoardData();
         }else{
-            console.log("Add Board Failed", JSON.stringify(result.error));
+         //   console.log("Add Board Failed", JSON.stringify(result.error));
         }
       } catch (error) {
        // setLoading(false); // Stop loading
-        console.log("Error updating/adding board:", error);
+       // console.log("Error updating/adding board:", error);
       //  setErrorMessage('An error occurred. Please try again.');
       }
    
@@ -112,19 +112,19 @@ function BoardData() {
       if (updateboardResult.sucess) {
         fetchBoardData();
         handleDeleteModalClose();
-        console.log("Boards Deleted successfully");
+      //  console.log("Boards Deleted successfully");
       } else {
-        console.error("Failed to update boards");
+      //  console.error("Failed to update boards");
       }
     } catch (error) {
-      console.error("Error updating boards:", error);
+    //  console.error("Error updating boards:", error);
     }
        
   }
 
   const handleDelete = async()=>{
 
-    console.log("Selected Board is " + JSON.stringify(selectedBoard));
+   // console.log("Selected Board is " + JSON.stringify(selectedBoard));
     ChangeBoardStatus();
   }
 
@@ -145,10 +145,10 @@ function BoardData() {
         handleEditModalClose();
         fetchBoardData();
       } else {
-        console.error('Edit Board Failed', result.error);
+       // console.error('Edit Board Failed', result.error);
       }
     } catch (error) {
-      console.error('Error editing board:', error);
+    //  console.error('Error editing board:', error);
     }
   };
 
@@ -170,12 +170,12 @@ function BoardData() {
 
       if (boardResult.success) {
         setBoards(boardResult.boards);
-        console.log("Boards fetched successfully");
+      //  console.log("Boards fetched successfully");
       } else {
-        console.error("Failed to fetch boards");
+       // console.error("Failed to fetch boards");
       }
     } catch (error) {
-      console.error("Error fetching boards:", error);
+     // console.error("Error fetching boards:", error);
     }
   };
 

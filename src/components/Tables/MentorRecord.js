@@ -27,10 +27,10 @@ function MentorRecord() {
       if (result.success) {
         setMentors(result.salesmen);
       } else {
-        console.log('Mentor List Issue', JSON.stringify(result));
+      //  console.log('Mentor List Issue', JSON.stringify(result));
       }
     } catch (error) {
-      console.log('Mentor List Error', JSON.stringify(error));
+    //  console.log('Mentor List Error', JSON.stringify(error));
     }
   };
 

@@ -76,15 +76,15 @@ const ChatLayoutData = () => {
     socketService.initializeSocket(token, fromUUID);
 
     socketService.on('connect', () => {
-      console.log('Socket connected');
+     // console.log('Socket connected');
     });
 
     socketService.on('disconnect', () => {
-      console.log('Socket disconnected');
+     // console.log('Socket disconnected');
     });
 
     socketService.on('connect_error', (error) => {
-      console.log('Connection error:', error.message);
+     // console.log('Connection error:', error.message);
     });
 
     socketService.on('accept_message', handleNewMessage);

@@ -94,7 +94,7 @@ const TeacherProfileData = () => {
         setMentorDetails(result.mentor);
       }
     } catch (error) {
-      console.error('Error fetching mentor details:', error);
+    //  console.error('Error fetching mentor details:', error);
     }
   };
 
@@ -110,7 +110,7 @@ const TeacherProfileData = () => {
         setLeaves(result.leaveRequests || []);
       }
     } catch (error) {
-      console.error('Error fetching mentor leaves:', error);
+    //  console.error('Error fetching mentor leaves:', error);
     }
   };
   const fetchAttendanceRecords = async (mentorId) => {
@@ -125,7 +125,7 @@ const TeacherProfileData = () => {
         setAttendanceRecords(result.records || []);
       }
     } catch (error) {
-      console.error('Error fetching attendance data:', error);
+   //   console.error('Error fetching attendance data:', error);
     }
   };
 

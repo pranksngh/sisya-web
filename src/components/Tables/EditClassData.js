@@ -48,7 +48,7 @@ const EditClassData = () => {
   });
 
   useEffect(() => {
-    console.log("my session info is ", JSON.stringify(sessionInfo));
+   // console.log("my session info is ", JSON.stringify(sessionInfo));
     fetchCourses();
   }, []);
   useEffect(()=>{
@@ -70,7 +70,7 @@ const EditClassData = () => {
         setCourseList(result.courses || []);
       }
     } catch (error) {
-      console.error('Error fetching course:', error);
+    //  console.error('Error fetching course:', error);
     }
   };
  
@@ -88,7 +88,7 @@ const EditClassData = () => {
         setMentorDetails(result.mentor);
       }
     } catch (error) {
-      console.error('Error fetching mentor details:', error);
+    //  console.error('Error fetching mentor details:', error);
     }
   };
 
@@ -106,7 +106,7 @@ const EditClassData = () => {
         return result.subjects[0].name;
       }
     } catch (error) {
-      console.error('Error fetching subject details:', error);
+     // console.error('Error fetching subject details:', error);
     }
     return null;
   };
@@ -194,7 +194,7 @@ const EditClassData = () => {
         alert('Failed to add class');
       }
     } catch (error) {
-      console.error('Error adding class:', error);
+     // console.error('Error adding class:', error);
       alert('An error occurred while adding the class.');
     }
   };

@@ -27,10 +27,10 @@ function StudentRecords() {
       if (result.success) {
         setStudents(result.studentList);
       } else {
-        console.log('Student List Issues', JSON.stringify(result));
+      //  console.log('Student List Issues', JSON.stringify(result));
       }
     } catch (error) {
-      console.log('Student List Error', JSON.stringify(error));
+    //  console.log('Student List Error', JSON.stringify(error));
     }
   };
 

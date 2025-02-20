@@ -13,7 +13,7 @@ export const addBoardFunction = async(formData)=>{
        return  result;
       } catch (error) {
        // setLoading(false); // Stop loading
-        console.log("Error updating/adding board:", error);
+      //  console.log("Error updating/adding board:", error);
       //  setErrorMessage('An error occurred. Please try again.');
       }
 

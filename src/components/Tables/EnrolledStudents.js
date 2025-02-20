@@ -35,7 +35,7 @@ function EnrolledStudents() {
         body: JSON.stringify({ mentorId: user.mentor.id }),
       });
       const result = await response.json();
-      console.log('Enrolled Students API Response:', result);
+    //  console.log('Enrolled Students API Response:', result);
 
       if (result.success && result.endUsers) {
         // Remove duplicates based on student id
@@ -47,7 +47,7 @@ function EnrolledStudents() {
         setEnrolledStudents([]);
       }
     } catch (error) {
-      console.log('Error fetching enrolled students:', error);
+     // console.log('Error fetching enrolled students:', error);
     } finally {
       setLoadingStudents(false);
     }

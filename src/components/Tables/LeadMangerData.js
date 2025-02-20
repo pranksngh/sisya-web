@@ -35,7 +35,7 @@ const fetchLeadsData = async (setLeadsData, setFilteredLeads, setTotalLeads, set
       setFilteredLeads(leads);
     }
   } catch (error) {
-    console.error('Error fetching leads:', error);
+  //  console.error('Error fetching leads:', error);
   }
 };
 
@@ -51,7 +51,7 @@ const fetchCourses = async (setCourseList) => {
       setCourseList(shortTermCourses);
     }
   } catch (error) {
-    console.error('Error fetching courses:', error);
+ //   console.error('Error fetching courses:', error);
   }
 };
 
@@ -139,7 +139,7 @@ const LeadManagerData = () => {
       }
     } catch (error) {
       setIsLoading(false);
-      console.error('Error during file import:', error);
+   //   console.error('Error during file import:', error);
       toast.error('Error occurred during file upload.');
     }
   };
@@ -159,7 +159,7 @@ const LeadManagerData = () => {
         toast.error('Failed to approve lead.');
       }
     } catch (error) {
-      console.error('Error approving lead:', error);
+     // console.error('Error approving lead:', error);
       toast.error('Error occurred while approving the lead.');
     }
   };
@@ -179,7 +179,7 @@ const LeadManagerData = () => {
         toast.error('Failed to reject lead.');
       }
     } catch (error) {
-      console.error('Error rejecting lead:', error);
+    //  console.error('Error rejecting lead:', error);
       toast.error('Error occurred while rejecting the lead.');
     }
   };

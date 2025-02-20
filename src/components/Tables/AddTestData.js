@@ -43,7 +43,7 @@ const AddTestData = () => {
     const matchingTeachIntro = course.TeachIntro.find(
       (intro) => intro.mentorId === user.mentor.id
     );
-    console.log(matchingTeachIntro);
+  //  console.log(matchingTeachIntro);
    
       setHomeworkData({
         ...homeworkData,
@@ -123,7 +123,7 @@ const AddTestData = () => {
     const matchingTeachIntro = course.TeachIntro.find(
       (intro) => intro.mentorId === user.mentor.id
     );
-    console.log(matchingTeachIntro);
+  //  console.log(matchingTeachIntro);
    
       setHomeworkData({
         ...homeworkData,
@@ -136,7 +136,7 @@ const AddTestData = () => {
     
     
 
-    console.log("coursetest data is ", JSON.stringify(homeworkData));
+ //   console.log("coursetest data is ", JSON.stringify(homeworkData));
     const response = await fetch("https://sisyabackend.in/rkadmin/insert_ctest", {
       method: "POST",
       headers: {
@@ -147,10 +147,10 @@ const AddTestData = () => {
 
     const result = await response.json();
     if (result.success) {
-      console.log("Ctest Added Successfully");
+    //  console.log("Ctest Added Successfully");
       navigate("/homework");
     } else {
-      console.log("Course Test Addition Failed", JSON.stringify(result));
+     // console.log("Course Test Addition Failed", JSON.stringify(result));
     }
   };
 

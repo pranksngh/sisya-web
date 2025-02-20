@@ -58,7 +58,10 @@ const DoubtScreenLayoutData = () => {
           setFilteredDoubtList(sortedDoubts);
         }
       })
-      .catch(error => console.error('Error fetching doubts:', error));
+      .catch(error => 
+        console.error('Error fetching doubts:'
+
+        ));
   };
 
   useEffect(() => {
@@ -176,7 +179,7 @@ const DoubtScreenLayoutData = () => {
       const result = await response.json();
       if (result.success) {
         setDoubtStatus(2); // Update local status to 2
-        console.log('Doubt status updated to resolved');
+       // console.log('Doubt status updated to resolved');
 
         // Refresh the doubt list after resolving
         fetchDoubtList();
@@ -202,15 +205,15 @@ const DoubtScreenLayoutData = () => {
 
         const notificationResult = await notificationResponse.json();
         if (notificationResult.success) {
-          console.log("Notification sent successfully");
+        //  console.log("Notification sent successfully");
         } else {
-          console.error("Failed to send notification:", notificationResult.message);
+        //  console.error("Failed to send notification:", notificationResult.message);
         }
       } else {
-        console.error('Failed to update doubt status:', result.message);
+       // console.error('Failed to update doubt status:', result.message);
       }
     } catch (error) {
-      console.error('Error updating doubt status:', error);
+     // console.error('Error updating doubt status:', error);
     }
   };
 
@@ -242,7 +245,7 @@ const DoubtScreenLayoutData = () => {
 
           const result = await response.json();
           if (result.success) {
-            console.log('Doubt status updated successfully');
+          //  console.log('Doubt status updated successfully');
 
             const notificationResponse = await fetch('https://sisyabackend.in/rkadmin/send_notif2', {
               method: 'POST',
@@ -265,15 +268,15 @@ const DoubtScreenLayoutData = () => {
   
             const notificationResult = await notificationResponse.json();
             if (notificationResult.success) {
-              console.log("Notification sent successfully");
+           //   console.log("Notification sent successfully");
             } else {
-              console.error("Failed to send notification:", notificationResult.message);
+            //  console.error("Failed to send notification:", notificationResult.message);
             }
           } else {
-            console.error('Failed to update doubt status:', result.message);
+          //  console.error('Failed to update doubt status:', result.message);
           }
         } catch (error) {
-          console.error('Error updating doubt status:', error);
+         // console.error('Error updating doubt status:', error);
         }
       }
     }
@@ -291,7 +294,7 @@ const DoubtScreenLayoutData = () => {
       const mimeType = matches[1];
       const fileName = matches[2];
       
-    console.log("mime type is " + mimeType);
+   // console.log("mime type is " + mimeType);
       if (mimeType.startsWith('image/')) {
        
         return <img src={content} alt={fileName} className="message-image" style={{width:150,}} />;
@@ -338,7 +341,7 @@ const generateVideoToken = async(userData, roomid)=>{
     });
     }
   }catch(error){
-    console.log("something went wrong", error);
+   // console.log("something went wrong", error);
   }
 }
   const initiateCall = async (userData)=>{
@@ -381,7 +384,7 @@ const generateVideoToken = async(userData, roomid)=>{
        }
     
     } catch (error) {
-      console.log('JSON Stringify Eror:', error);
+     // console.log('JSON Stringify Eror:', error);
     }
   }
 

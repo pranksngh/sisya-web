@@ -26,7 +26,7 @@ const CourseDetailsData = () => {
     const [tabValue, setTabValue] = useState(0);
     const [homeworkModalOpen, sethomeworkModalOpen] = useState(false);
 
-    console.log("course Id is ", courseId);
+ //   console.log("course Id is ", courseId);
 
     const fetchCourseData = async () => {
         try {
@@ -49,12 +49,12 @@ const CourseDetailsData = () => {
                     fetchAttendanceData(courseData.session); // Fetch attendance for sessions
                 }
 
-                console.log("course data is " + JSON.stringify(courseData));
+              //  console.log("course data is " + JSON.stringify(courseData));
             } else {
                 setCourse({});
             }
         } catch (error) {
-            console.error('Error fetching course data:', error);
+         //   console.error('Error fetching course data:', error);
             setCourse({});
         }
     };
@@ -72,7 +72,7 @@ const CourseDetailsData = () => {
             const result = await response.json();
 
             // Debug the result to verify its structure
-            console.log('Enrolled Students API Response:', result);
+         //   console.log('Enrolled Students API Response:', result);
 
             if (result.success && result.users) {
                 setEnrolledStudents(result.users); // Set enrolled students data
@@ -81,7 +81,7 @@ const CourseDetailsData = () => {
                 toast.error(result.message || 'Failed to fetch enrolled students');
             }
         } catch (error) {
-            console.error('Error fetching enrolled students:', error);
+         //   console.error('Error fetching enrolled students:', error);
             toast.error('Error fetching enrolled students');
         }
     };
@@ -120,7 +120,7 @@ const CourseDetailsData = () => {
           }
       } catch (error) {
           setLoading(false);
-          console.error('Error starting session:', error);
+       //   console.error('Error starting session:', error);
           alert('Error starting session');
       }
   };
@@ -178,7 +178,7 @@ const CourseDetailsData = () => {
             const result = await response.json();
             return result;
         } catch (error) {
-            console.error('Error fetching user details:', error);
+         //   console.error('Error fetching user details:', error);
             return null;
         }
     };
@@ -602,7 +602,7 @@ const CourseDetailsData = () => {
       color="primary"
       size="small"
       onClick={() =>{
-       console.log("course data is", JSON.stringify(course));
+    //   console.log("course data is", JSON.stringify(course));
      navigate("../add-test",{state:{course}})
     
     }}

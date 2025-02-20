@@ -142,12 +142,12 @@ function StudentData() {
         
       
       } else {
-        console.log('Failed to add students', result.error);
+      //  console.log('Failed to add students', result.error);
       //  handleClose();
       
       }
     } catch (error) {
-      console.log("Error adding student:", error);
+    //  console.log("Error adding student:", error);
     //  handleClose();
      
     }
@@ -155,7 +155,7 @@ function StudentData() {
 
 
   const handleEditSubmit = async() =>{
-     console.log("Edit Form", JSON.stringify(formData));
+   //  console.log("Edit Form", JSON.stringify(formData));
      if (formData.imageData) {
       formData.imageData = formData.imageData.replace(/^data:image\/[a-z]+;base64,/, '');
     }
@@ -174,10 +174,10 @@ function StudentData() {
        handleEditModalClose();
       
       } else {
-       console.log("Student Update Failed", result.error);
+    //   console.log("Student Update Failed", result.error);
       }
     } catch (error) {
-      console.error("Error fetching students:", error);
+    //  console.error("Error fetching students:", error);
     }
   }
 
@@ -205,12 +205,12 @@ function StudentData() {
 
       if (boardResult.success) {
         setBoards(boardResult.boards);
-        console.log("Boards fetched successfully");
+      //  console.log("Boards fetched successfully");
       } else {
-        console.error("Failed to fetch boards");
+      //  console.error("Failed to fetch boards");
       }
     } catch (error) {
-      console.error("Error fetching boards:", error);
+    //  console.error("Error fetching boards:", error);
     }
   };
 
@@ -236,7 +236,7 @@ function StudentData() {
        
       }
     } catch (error) {
-      console.log("Error fetching students:", error);
+    //  console.log("Error fetching students:", error);
     }
   };
 

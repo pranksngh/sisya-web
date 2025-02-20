@@ -63,7 +63,7 @@ const SalesMentorListData = () => {
         setFilteredData(result?.salesmen);
       }
     } catch (error) {
-      console.error('Error fetching salesmen:', error);
+     // console.error('Error fetching salesmen:', error);
     }
   };
 

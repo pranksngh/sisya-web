@@ -40,10 +40,10 @@ const TeacherLeavesRecord = () => {
         const uniqueMentorIds = [...new Set(result.leaveRequests.map(item => item.mentorId))];
         uniqueMentorIds.forEach(fetchMentorDetails);
       } else {
-        console.error('Failed to fetch leaves');
+      //  console.error('Failed to fetch leaves');
       }
     } catch (error) {
-      console.error('Error fetching leaves:', error);
+     // console.error('Error fetching leaves:', error);
     }
   };
 
@@ -65,7 +65,7 @@ const TeacherLeavesRecord = () => {
         }));
       }
     } catch (error) {
-      console.error('Error fetching mentor details:', error);
+     // console.error('Error fetching mentor details:', error);
     }
   };
 
@@ -104,7 +104,7 @@ const TeacherLeavesRecord = () => {
       }
     } catch (error) {
       toast.error('Error approving leave.');
-      console.error('Error approving leave:', error);
+   //   console.error('Error approving leave:', error);
     }
   };
 
@@ -126,7 +126,7 @@ const TeacherLeavesRecord = () => {
       }
     } catch (error) {
       toast.error('Error rejecting leave.');
-      console.error('Error rejecting leave:', error);
+    //  console.error('Error rejecting leave:', error);
     }
   };
 
@@ -192,7 +192,7 @@ const TeacherLeavesRecord = () => {
       setLeaveLoading(false);
       setLeaveErrorMessage('An error occurred. Please try again.');
       toast.error('An error occurred. Please try again.');
-      console.error('Error requesting leave:', error);
+    //  console.error('Error requesting leave:', error);
     }
   };
 

@@ -47,7 +47,7 @@ function CourseData() {
 
   const handleSubmit = async() => {
     // Add your submission logic here
-    console.log('Form Data Submitte:', formData);
+  //  console.log('Form Data Submitte:', formData);
 
     try {
         const response = await fetch('https://sisyabackend.in/rkadmin/add_board', {
@@ -65,7 +65,7 @@ function CourseData() {
             //refresh board data
             fetchCourses();
         }else{
-            console.log("Add Board Failed", JSON.stringify(result.error));
+         //   console.log("Add Board Failed", JSON.stringify(result.error));
         }
       } catch (error) {
        // setLoading(false); // Stop loading
@@ -100,14 +100,14 @@ function CourseData() {
         alert("Failed to Update Course");
       }
     } catch (error) {
-      console.error("Error updating boards:", error);
+  //    console.error("Error updating boards:", error);
     }
        
   }
 
   const handleDelete = async()=>{
 
-    console.log("Selected Board is " + JSON.stringify(selectedBoard));
+   // console.log("Selected Board is " + JSON.stringify(selectedBoard));
     ChangeBoardStatus();
   }
 
@@ -128,10 +128,10 @@ function CourseData() {
         handleEditModalClose();
         fetchCourses();
       } else {
-        console.error('Edit Board Failed', result.error);
+       // console.error('Edit Board Failed', result.error);
       }
     } catch (error) {
-      console.error('Error editing board:', error);
+     // console.error('Error editing board:', error);
     }
   };
 
@@ -157,7 +157,7 @@ function CourseData() {
       setCourses(courseResult.bigCourses);
      // setFilteredData(courseResult.bigCourses);
 
-      console.log(JSON.stringify(courseResult));
+     // console.log(JSON.stringify(courseResult));
     }
   };
 

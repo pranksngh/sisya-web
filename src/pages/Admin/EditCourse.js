@@ -80,7 +80,7 @@ const EditCourse = () => {
   useEffect(() => {
   //  console.log("teach intro issue", JSON.stringify(courseData.TeachIntro))
     if (availableTeachers.length > 0 && courseData.TeachIntro) {
-      console.log("available teachers", JSON.stringify(availableTeachers));
+     // console.log("available teachers", JSON.stringify(availableTeachers));
       fetchSelectedTeachers();
     }
   }, [availableTeachers]); 
@@ -106,7 +106,7 @@ const EditCourse = () => {
       const base64 = await convertToBase64(file);
       setState(base64);
     } catch (error) {
-      console.error("Error fetching and converting image:", error);
+    //  console.error("Error fetching and converting image:", error);
     }
   };
 
@@ -118,7 +118,7 @@ const EditCourse = () => {
     setErrorModalOpen(false);
   };
    const fetchSelectedTeachers = () =>{
-    console.log("default teacher", courseData.TeachIntro.length);
+   // console.log("default teacher", courseData.TeachIntro.length);
 
     setSelectedTeachers([]);
     courseData.TeachIntro.forEach((mentor) => {
@@ -131,7 +131,7 @@ const EditCourse = () => {
       // Check if teacher is found
       if (teacher) {
         handleSubjectChange(mentor.mentorId, mentor.subjectId);
-         console.log("Selected teacher", JSON.stringify(teacher));
+       //  console.log("Selected teacher", JSON.stringify(teacher));
    
          // Get the subject for the teacher
          const subjectId = selectedSubjectsForTeachers[teacher.id];
@@ -149,7 +149,7 @@ const EditCourse = () => {
          ]);
       } else {
          // Handle case where teacher is not found
-         console.log(`Teacher with id ${mentor.mentorId} not found`);
+       //  console.log(`Teacher with id ${mentor.mentorId} not found`);
       }
    });
    
@@ -163,7 +163,7 @@ const EditCourse = () => {
         .map((subjectId) => available.find((s) => s.id === subjectId))
         .filter(Boolean); // Filter out nulls for non-matching subjects
       setSelectedSubjects(selected); // Use setState here
-      console.log("Selected subjects list", JSON.stringify(selected));
+   //   console.log("Selected subjects list", JSON.stringify(selected));
     }
   };
 
@@ -301,7 +301,7 @@ const EditCourse = () => {
     }
     if(name ==="grade" && value !== courseInfo.grade){
 
-        console.log("my grade is " + e.target.value)
+     //   console.log("my grade is " + e.target.value)
         fetchSubjects(e.target.value);
         fetchTeacherList(e.target.value);
     }
@@ -323,8 +323,8 @@ const EditCourse = () => {
       const updatedTeacher = { ...teacher, subjectId: subjectId.id };
    setSelectedTeachers([...selectedTeachers, updatedTeacher]);
      //  selectedTeachers.push(updatedTeacher);
-     console.log("selectd teachers length", JSON.stringify(selectedTeachers.length))
-      console.log("selectd teachers", JSON.stringify(selectedTeachers))
+    // console.log("selectd teachers length", JSON.stringify(selectedTeachers.length))
+    //  console.log("selectd teachers", JSON.stringify(selectedTeachers))
     } else {
       alert("Subject ID not found!");
     }
@@ -342,15 +342,15 @@ const EditCourse = () => {
       const result = await response.json();
       if (result.success) {
         setAvailableSubjects(result.subjects);
-        console.log("Subjects fetched successfully");
+      //  console.log("Subjects fetched successfully");
         fetchSelectedSubjects(result.subjects); // Only once
       }
     } catch (error) {
-      console.error("Error fetching Subjects:", error);
+     // console.error("Error fetching Subjects:", error);
     }
   };
   const fetchTeacherList = async (selectedGrade) => {
-    console.log("selected grade is " , selectedGrade);
+   // console.log("selected grade is " , selectedGrade);
     
     try {
       const mentorResponse = await fetch('https://sisyabackend.in/rkadmin/get_mentors', {
@@ -373,12 +373,12 @@ const EditCourse = () => {
 
        
 
-        console.log("Mentors fetched and filtered successfully",);
+      //  console.log("Mentors fetched and filtered successfully",);
       } else {
-        console.error("Failed to fetch Mentors");
+      //  console.error("Failed to fetch Mentors");
       }
     } catch (error) {
-      console.error("Error fetching Mentors:", error);
+     // console.error("Error fetching Mentors:", error);
     }
   };
 
@@ -462,7 +462,7 @@ const EditCourse = () => {
       }))
     };
 
-    console.log("selected teacher length", JSON.stringify(finalData));
+   // console.log("selected teacher length", JSON.stringify(finalData));
   
     try {
       const response = await fetch('https://sisyabackend.in/rkadmin/update_course', {
@@ -476,14 +476,14 @@ const EditCourse = () => {
       const result = await response.json();
 
       if (result.success) {
-         console.log("Course Updated Successfully");
+      //   console.log("Course Updated Successfully");
          setSuccessModalOpen(true); 
       } else {
         setErrorModalOpen(true);
        // alert(JSON.stringify(result.error));
       }
     } catch (error) {
-      console.log("Error adding course:", error);
+   //   console.log("Error adding course:", error);
       setErrorModalOpen(true);
     }
 

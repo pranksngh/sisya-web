@@ -33,13 +33,13 @@ export default function VideoCallPage() {
   const [remoteStreams, setRemoteStreams] = useState([]);
 
   onMessage(messaging, (payload) => {
-    console.log('Message received in the foreground:', payload);
+   // console.log('Message received in the foreground:', payload);
     const notificationData = payload.data;
-  console.log('Notification Data:', notificationData);
+ // console.log('Notification Data:', notificationData);
 
   // Check if the notification type is 'end_call'
   if (notificationData.type === 'end_call') {
-    console.log('The call has ended.');
+   // console.log('The call has ended.');
     // Handle the 'end_call' action as needed
     leaveRoom();
   }
@@ -57,7 +57,7 @@ export default function VideoCallPage() {
 
         const result = await zg.checkSystemRequirements();
         if (!result.webRTC) {
-          console.log("Browser does not support required WebRTC features.");
+        //  console.log("Browser does not support required WebRTC features.");
           return;
         }
 
@@ -105,19 +105,19 @@ export default function VideoCallPage() {
 
         zg.on('publisherStateUpdate', (result) => {
           if (result.state === 'PUBLISHING') {
-            console.log('Publishing started');
+         //   console.log('Publishing started');
             initiateCall();
           } else if (result.state === 'NO_PUBLISH') {
-            console.log(`Publishing failed with error code: ${result.errorCode}`);
+          //  console.log(`Publishing failed with error code: ${result.errorCode}`);
           }
         });
 
         zg.on('roomStreamUpdate', async (roomID, updateType, streamList) => {
-          console.log("Room stream update type is " + JSON.stringify(updateType));
+         // console.log("Room stream update type is " + JSON.stringify(updateType));
         
           if (updateType === 'ADD') {
             streamList.forEach(async (stream) => {
-              console.log("stream id is " + stream.streamID);
+           //   console.log("stream id is " + stream.streamID);
               const remoteStream = await zg.startPlayingStream(stream.streamID);
               setRemoteStreams((prevStreams) => [...prevStreams, remoteStream]);
         
@@ -125,14 +125,14 @@ export default function VideoCallPage() {
                                  stream.streamID.startsWith("hostscreen") ? 'Screen' : 'User';
         
               // Add stream to a card layout based on the stream type
-              console.log("stream type is " + streamType);
+          //    console.log("stream type is " + streamType);
               if (streamType === 'User') {
                 
                   const videoElement = document.getElementById('hostVideo');
                   if (videoElement) {
                     videoElement.srcObject = remoteStream;
                   } else {
-                    console.log('Video element with I "hostVideo" not found');
+                //    console.log('Video element with I "hostVideo" not found');
                   }
                
               }
@@ -142,14 +142,14 @@ export default function VideoCallPage() {
               const streamDiv = document.getElementById(`remoteStream_${stream.streamID}`);
               if (streamDiv) {
                 streamDiv.remove();
-                console.log(`Removed user stream with ID: ${stream.streamID}`);
+              //  console.log(`Removed user stream with ID: ${stream.streamID}`);
               }
             });
         
             setRemoteStreams((prevStreams) =>
               prevStreams.filter(s => !streamList.find(st => st.streamID === s.streamID))
             );
-            console.log("Streams deleted:", streamList.map(s => s.streamID).join(", "));
+         //   console.log("Streams deleted:", streamList.map(s => s.streamID).join(", "));
           }
         });
         
@@ -182,14 +182,14 @@ export default function VideoCallPage() {
         zg.on('streamExtraInfoUpdate', (roomID, streamList) => {
           streamList.forEach((stream) => {
             if (stream.extraInfo && stream.extraInfo.reason === '18') {
-              console.log('Stream refused to pull, reason: 18');
+           //   console.log('Stream refused to pull, reason: 18');
             }
           });
         });
         
       } catch (error) {
         // if (error.message.includes('network timeout') || error.code === 1100002) {
-          console.log('Network timeout detected, attempting to reconnect...');
+        //  console.log('Network timeout detected, attempting to reconnect...');
           setTimeout(initZego, 5000);
         // }
       }
@@ -283,14 +283,14 @@ const initiateCall = async()=>{
      const result = await response.json();
 
      if(result.success){
-          console.log("calling notification sent");
+       //   console.log("calling notification sent");
      }else{
-        console.log("calling notification sent failed");
+      //  console.log("calling notification sent failed");
      }
     
   
   } catch (error) {
-    console.log('JSON Stringify Error:', error);
+  //  console.log('JSON Stringify Error:', error);
   }
 }  
 
@@ -326,15 +326,15 @@ const endCall = async()=>{
      const result = await response.json();
 
      if(result.success){
-          console.log("call end working fine !!");
+       //   console.log("call end working fine !!");
           leaveRoom();
      }else{
-        console.log("end call not working");
+      //  console.log("end call not working");
      }
     
   
   } catch (error) {
-    console.log('JSON Stringify Error:', error);
+   // console.log('JSON Stringify Error:', error);
   }
 }  
   
@@ -356,7 +356,7 @@ const endCall = async()=>{
         if (screenVideoElement) {
           screenVideoElement.srcObject = screenStream;
         } else {
-          console.error("Screen video element not found in DOM");
+        //  console.error("Screen video element not found in DOM");
         }
   
         zegoEngine.startPublishingStream(screenStreamID, screenStream);
@@ -370,7 +370,7 @@ const endCall = async()=>{
           stopScreenShare();
         };
       } catch (error) {
-        console.error('Error sharing screen:', error);
+      //  console.error('Error sharing screen:', error);
       }
     }
   };
@@ -400,7 +400,7 @@ const endCall = async()=>{
       // }
       zegoEngine.logoutRoom(roomID);
       zegoEngine.destroyEngine();
-      console.log('Left room and stopped publishing' + roomID);
+   //   console.log('Left room and stopped publishing' + roomID);
       // socketService.emit("class:end",{token: roomID, data:{isClosed:true}});
       // socketService.emit("class:end",{token: streamInfo.Token, data:{isClosed:true}});
       navigate("../teacher");
@@ -414,7 +414,7 @@ const endCall = async()=>{
         setMessages([...messages, { userID: "prashant90654", userName, message }]);
         setMessage("");
       }).catch(error => {
-        console.error("Failed to send message", error);
+      //  console.error("Failed to send message", error);
       });
     }
   };
@@ -441,7 +441,7 @@ const endCall = async()=>{
   };
 
   const handleAcceptSpeakRequest = (userID) => {
-    console.log('Accepted speak request for user:', userID);
+  //  console.log('Accepted speak request for user:', userID);
   //  socketService.emit('toggle:mic:teacher', { token: roomID, data: { userID, isMuted: false, raisedRequest: true } });
     setUserList(prevList =>
       prevList.map(user =>

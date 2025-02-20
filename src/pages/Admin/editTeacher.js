@@ -55,7 +55,7 @@ const EditTeacher = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  console.log("teacher data" + JSON.stringify(teacherData));
+ // console.log("teacher data" + JSON.stringify(teacherData));
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -122,12 +122,12 @@ const EditTeacher = () => {
       setErrorModalOpen(true);
         }
       } catch (error) {
-        console.log("Error adding teacher:", error);
+    //    console.log("Error adding teacher:", error);
       //  alert("An error occurred while adding the teacher.");
       setErrorModalOpen(true);
       }
   
-    console.log("Form Data Submitted:", payload);
+ //   console.log("Form Data Submitted:", payload);
     // Add API call or validation logic here
   };
 
@@ -146,12 +146,12 @@ const EditTeacher = () => {
 
       if (subjectResult.success) {
         setSubjectOptions(subjectResult.subjects);
-        console.log("Subjects fetched successfully");
+       // console.log("Subjects fetched successfully");
       } else {
-        console.log("Failed to fetch Subjects");
+      //  console.log("Failed to fetch Subjects");
       }
     } catch (error) {
-      console.log("Error fetching Subjects:", error);
+    //  console.log("Error fetching Subjects:", error);
     }
   };
 

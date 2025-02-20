@@ -50,7 +50,7 @@ const TeacherReportData = () => {
         setFilteredTeachers(result.mentors); // Display all teachers initially
       }
     } catch (error) {
-      console.error('Error fetching teacher list:', error);
+     // console.error('Error fetching teacher list:', error);
     }
     setLoading(false);
   };
@@ -122,7 +122,7 @@ const TeacherReportData = () => {
       }
       setCourseData(dataList);
     } catch (error) {
-      console.error('Error while fetching course data', error);
+    //  console.error('Error while fetching course data', error);
     }
     setLoading(false);
   };

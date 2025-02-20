@@ -11,7 +11,7 @@ export const fetchCoursesList = async () => {
       
           return courseResult;
     }catch(error){
-     console.log("fetch course error", error);
+   //  console.log("fetch course error", error);
     }
 
   

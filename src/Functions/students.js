@@ -15,7 +15,7 @@ export const fetchStudentList = async () => {
       return result;
 
     } catch (error) {
-      console.error("Error fetching students:", error);
+    //  console.error("Error fetching students:", error);
       return [];
     }
   };

@@ -68,7 +68,7 @@ const CoursePurchaseListData = () => {
         setStudentList(result.studentList);
       }
     } catch (error) {
-      console.error('Error fetching students:', error);
+    //  console.error('Error fetching students:', error);
     }
   };
 

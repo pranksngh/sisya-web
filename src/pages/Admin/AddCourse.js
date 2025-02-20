@@ -229,7 +229,7 @@ const AddCourse = () => {
       const updatedTeacher = { ...teacher, subjectId: subjectId.id };
       setSelectedTeachers([...selectedTeachers, updatedTeacher]);
 
-      console.log("selected teachers", JSON.stringify(selectedTeachers))
+     // console.log("selected teachers", JSON.stringify(selectedTeachers))
     } else {
       alert("Subject ID not found!");
     }
@@ -250,17 +250,17 @@ const AddCourse = () => {
 
       if (subjectResult.success) {
         setAvailableSubjects(subjectResult.subjects);
-        console.log("Subjects fetched successfully");
+     //   console.log("Subjects fetched successfully");
       } else {
-        console.error("Failed to fetch Subjects", subjectResult.error);
+     //   console.error("Failed to fetch Subjects", subjectResult.error);
       }
     } catch (error) {
-      console.error("Error fetching Subjects:", error);
+    //  console.error("Error fetching Subjects:", error);
     }
   };
 
   const fetchTeacherList = async (selectedGrade) => {
-    console.log("selected grade is " , selectedGrade);
+   // console.log("selected grade is " , selectedGrade);
     try {
       const mentorResponse = await fetch('https://sisyabackend.in/rkadmin/get_mentors', {
         method: 'POST',
@@ -276,15 +276,15 @@ const AddCourse = () => {
           mentor.Grades.includes(selectedGrade.toString())
         );
 
-        console.log("Filtered Mentors List", JSON.stringify(filteredMentors));
+      //  console.log("Filtered Mentors List", JSON.stringify(filteredMentors));
         setAvailableTeachers(filteredMentors); // Set the filtered mentors in the state
 
-        console.log("Mentors fetched and filtered successfully");
+      //  console.log("Mentors fetched and filtered successfully");
       } else {
-        console.error("Failed to fetch Mentors");
+     //   console.error("Failed to fetch Mentors");
       }
     } catch (error) {
-      console.error("Error fetching Mentors:", error);
+     // console.error("Error fetching Mentors:", error);
     }
   };
 
@@ -369,7 +369,7 @@ const AddCourse = () => {
       }))
     };
 
-    console.log(JSON.stringify(finalData));
+   // console.log(JSON.stringify(finalData));
   
     try {
       const response = await fetch('https://sisyabackend.in/rkadmin/create_big_course', {
@@ -383,15 +383,15 @@ const AddCourse = () => {
       const result = await response.json();
 
       if (result.success) {
-         console.log("Course Added Successfully");
+       //  console.log("Course Added Successfully");
        //  alert("Course Added Successfully");
        setSuccessModalOpen(true);
       } else {
-        console.log("Course Addition Failed");
+      //  console.log("Course Addition Failed");
         setErrorModalOpen(true);
       }
     } catch (error) {
-      console.log("Error adding course:", error);
+     // console.log("Error adding course:", error);
       setErrorModalOpen(true);
     }
 

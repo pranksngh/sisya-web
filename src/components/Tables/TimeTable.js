@@ -30,7 +30,7 @@ const TimeTable = () => {
         setSessions([]);
       }
     } catch (error) {
-      console.error('Error fetching courses:', error);
+     // console.error('Error fetching courses:', error);
     } finally {
       setLoading(false);
     }
@@ -45,12 +45,12 @@ const TimeTable = () => {
       });
       const result = await response.json();
       if (result.success && result.mentor) {
-        console.log('Mentor detail:', JSON.stringify(result));
+     //   console.log('Mentor detail:', JSON.stringify(result));
         return result.mentor.name;
       }
       return 'Unknown Mentor';
     } catch (error) {
-      console.error('Error fetching mentor:', error);
+    //  console.error('Error fetching mentor:', error);
       return 'Unknown Mentor';
     }
   };
@@ -71,7 +71,7 @@ const TimeTable = () => {
       )
     );
 
-    console.log('All sessions:', allSessions);
+   // console.log('All sessions:', allSessions);
     setSessions(allSessions);
   };
 

@@ -49,7 +49,7 @@ const GroupChatLayoutData = () => {
         setGroupList(data.gc);
       }
     } catch (error) {
-      console.error('Error fetching groups:', error);
+    //  console.error('Error fetching groups:', error);
     }
   };
 
@@ -66,7 +66,7 @@ const GroupChatLayoutData = () => {
         setFilteredUsers(data.studnetInfo);
       }
     } catch (error) {
-      console.error('Error fetching students:', error);
+   //   console.error('Error fetching students:', error);
     }
   };
 
@@ -106,15 +106,15 @@ const GroupChatLayoutData = () => {
     socketService.initializeSocket(token, fromUUID);
 
     socketService.on('connect', () => {
-      console.log('Socket connected');
+    //  console.log('Socket connected');
     });
 
     socketService.on('disconnect', () => {
-      console.log('Socket disconnected');
+    //  console.log('Socket disconnected');
     });
 
     socketService.on('connect_error', (error) => {
-      console.log('Connection error:', error.message);
+    //  console.log('Connection error:', error.message);
     });
 
     groupList.map((data) => {
@@ -149,7 +149,7 @@ const GroupChatLayoutData = () => {
         }, 100);
       }
     } catch (error) {
-      console.log('Error fetching conversation:', error);
+     // console.log('Error fetching conversation:', error);
     }
   };
 

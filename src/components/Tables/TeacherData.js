@@ -154,12 +154,12 @@ function TeacherData() {
         
       
       } else {
-        console.log('Failed to add student', result.error);
+       // console.log('Failed to add student', result.error);
       //  handleClose();
       
       }
     } catch (error) {
-      console.log("Error adding student:", error);
+    //  console.log("Error adding student:", error);
     //  handleClose();
      
     }
@@ -167,7 +167,7 @@ function TeacherData() {
 
 
   const handleEditSubmit = async() =>{
-     console.log("Edit Form", JSON.stringify(formData));
+   //  console.log("Edit Form", JSON.stringify(formData));
      if (formData.imageData) {
       formData.imageData = formData.imageData.replace(/^data:image\/[a-z]+;base64,/, '');
     }
@@ -186,10 +186,10 @@ function TeacherData() {
        handleEditModalClose();
       
       } else {
-       console.log("Student Update Failed", result.error);
+   //    console.log("Student Update Failed", result.error);
       }
     } catch (error) {
-      console.error("Error fetching students:", error);
+     // console.error("Error fetching students:", error);
     }
   }
 
@@ -217,12 +217,12 @@ function TeacherData() {
 
       if (boardResult.success) {
         setBoards(boardResult.boards);
-        console.log("Boards fetched successfully");
+       // console.log("Boards fetched successfully");
       } else {
-        console.error("Failed to fetch boards");
+      //  console.error("Failed to fetch boards");
       }
     } catch (error) {
-      console.error("Error fetching boards:", error);
+     // console.error("Error fetching boards:", error);
     }
   };
 
@@ -241,10 +241,10 @@ function TeacherData() {
       
       //  console.log("Mentors fetched successfully", JSON.stringify(result.mentors));
       } else {
-        console.log("Failed to fetch mentors", result.error);
+      //  console.log("Failed to fetch mentors", result.error);
       }
     } catch (error) {
-      console.error("Error fetching mentors:", error);
+    //  console.error("Error fetching mentors:", error);
     }
   };
 
@@ -282,7 +282,7 @@ function TeacherData() {
         alert("Failed to Update Course");
       }
     } catch (error) {
-      console.error("Error updating boards:", error);
+     // console.error("Error updating boards:", error);
     }
        
   }
