@@ -479,8 +479,8 @@ const addAddtionalImages = async(bigcourseId,filteredFiles) =>{
       },
       body: JSON.stringify(finalInfo)
     });
-
-    if(response.success){
+    const result = await response.json();
+    if(result.success){
       setSuccessModalOpen(true);
     }else{
       setErrorModalOpen(true);
