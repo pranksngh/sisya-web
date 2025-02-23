@@ -72,6 +72,14 @@ const sidebarConfig = [
     ],
   },
   {
+    label: "Add Class",
+    icon: "LibraryBooks",
+    roles: ["admin"],
+    path:"addclass",
+    expandable: false,
+   
+  },
+  {
     label: "Reports",
     icon: "Assessment",
     roles: ["admin"],
@@ -144,13 +152,13 @@ const sidebarConfig = [
     roles: ["teacher"],
     expandable: false,
   },
-  {
-    label: "Add Class",
-    icon: "AddCircle",
-    path: "add-class",
-    roles: ["teacher"],
-    expandable: false,
-  },
+  // {
+  //   label: "Add Class",
+  //   icon: "AddCircle",
+  //   path: "add-class",
+  //   roles: ["teacher"],
+  //   expandable: false,
+  // },
   {
     label: "Chats",
     icon: "ChatBubble",

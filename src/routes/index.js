@@ -51,6 +51,7 @@ import EditClass from '../pages/Teacher/EditClass';
 import ClassRoom from '../pages/Teacher/ClassRoom';
 import ChangePassword from '../pages/Teacher/changePassword';
 import Registration from '../pages/Admin/Registrations';
+import AddClassData from '../pages/Admin/AddClass';
 
 const router = createBrowserRouter([
   {
@@ -176,6 +177,13 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           Courses
+        ),
+      },
+      {
+        path: 'addclass',
+        element: React.createElement(
+         
+          AddClassData
         ),
       },
       {
