@@ -337,7 +337,7 @@ const AddCourse = () => {
   const handleSubmit = async (e) => {
    // e.preventDefault();
    if (!selectedTeachers || selectedTeachers.length === 0) {
-    alert("Kindly select at least one teacher to proceed further.");
+    alert("Kindly select at least one teacher to proceed.");
     return; // Stop further execution
   }
   if (!selectedSubjects || selectedSubjects.length === 0) {
