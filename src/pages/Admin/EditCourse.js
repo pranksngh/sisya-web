@@ -391,7 +391,7 @@ const EditCourse = () => {
     // console.log("selectd teachers length", JSON.stringify(selectedTeachers.length))
     //  console.log("selectd teachers", JSON.stringify(selectedTeachers))
     } else {
-      alert("Subject ID not found!");
+      alert("Subject not found!");
     }
   
   };
