@@ -30,7 +30,7 @@ const defaultUserImage = "https://via.placeholder.com/100?text=User";
 
 const EditCourse = () => {
   const [activeStep, setActiveStep] = useState(0);
-  const steps = ["Course Banner", "Course Info", "Subjects", "Teachers","Additional Images"];
+  const steps = ["Course Banner", "Course Info", "Subjects", "Teachers"];
    const navigate = useNavigate();
   const location = useLocation();
   const courseData = location.state?.course || {};
@@ -139,24 +139,24 @@ const EditCourse = () => {
     }
   };
 
-  const handleMultipleImageUpload = (event) => {
-    const files = Array.from(event.target.files);
+  // const handleMultipleImageUpload = (event) => {
+  //   const files = Array.from(event.target.files);
 
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImageList((prev) => [
-          ...prev,
-          { name: file.name, content: e.target.result, serverImage: false },
-        ]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
+  //   files.forEach((file) => {
+  //     const reader = new FileReader();
+  //     reader.onload = (e) => {
+  //       setImageList((prev) => [
+  //         ...prev,
+  //         { name: file.name, content: e.target.result, serverImage: false },
+  //       ]);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   });
+  // };
 
-  const handleRemoveImage = (index) => {
-    setImageList((prev) => prev.filter((_, i) => i !== index));
-  };
+  // const handleRemoveImage = (index) => {
+  //   setImageList((prev) => prev.filter((_, i) => i !== index));
+  // };
 
   useEffect(() => {
     fetchServerImages();
@@ -393,7 +393,7 @@ const EditCourse = () => {
     } else {
       alert("Subject not found!");
     }
-  
+    
   };
 
   const fetchSubjects = async (grade) => {
@@ -555,7 +555,7 @@ const EditCourse = () => {
 
       if (result.success) {
       //   console.log("Course Updated Successfully");
-      addAddtionalImages(courseInfo.id,formattedImages);
+    //  addAddtionalImages(courseInfo.id,formattedImages);
       //   setSuccessModalOpen(true); 
       } else {
         setErrorModalOpen(true);
@@ -569,34 +569,34 @@ const EditCourse = () => {
  // setResultModalOpen(true); // Open the result modal
   }; 
 
-  const addAddtionalImages = async(bigcourseId,filteredFiles) =>{
+  // const addAddtionalImages = async(bigcourseId,filteredFiles) =>{
 
-    const finalInfo = {
-      bigCourseId:bigcourseId,  
-      fileList: filteredFiles
-    }
-    console.log("filelist info", JSON.stringify(finalInfo));
-    try{
-      const response = await fetch('https://sisyabackend.in/rkadmin/insert_course_banner', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(finalInfo)
-      });
-      const result = await response.json();
-      console.log("my response", JSON.stringify(result));
+  //   const finalInfo = {
+  //     bigCourseId:bigcourseId,  
+  //     fileList: filteredFiles
+  //   }
+  //   console.log("filelist info", JSON.stringify(finalInfo));
+  //   try{
+  //     const response = await fetch('https://sisyabackend.in/rkadmin/insert_course_banner', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify(finalInfo)
+  //     });
+  //     const result = await response.json();
+  //     console.log("my response", JSON.stringify(result));
   
-      if(result.success){
-        setSuccessModalOpen(true);
-      }else{
-       // console.log(JSON.stringify(response));
-        setErrorModalOpen(true);
-      }
-    }catch(error){
-      setErrorModalOpen(true);
-    }
-  };  
+  //     if(result.success){
+  //       setSuccessModalOpen(true);
+  //     }else{
+  //      // console.log(JSON.stringify(response));
+  //       setErrorModalOpen(true);
+  //     }
+  //   }catch(error){
+  //     setErrorModalOpen(true);
+  //   }
+  // };  
   const renderStepContent = (step) => {
     switch (step) {
         case 0:
@@ -902,58 +902,58 @@ const EditCourse = () => {
             </Grid>
           </div>
         );
-        case 4:
-          return (
-            <div style={{ textAlign: "center", padding: "20px" }}>
-              <Typography variant="h5" style={{ marginBottom: "20px" }}>
-                Upload Additional Images
-              </Typography>
+        // case 4:
+        //   return (
+        //     <div style={{ textAlign: "center", padding: "20px" }}>
+        //       <Typography variant="h5" style={{ marginBottom: "20px" }}>
+        //         Upload Additional Images
+        //       </Typography>
         
-              {/* Upload Button */}
-              <label htmlFor="upload-additional-images">
-                <input
-                  accept="image/*"
-                  id="upload-additional-images"
-                  type="file"
-                  multiple
-                  style={{ display: "none" }}
-                  onChange={handleMultipleImageUpload}
-                />
-                <Button variant="contained" component="span" color="primary" startIcon={<CloudUploadIcon />}>
-                  Upload Images
-                </Button>
-              </label>
+        //       {/* Upload Button */}
+        //       <label htmlFor="upload-additional-images">
+        //         <input
+        //           accept="image/*"
+        //           id="upload-additional-images"
+        //           type="file"
+        //           multiple
+        //           style={{ display: "none" }}
+        //           onChange={handleMultipleImageUpload}
+        //         />
+        //         <Button variant="contained" component="span" color="primary" startIcon={<CloudUploadIcon />}>
+        //           Upload Images
+        //         </Button>
+        //       </label>
         
-              {/* Image Preview Grid */}
-              <Grid container spacing={2} style={{ marginTop: "20px" }}>
-                {imageList.map((image, index) => (
-                  <Grid item xs={6} sm={4} md={3} key={index}>
-                    <Card sx={{ position: "relative", boxShadow: 3, borderRadius: 2 }}>
-                      <CardMedia
-                        component="img"
-                        image={image.content}
-                        alt={image.name}
-                        sx={{ height: "300px", objectFit: "contain", borderRadius: "8px" }}
-                      />
-                      <IconButton
-                        size="small"
-                        color="error"
-                        sx={{
-                          position: "absolute",
-                          top: 5,
-                          right: 5,
-                          backgroundColor: "rgba(255, 255, 255, 0.7)",
-                        }}
-                        onClick={() => handleRemoveImage(index)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            </div>
-          );
+        //       {/* Image Preview Grid */}
+        //       <Grid container spacing={2} style={{ marginTop: "20px" }}>
+        //         {imageList.map((image, index) => (
+        //           <Grid item xs={6} sm={4} md={3} key={index}>
+        //             <Card sx={{ position: "relative", boxShadow: 3, borderRadius: 2 }}>
+        //               <CardMedia
+        //                 component="img"
+        //                 image={image.content}
+        //                 alt={image.name}
+        //                 sx={{ height: "300px", objectFit: "contain", borderRadius: "8px" }}
+        //               />
+        //               <IconButton
+        //                 size="small"
+        //                 color="error"
+        //                 sx={{
+        //                   position: "absolute",
+        //                   top: 5,
+        //                   right: 5,
+        //                   backgroundColor: "rgba(255, 255, 255, 0.7)",
+        //                 }}
+        //                 onClick={() => handleRemoveImage(index)}
+        //               >
+        //                 <DeleteIcon />
+        //               </IconButton>
+        //             </Card>
+        //           </Grid>
+        //         ))}
+        //       </Grid>
+        //     </div>
+        //   );
         
       default:
         return null;
