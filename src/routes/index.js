@@ -49,6 +49,7 @@ import LiveClassRoom from '../pages/Teacher/LiveClassRoom';
 import LiveClassRoomLayout4 from '../pages/Teacher/LiveClassRoomLayout4';
 import VideoCallPage from '../pages/Teacher/videocall';
 import EditClass from '../pages/Teacher/EditClass';
+import PilotRegistration from '../pages/Admin/PilotRegistration';
 
 const router = createBrowserRouter([
   {
@@ -210,6 +211,13 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           CoursePurchaseList
+        ),
+      },
+      {
+        path: 'pilot-course-reg',
+        element: React.createElement(
+         
+          PilotRegistration
         ),
       },
       {
