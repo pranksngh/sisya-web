@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -14,21 +14,45 @@ import {
   MenuItem,
 } from "@mui/material";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-
+import { toast, ToastContainer } from "react-toastify";
 const AddStudent = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    grade: "",
-    class: "",
-    board: "",
-    profilePicture: null,
+    type: 'student',
+    name: '',
+    email: '',
+    phone: '',
+    grade: '',
+    educationBoardId: '', // Add educationBoardId to form data as a number
+    imageData: '' // Key for the image will be imageData
   });
-
+  const [boardList, setBoardList] = useState([]);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+useEffect(()=>{
+  fetchBoardList();
+},[]);
+  const fetchBoardList = async () => {
+    try {
+      const response = await fetch('https://sisyabackend.in/student/get_all_boards', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        setBoardList(result.boards); // Store the fetched boards in state
+        console.log("Boards fetched successfully");
+      } else {
+        console.error("Failed to fetch boards");
+      }
+    } catch (error) {
+      console.error("Error fetching boards:", error);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -54,7 +78,9 @@ const AddStudent = () => {
       console.log("Response:", result);
 
       if (response.ok) {
-        alert("Student created successfully!");
+      //  alert("Student created successfully!");
+      toast.success("Student created successfully!");
+      setFormData({ name: "", email: "", phone: "", grade: "",educationalBoardId:'',imageData:null });
       } else {
         alert("Error creating student: " + result.message);
       }
@@ -65,6 +91,7 @@ const AddStudent = () => {
   };
 
   return (
+    <>
     <Paper
       elevation={3}
       sx={{
@@ -165,15 +192,24 @@ const AddStudent = () => {
           <InputLabel id="class-label">Class</InputLabel>
           <Select
             labelId="class-label"
-            name="class"
-            value={formData.class}
+            name="grade"
+            value={formData.grade}
             onChange={handleChange}
             label="Class"
             required
           >
-            <MenuItem value="10th">10th</MenuItem>
-            <MenuItem value="11th">11th</MenuItem>
-            <MenuItem value="12th">12th</MenuItem>
+            <MenuItem value="1">Class 1</MenuItem>
+            <MenuItem value="2">Class 2</MenuItem>
+            <MenuItem value="3">Class 3</MenuItem>
+            <MenuItem value="4">Class 4</MenuItem>
+            <MenuItem value="5">Class 5</MenuItem>
+            <MenuItem value="6">Class 6</MenuItem>
+            <MenuItem value="7">Class 7</MenuItem>
+            <MenuItem value="8">Class 8</MenuItem>
+            <MenuItem value="9">Class 9</MenuItem>
+            <MenuItem value="10">Class 10</MenuItem>
+            <MenuItem value="11">Class 11</MenuItem>
+            <MenuItem value="12">Class 12</MenuItem>
           </Select>
         </FormControl>
 
@@ -182,15 +218,16 @@ const AddStudent = () => {
           <InputLabel id="board-label">Educational Board</InputLabel>
           <Select
             labelId="board-label"
-            name="board"
-            value={formData.board}
+            name="educationBoardId"
+            value={formData.educationBoardId}
             onChange={handleChange}
             label="Educational Board"
             required
           >
-            <MenuItem value="CBSE">CBSE</MenuItem>
-            <MenuItem value="ICSE">ICSE</MenuItem>
-            <MenuItem value="State Board">State Board</MenuItem>
+            {boardList.map(board => (
+            <MenuItem value={board.id}>{board.name}</MenuItem>
+            ))}
+            
           </Select>
         </FormControl>
 
@@ -205,6 +242,8 @@ const AddStudent = () => {
         </Button>
       </Box>
     </Paper>
+    <ToastContainer/>
+    </>
   );
 };
 
