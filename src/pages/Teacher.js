@@ -70,14 +70,14 @@ function Admin() {
       const students = result.studentList;
       setTotalStudentCount(students.length);
       setStudents(students);
-     // console.log("fetched Student List Successfully");
+      console.log("fetched Student List Successfully");
 
     }else{
-    //  console.log("Student List Error : ", JSON.stringify(result));
+      console.log("Student List Error : ", JSON.stringify(result));
 
     }
   }catch(error){
-  //  console.log("Student Fetch Failed", JSON.stringify(error));
+    console.log("Student Fetch Failed", JSON.stringify(error));
   }
   }
 
@@ -91,14 +91,14 @@ function Admin() {
       const teachers = result.mentors;
        setTotalTeacherCount(teachers.length);
        setTeachers(teachers);
-    //  console.log("Fetched Teacher List Successfully");
+      console.log("Fetched Teacher List Successfully");
 
     }else{
-    //  console.log("Teacher List Error : ", JSON.stringify(result));
+      console.log("Teacher List Error : ", JSON.stringify(result));
 
     }
   }catch(error){
-   // console.log("Teacher Fetch Failed", JSON.stringify(error));
+    console.log("Teacher Fetch Failed", JSON.stringify(error));
   }
   }
 
@@ -111,14 +111,14 @@ function Admin() {
       const salesman = result.salesman;
       setTotalSalesManCount(salesman.length);
       setSalesman(salesman);
-    //  console.log("Fetched Salesman List Successfully");
+      console.log("Fetched Salesman List Successfully");
 
     }else{
-    //  console.log("Salesman List Error : ", JSON.stringify(result));
+      console.log("Salesman List Error : ", JSON.stringify(result));
 
     }
   }catch(error){
-   // console.log("Salesman Fetch Failed", JSON.stringify(error));
+    console.log("Salesman Fetch Failed", JSON.stringify(error));
   }
   }
 
@@ -132,10 +132,10 @@ function Admin() {
          setTotalPurchasePrice(totalEarning.toFixed(2));
          setPurchases(purchases);
        }else{
-     //   console.log("purchase failed", JSON.stringify(result));
+        console.log("purchase failed", JSON.stringify(result));
        }
     }catch(error){
-    //  console.log("Purchase Error", JSON.stringify(error));
+      console.log("Purchase Error", JSON.stringify(error));
     }
   }
 

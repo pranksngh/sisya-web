@@ -34,10 +34,10 @@ const LeaveCalendar = () => {
       if (result.success) {
         setLeaveRequests(result.leaves); // Set the fetched leave requests data
       } else {
-     //   console.error('Failed to fetch leaves');
+        console.error('Failed to fetch leaves');
       }
     } catch (error) {
-     // console.error('Error fetching leaves:', error);
+      console.error('Error fetching leaves:', error);
     } finally {
       setLoading(false);
     }

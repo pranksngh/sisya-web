@@ -32,7 +32,7 @@ function DoubtAnalysis() {
           mentorNamesMap[mentorId] = result.mentor.name;
         }
       } catch (error) {
-       // console.error(`Error fetching mentor ${mentorId}:`, error);
+        console.error(`Error fetching mentor ${mentorId}:`, error);
       }
     }
     setMentorNames(mentorNamesMap);
@@ -57,7 +57,7 @@ function DoubtAnalysis() {
           };
         }
       } catch (error) {
-       // console.error(`Error fetching student ${userId}:`, error);
+        console.error(`Error fetching student ${userId}:`, error);
       }
     }
     setStudentDetails(studentDetailsMap);
@@ -71,10 +71,10 @@ function DoubtAnalysis() {
         fetchMentorNames(result.doubts);
         fetchStudentDetails(result.doubts);
       } else {
-       // console.log('Doubt List Issue', JSON.stringify(result));
+        console.log('Doubt List Issue', JSON.stringify(result));
       }
     } catch (error) {
-    //  console.log('Doubt List Error', JSON.stringify(error));
+      console.log('Doubt List Error', JSON.stringify(error));
     }
   };
 

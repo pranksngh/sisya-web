@@ -56,7 +56,7 @@ const DoubtsData = () => {
         setDoubtList([]);
       }
     } catch (error) {
-    //  console.error('Error fetching doubts:', error);
+      console.error('Error fetching doubts:', error);
     }
   };
 
@@ -76,7 +76,7 @@ const DoubtsData = () => {
           mentorNamesMap[mentorId] = result.mentor.name;
         }
       } catch (error) {
-       // console.error(`Error fetching mentor ${mentorId}:`, error);
+        console.error(`Error fetching mentor ${mentorId}:`, error);
       }
     }
     setMentorNames(mentorNamesMap);
@@ -101,7 +101,7 @@ const DoubtsData = () => {
           };
         }
       } catch (error) {
-       // console.error(`Error fetching student ${userId}:`, error);
+        console.error(`Error fetching student ${userId}:`, error);
       }
     }
     setStudentDetails(studentDetailsMap);

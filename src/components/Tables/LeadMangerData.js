@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Chip,
@@ -15,43 +15,61 @@ import {
   Modal,
   TextField,
   Autocomplete,
-} from '@mui/material';
-import { toast } from 'react-toastify'; // Add this if you want to show success/error messages
+} from "@mui/material";
+import { toast } from "react-toastify"; // Add this if you want to show success/error messages
+import * as XLSX from "xlsx";
 
 // Provided function for fetching leads data
-const fetchLeadsData = async (setLeadsData, setFilteredLeads, setTotalLeads, setConvertedLeads) => {
+const fetchLeadsData = async (
+  setLeadsData,
+  setFilteredLeads,
+  setTotalLeads,
+  setConvertedLeads
+) => {
   try {
-    const response = await fetch('https://sisyabackend.in/rkadmin/get_all_leads', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const response = await fetch(
+      "https://sisyabackend.in/rkadmin/get_all_leads",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
     const result = await response.json();
     if (result.success) {
-      const leads = result.lead.sort((a, b) => new Date(b.updatedOn) - new Date(a.updatedOn));
-      const convertedCount = leads.filter(lead => lead.status === 'converted').length;
+      const leads = result.lead.sort(
+        (a, b) => new Date(b.updatedOn) - new Date(a.updatedOn)
+      );
+      const convertedCount = leads.filter(
+        (lead) => lead.status === "converted"
+      ).length;
       setTotalLeads(leads.length);
       setConvertedLeads(convertedCount);
       setLeadsData(leads);
       setFilteredLeads(leads);
     }
   } catch (error) {
-  //  console.error('Error fetching leads:', error);
+    console.error("Error fetching leads:", error);
   }
 };
 
 const fetchCourses = async (setCourseList) => {
   try {
-    const response = await fetch('https://sisyabackend.in/rkadmin/get_all_courses', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const response = await fetch(
+      "https://sisyabackend.in/rkadmin/get_all_courses",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
     const result = await response.json();
     if (result.success) {
-      const shortTermCourses = result.bigCourses.filter(course => !course.isLongTerm);
+      const shortTermCourses = result.bigCourses.filter(
+        (course) => !course.isLongTerm
+      );
       setCourseList(shortTermCourses);
     }
   } catch (error) {
- //   console.error('Error fetching courses:', error);
+    console.error("Error fetching courses:", error);
   }
 };
 
@@ -59,7 +77,7 @@ const convertFileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result.split(',')[1]); // Remove the prefix from base64 string
+    reader.onload = () => resolve(reader.result.split(",")[1]); // Remove the prefix from base64 string
     reader.onerror = (error) => reject(error);
   });
 };
@@ -69,7 +87,7 @@ const LeadManagerData = () => {
   const [filteredLeads, setFilteredLeads] = useState([]);
   const [totalLeads, setTotalLeads] = useState(0);
   const [convertedLeads, setConvertedLeads] = useState(0);
-  const [filter, setFilter] = useState('ALL');
+  const [filter, setFilter] = useState("ALL");
 
   const [openModal, setOpenModal] = useState(false);
   const [courseList, setCourseList] = useState([]);
@@ -78,7 +96,12 @@ const LeadManagerData = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetchLeadsData(setLeadsData, setFilteredLeads, setTotalLeads, setConvertedLeads);
+    fetchLeadsData(
+      setLeadsData,
+      setFilteredLeads,
+      setTotalLeads,
+      setConvertedLeads
+    );
   }, []);
 
   useEffect(() => {
@@ -87,10 +110,12 @@ const LeadManagerData = () => {
 
   const handleFilterChange = (selectedFilter) => {
     setFilter(selectedFilter);
-    if (selectedFilter === 'ALL') {
+    if (selectedFilter === "ALL") {
       setFilteredLeads(leadsData);
     } else {
-      const filtered = leadsData.filter(lead => lead.status === selectedFilter);
+      const filtered = leadsData.filter(
+        (lead) => lead.status === selectedFilter
+      );
       setFilteredLeads(filtered);
     }
   };
@@ -104,7 +129,7 @@ const LeadManagerData = () => {
 
   const handleImport = async () => {
     if (!file || !selectedCourse) {
-      alert('Please select a course and upload a file.');
+      alert("Please select a course and upload a file.");
       return;
     }
 
@@ -119,77 +144,113 @@ const LeadManagerData = () => {
         grade: Number(selectedCourse.grade),
       };
 
-      const response = await fetch('https://sisyabackend.in/student/leads/bulk_insert', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(postData),
-      });
+      const response = await fetch(
+        "https://sisyabackend.in/student/leads/bulk_insert",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postData),
+        }
+      );
 
       const result = await response.json();
       setIsLoading(false);
 
       if (result.success) {
-        toast.success('Leads uploaded successfully.');
-        fetchLeadsData(setLeadsData, setFilteredLeads, setTotalLeads, setConvertedLeads);
+        toast.success("Leads uploaded successfully.");
+        fetchLeadsData(
+          setLeadsData,
+          setFilteredLeads,
+          setTotalLeads,
+          setConvertedLeads
+        );
         handleModalClose();
       } else {
-        toast.error('Failed to upload leads.');
+        toast.error("Failed to upload leads.");
       }
     } catch (error) {
       setIsLoading(false);
-   //   console.error('Error during file import:', error);
-      toast.error('Error occurred during file upload.');
+      console.error("Error during file import:", error);
+      toast.error("Error occurred during file upload.");
     }
   };
 
   const approveLead = async (leadId) => {
     try {
-      const response = await fetch(`https://sisyabackend.in/rkadmin/approve_lead/${leadId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-  
+      const response = await fetch(
+        `https://sisyabackend.in/rkadmin/approve_lead/${leadId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
       const result = await response.json();
       if (result.success) {
-        toast.success('Lead approved successfully.');
-        fetchLeadsData(setLeadsData, setFilteredLeads, setTotalLeads, setConvertedLeads);
+        toast.success("Lead approved successfully.");
+        fetchLeadsData(
+          setLeadsData,
+          setFilteredLeads,
+          setTotalLeads,
+          setConvertedLeads
+        );
       } else {
-        toast.error('Failed to approve lead.');
+        toast.error("Failed to approve lead.");
       }
     } catch (error) {
-     // console.error('Error approving lead:', error);
-      toast.error('Error occurred while approving the lead.');
+      console.error("Error approving lead:", error);
+      toast.error("Error occurred while approving the lead.");
     }
   };
-  
+
   const rejectLead = async (leadId) => {
     try {
-      const response = await fetch(`https://sisyabackend.in/rkadmin/reject_lead/${leadId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-  
+      const response = await fetch(
+        `https://sisyabackend.in/rkadmin/reject_lead/${leadId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
       const result = await response.json();
       if (result.success) {
-        toast.success('Lead rejected successfully.');
-        fetchLeadsData(setLeadsData, setFilteredLeads, setTotalLeads, setConvertedLeads);
+        toast.success("Lead rejected successfully.");
+        fetchLeadsData(
+          setLeadsData,
+          setFilteredLeads,
+          setTotalLeads,
+          setConvertedLeads
+        );
       } else {
-        toast.error('Failed to reject lead.');
+        toast.error("Failed to reject lead.");
       }
     } catch (error) {
-    //  console.error('Error rejecting lead:', error);
-      toast.error('Error occurred while rejecting the lead.');
+      console.error("Error rejecting lead:", error);
+      toast.error("Error occurred while rejecting the lead.");
     }
   };
-  
+
+  // Function to download leads data as an Excel file
+  const downloadExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(filteredLeads);
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, "Leads");
+    XLSX.writeFile(wb, "leads.xlsx");
+  };
 
   return (
-    <Grid container spacing={3} style={{ padding: '20px' }}>
+    <Grid container spacing={3} style={{ padding: "20px" }}>
       {/* Header Section */}
       <Grid item xs={12}>
-        <Typography variant="h4" align="center" style={{ marginBottom: '10px' }}>
+        <Typography
+          variant="h4"
+          align="center"
+          style={{ marginBottom: "10px" }}
+        >
           Leads Dashboard
         </Typography>
         <Typography variant="subtitle1" align="center" color="textSecondary">
@@ -198,22 +259,38 @@ const LeadManagerData = () => {
       </Grid>
 
       {/* Filter & Upload Section */}
-      <Grid item xs={12} container justifyContent="space-between" alignItems="center">
+      <Grid
+        item
+        xs={12}
+        container
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Box>
-          {['ALL', 'converted', 'pending', 'contacted'].map((item) => (
+          {["ALL", "converted", "pending", "contacted"].map((item) => (
             <Chip
               key={item}
               label={item}
               clickable
-              color={filter === item ? 'primary' : 'default'}
+              color={filter === item ? "primary" : "default"}
               onClick={() => handleFilterChange(item)}
-              style={{ margin: '5px' }}
+              style={{ margin: "5px" }}
             />
           ))}
         </Box>
-        <Button variant="contained" color="primary" onClick={handleModalOpen}>
-          Upload CSV
-        </Button>
+        <Box>
+          <Button variant="contained" color="primary" onClick={handleModalOpen}>
+            Upload CSV
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={downloadExcel}
+            style={{ marginLeft: "10px" }}
+          >
+            Download CSV
+          </Button>
+        </Box>
       </Grid>
 
       {/* Leads Table Section */}
@@ -223,84 +300,106 @@ const LeadManagerData = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell><strong>Name</strong></TableCell>
-                  <TableCell><strong>Email</strong></TableCell>
-                  <TableCell><strong>Phone</strong></TableCell>
-                  <TableCell><strong>Status</strong></TableCell>
-                  <TableCell><strong>Last Updated</strong></TableCell>
-                  <TableCell><strong>Details</strong></TableCell>
-                  <TableCell><strong>Actions</strong></TableCell>
+                  <TableCell>
+                    <strong>Name</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Email</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Phone</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Status</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Last Updated</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Details</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Actions</strong>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-  {filteredLeads.length > 0 ? (
-    filteredLeads.map((lead, index) => (
-      <TableRow key={index}>
-        <TableCell>{lead.name}</TableCell>
-        <TableCell>{lead.email}</TableCell>
-        <TableCell>{lead.phone}</TableCell>
-        <TableCell>{lead.status}</TableCell>
-        <TableCell>{new Date(lead.updatedOn).toLocaleDateString()}</TableCell>
-        {/* Action Field */}
-        <TableCell>
-          {lead.status === 'pending approval' ? (
-            <a href={`#view-proof/${lead.id}`} className="view-proof-link" style={{ color: '#1976d2', textDecoration: 'underline' }}>
-              View Proof
-            </a>
-          ) : lead.status === 'converted' ? (
-            <Button variant="outlined" size="small">
-              View
-            </Button>
-          ) : (
-            <Typography variant="body2" color="textSecondary">
-              N/A
-            </Typography>
-          )}
-        </TableCell>
-        <TableCell>
-          {lead.status === 'pending approval' ? (
-            <>
-              <Button
-                variant="contained"
-                color="success"
-                size="small"
-                onClick={() => approveLead(lead.id)}
-                style={{ marginRight: '10px' }}
-              >
-                Approve
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-                size="small"
-                onClick={() => rejectLead(lead.id)}
-              >
-                Reject
-              </Button>
-            </>
-          ) : lead.status === 'converted' ? (
-            <Typography variant="body2" color="textSecondary">
-              Completed
-            </Typography>
-          ) : (
-            <Typography variant="body2" color="textSecondary">
-              N/A
-            </Typography>
-          )}
-        </TableCell>
-      </TableRow>
-    ))
-  ) : (
-    <TableRow>
-      <TableCell colSpan={7} align="center">
-        <Typography variant="body1" color="textSecondary">
-          No leads match the filter criteria.
-        </Typography>
-      </TableCell>
-    </TableRow>
-  )}
-</TableBody>
-
+                {filteredLeads.length > 0 ? (
+                  filteredLeads.map((lead, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{lead.name}</TableCell>
+                      <TableCell>{lead.email}</TableCell>
+                      <TableCell>{lead.phone}</TableCell>
+                      <TableCell>{lead.status}</TableCell>
+                      <TableCell>
+                        {new Date(lead.updatedOn).toLocaleDateString()}
+                      </TableCell>
+                      {/* Action Field */}
+                      <TableCell>
+                        {lead.status === "pending approval" ? (
+                          <a
+                            href={`#view-proof/${lead.id}`}
+                            className="view-proof-link"
+                            style={{
+                              color: "#1976d2",
+                              textDecoration: "underline",
+                            }}
+                          >
+                            View Proof
+                          </a>
+                        ) : lead.status === "converted" ? (
+                          <Button variant="outlined" size="small">
+                            View
+                          </Button>
+                        ) : (
+                          <Typography variant="body2" color="textSecondary">
+                            N/A
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {lead.status === "pending approval" ? (
+                          <>
+                            <Button
+                              variant="contained"
+                              color="success"
+                              size="small"
+                              onClick={() => approveLead(lead.id)}
+                              style={{ marginRight: "10px" }}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              variant="contained"
+                              color="error"
+                              size="small"
+                              onClick={() => rejectLead(lead.id)}
+                            >
+                              Reject
+                            </Button>
+                          </>
+                        ) : lead.status === "converted" ? (
+                          <Typography variant="body2" color="textSecondary">
+                            Completed
+                          </Typography>
+                        ) : (
+                          <Typography variant="body2" color="textSecondary">
+                            N/A
+                          </Typography>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={7} align="center">
+                      <Typography variant="body1" color="textSecondary">
+                        No leads match the filter criteria.
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
             </Table>
           </TableContainer>
         </Paper>
@@ -310,13 +409,13 @@ const LeadManagerData = () => {
       <Modal open={openModal} onClose={handleModalClose}>
         <Box
           sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
             width: 400,
-            bgcolor: 'background.paper',
-            border: '2px solid #000',
+            bgcolor: "background.paper",
+            border: "2px solid #000",
             boxShadow: 24,
             p: 4,
           }}
@@ -326,7 +425,7 @@ const LeadManagerData = () => {
           </Typography>
           <Autocomplete
             options={courseList}
-            getOptionLabel={(option) => option.name || 'Unknown Course'}
+            getOptionLabel={(option) => option.name || "Unknown Course"}
             value={selectedCourse}
             onChange={(event, newValue) => setSelectedCourse(newValue)}
             renderInput={(params) => (
@@ -335,11 +434,15 @@ const LeadManagerData = () => {
                 label="Select Course"
                 variant="outlined"
                 fullWidth
-                style={{ marginBottom: '20px' }}
+                style={{ marginBottom: "20px" }}
               />
             )}
           />
-          <input type="file" onChange={(e) => setFile(e.target.files[0])} style={{ marginBottom: '20px' }} />
+          <input
+            type="file"
+            onChange={(e) => setFile(e.target.files[0])}
+            style={{ marginBottom: "20px" }}
+          />
           <Button
             variant="contained"
             color="primary"
@@ -347,7 +450,7 @@ const LeadManagerData = () => {
             onClick={handleImport}
             disabled={!selectedCourse || !file || isLoading}
           >
-            {isLoading ? 'Uploading...' : 'Submit'}
+            {isLoading ? "Uploading..." : "Submit"}
           </Button>
         </Box>
       </Modal>

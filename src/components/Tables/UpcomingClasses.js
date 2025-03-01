@@ -45,7 +45,7 @@ function UpcomingClasses() {
         setMyCourses([]);
       }
     } catch (error) {
-     // console.log('Error fetching teacher courses:', error);
+      console.log('Error fetching teacher courses:', error);
     } finally {
       setLoadingCourses(false);
     }
@@ -65,7 +65,7 @@ function UpcomingClasses() {
       const subjectResult = await subjectResponse.json();
       return subjectResult.success ? subjectResult.subjects[0].name : subjectId;
     } catch (error) {
-    //  console.error("Error fetching subject details:", error);
+      console.error("Error fetching subject details:", error);
       return subjectId;
     }
   };
@@ -138,7 +138,7 @@ function UpcomingClasses() {
         }
     } catch (error) {
         setLoading(false);
-      //  console.error('Error starting session:', error);
+        console.error('Error starting session:', error);
         alert('Error starting session');
     }
 };

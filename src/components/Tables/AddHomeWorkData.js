@@ -94,10 +94,10 @@ const AddHomeworkData = () => {
 
     const result = await response.json();
     if (result.success) {
-     // console.log("Homework Added Successfully");
+      console.log("Homework Added Successfully");
       navigate("../teacher");
     } else {
-     // console.log("Homework Addition Failed");
+      console.log("Homework Addition Failed");
     }
   };
 

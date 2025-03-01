@@ -72,14 +72,6 @@ const sidebarConfig = [
     ],
   },
   {
-    label: "Add Class",
-    icon: "LibraryBooks",
-    roles: ["admin"],
-    path:"addclass",
-    expandable: false,
-   
-  },
-  {
     label: "Reports",
     icon: "Assessment",
     roles: ["admin"],
@@ -132,13 +124,6 @@ const sidebarConfig = [
     expandable: false,
   },
   {
-    label: "Registration",
-    icon: "Image",
-    path: "registration",
-    roles: ["admin"],
-    expandable: false,
-  },
-  {
     label: "Push Notification",
     icon: "NotificationsActive",
     path: "pushNotification",
@@ -152,13 +137,13 @@ const sidebarConfig = [
     roles: ["teacher"],
     expandable: false,
   },
-  // {
-  //   label: "Add Class",
-  //   icon: "AddCircle",
-  //   path: "add-class",
-  //   roles: ["teacher"],
-  //   expandable: false,
-  // },
+  {
+    label: "Add Class",
+    icon: "AddCircle",
+    path: "add-class",
+    roles: ["teacher"],
+    expandable: false,
+  },
   {
     label: "Chats",
     icon: "ChatBubble",
@@ -223,20 +208,12 @@ const sidebarConfig = [
     expandable: false,
   },
   {
-    label: "Change Password",
-    icon: "Lock",
-    path: "change-password",
-    roles: ["teacher"],
-    expandable: false,
-  },
-  {
     label: "Logout",
     icon: "ExitToApp",
     path: "/",
     roles: ["teacher", "admin", "mentor", "hr"],
     expandable: false,
   },
- 
 ];
 
 export default sidebarConfig;

@@ -39,10 +39,10 @@ const MentorLeaveRequestData = () => {
         if (result.success) {
           setLeaveRequests(result.leaves); // Set the fetched leave requests data
         } else {
-        //  console.error('Failed to fetch leaves');
+          console.error('Failed to fetch leaves');
         }
       } catch (error) {
-      //  console.error('Error fetching leaves:', error);
+        console.error('Error fetching leaves:', error);
       }
     };
 
@@ -118,7 +118,7 @@ const MentorLeaveRequestData = () => {
       }
     } catch (error) {
       setLeaveLoading(false);
-    //  console.error("Error requesting leave:", error);
+      console.error("Error requesting leave:", error);
       setLeaveErrorMessage('An error occurred. Please try again.');
     }
   };

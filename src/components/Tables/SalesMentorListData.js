@@ -63,7 +63,7 @@ const SalesMentorListData = () => {
         setFilteredData(result?.salesmen);
       }
     } catch (error) {
-     // console.error('Error fetching salesmen:', error);
+      console.error('Error fetching salesmen:', error);
     }
   };
 
@@ -133,7 +133,7 @@ const SalesMentorListData = () => {
         toast.error('Operation failed. Please try again');
       }
     } catch (error) {
-   //   console.error('Error:', error);
+      console.error('Error:', error);
       toast.error('An error occurred!');
     } finally {
       setLoading(false);

@@ -32,7 +32,7 @@ function EnrolledCourse() {
         body: JSON.stringify({ mentorId: user.mentor.id }),
       });
       const result = await response.json();
-    //  console.log('Enrolled Courses API Response:', result);
+      console.log('Enrolled Courses API Response:', result);
 
       if (result.success && result.bigCourses) {
         setMyCourses(result.bigCourses);
@@ -40,7 +40,7 @@ function EnrolledCourse() {
         setMyCourses([]);
       }
     } catch (error) {
-    //  console.log('Error fetching teacher courses:', error);
+      console.log('Error fetching teacher courses:', error);
     } finally {
       setLoadingCourses(false);
     }

@@ -42,7 +42,7 @@ const BannerData = () => {
         setBanners(result.files);
       }
     } catch (error) {
-     // console.error('Error fetching banners:', error);
+      console.error('Error fetching banners:', error);
     }
   };
 
@@ -85,7 +85,7 @@ const BannerData = () => {
           fetchBannerList();
         }
       } catch (error) {
-      //  console.error('Error uploading file:', error);
+        console.error('Error uploading file:', error);
         setUploadProgress((prev) => ({
           ...prev,
           [file.name]: 'Failed',
@@ -126,7 +126,7 @@ const BannerData = () => {
         setBanners(banners.filter((banner) => banner !== bannerName));
       }
     } catch (error) {
-     // console.error('Error deleting banner:', error);
+      console.error('Error deleting banner:', error);
     }
   };
 

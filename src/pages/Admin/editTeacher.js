@@ -55,7 +55,7 @@ const EditTeacher = () => {
     setFormData({ ...formData, [name]: value });
   };
 
- // console.log("teacher data" + JSON.stringify(teacherData));
+  console.log("teacher data" + JSON.stringify(teacherData));
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -91,17 +91,15 @@ const EditTeacher = () => {
         searchTags: "",
         languages: "",
         Grades: formData.classes, // Submit the array of grades
-        qualificationList: formData.qualifications.map(q => ({
+        qualifications: formData.qualifications.map(q => ({
           name: q.name,
           level: q.level,
           institution: q.institution,
-          year: new Date(q.year).toISOString(), // Format the date as ISO 8601
-          mentorId: teacherData.id
+          year: new Date(q.year).toISOString() // Format the date as ISO 8601
         })),
-        subjectRecordList: formData.selectedSubjects.map(s => ({
+        subjectRecords: formData.selectedSubjects.map(s => ({
           comment: s.comment,
-          subjectId: s.id, // Assuming subjectId is the index
-          mentorId: teacherData.id
+          subjectId: s.id // Assuming subjectId is the index
         })),
         ...(formData.imageData && { imageData: formData.imageData }),
       };
@@ -122,18 +120,18 @@ const EditTeacher = () => {
       setErrorModalOpen(true);
         }
       } catch (error) {
-    //    console.log("Error adding teacher:", error);
+        console.log("Error adding teacher:", error);
       //  alert("An error occurred while adding the teacher.");
       setErrorModalOpen(true);
       }
   
- //   console.log("Form Data Submitted:", payload);
+    console.log("Form Data Submitted:", payload);
     // Add API call or validation logic here
   };
 
   const fetchSubjects = async(grade) => {
     const sgrade = parseInt(grade, 10);
-   // console.log(sgrade);
+    console.log(sgrade);
     try {
       const subjectResponse = await fetch('https://sisyabackend.in/student/get_subjects_by_grade', {
         method: 'POST',
@@ -146,12 +144,12 @@ const EditTeacher = () => {
 
       if (subjectResult.success) {
         setSubjectOptions(subjectResult.subjects);
-       // console.log("Subjects fetched successfully");
+        console.log("Subjects fetched successfully");
       } else {
-      //  console.log("Failed to fetch Subjects");
+        console.log("Failed to fetch Subjects");
       }
     } catch (error) {
-    //  console.log("Error fetching Subjects:", error);
+      console.log("Error fetching Subjects:", error);
     }
   };
 
@@ -465,7 +463,7 @@ const EditTeacher = () => {
                       onChange={(e) => {
                         const selectedId = e.target.value; // Get the selected subject ID
                         const selectedSubject = subjectOptions.find(subject => subject.id === parseInt(selectedId)); // Find the subject object
-                     //   console.log("Selected subject is: ", JSON.stringify(selectedSubject));
+                       // console.log("Selected subjec is: ", JSON.stringify(selectedSubject));
                         setFormData({ ...formData, selectedSubject })
                       
                       }}

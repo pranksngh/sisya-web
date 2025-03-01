@@ -50,7 +50,7 @@ const StudentReportData = () => {
         setStudentList(result.studentList);
       }
     } catch (error) {
-     // console.error('Error fetching student list:', error);
+      console.error('Error fetching student list:', error);
     }
   };
 
@@ -124,7 +124,7 @@ const StudentReportData = () => {
           }
         }
       } catch (error) {
-      //  console.error('Error fetching courses:', error);
+        console.error('Error fetching courses:', error);
       }
     }
     setCourseData(courseDataList);

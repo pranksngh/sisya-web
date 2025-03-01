@@ -57,7 +57,7 @@ const PushNotificationData = () => {
         setStudentList([]);
       }
     } catch (error) {
-   //   console.error('Error fetching students:', error);
+      console.error('Error fetching students:', error);
     }
   };
 
@@ -118,9 +118,9 @@ const PushNotificationData = () => {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      // console.log(result);
+      console.log(result);
     } catch (error) {
-    //  console.error('Error sending notification:', error);
+      console.error('Error sending notification:', error);
     } finally {
       setIsSubmitting(false);
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -12,17 +12,17 @@ import {
   InputLabel,
   Select,
   MenuItem,
-} from '@mui/material';
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+} from "@mui/material";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
 const AddStudent = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    grade: '',
-    class: '',
-    board: '',
+    name: "",
+    email: "",
+    phone: "",
+    grade: "",
+    class: "",
+    board: "",
     profilePicture: null,
   });
 
@@ -35,10 +35,33 @@ const AddStudent = () => {
     setFormData({ ...formData, profilePicture: e.target.files[0] });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-  //  console.log('Form Data Submitted:', formData);
-    // Add API call or validation logic here
+    console.log("Form Data Submitted:", formData);
+    try {
+      const response = await fetch(
+        "https://sisyabackend.in/rkadmin/create_student",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const result = await response.json();
+      console.log("Response:", result);
+
+      if (response.ok) {
+        alert("Student created successfully!");
+      } else {
+        alert("Error creating student: " + result.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -46,7 +69,7 @@ const AddStudent = () => {
       elevation={3}
       sx={{
         maxWidth: 500,
-        margin: 'auto',
+        margin: "auto",
         mt: 5,
         p: 4,
         borderRadius: 3,
@@ -56,8 +79,8 @@ const AddStudent = () => {
       <Typography
         variant="h6"
         sx={{
-          fontWeight: 'bold',
-          textAlign: 'center',
+          fontWeight: "bold",
+          textAlign: "center",
           mb: 3,
         }}
       >
@@ -66,7 +89,7 @@ const AddStudent = () => {
 
       {/* Profile Picture Upload */}
       <Stack direction="column" alignItems="center" spacing={2} sx={{ mb: 3 }}>
-        <Box sx={{ position: 'relative' }}>
+        <Box sx={{ position: "relative" }}>
           <Avatar
             alt="Profile Picture"
             src={
@@ -82,17 +105,22 @@ const AddStudent = () => {
           <IconButton
             component="label"
             sx={{
-              position: 'absolute',
+              position: "absolute",
               bottom: 0,
               left: 0,
-              backgroundColor: 'white',
-              '&:hover': {
-                backgroundColor: '#f5f5f5',
+              backgroundColor: "white",
+              "&:hover": {
+                backgroundColor: "#f5f5f5",
               },
             }}
           >
             <AddPhotoAlternateIcon color="primary" />
-            <input hidden accept="image/*" type="file" onChange={handleFileChange} />
+            <input
+              hidden
+              accept="image/*"
+              type="file"
+              onChange={handleFileChange}
+            />
           </IconButton>
         </Box>
         <Typography variant="body2" color="textSecondary">

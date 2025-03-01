@@ -106,18 +106,18 @@ const AddTeacher = () => {
          setErrorModalOpen(true);
         }
       } catch (error) {
-    //    console.log("Error adding teacher:", error);
+        console.log("Error adding teacher:", error);
      //   alert("An error occurred while adding the teacher.");
      setErrorModalOpen(true);
       }
   
-  //  console.log("Form Data Submitted:", payload);
+    console.log("Form Data Submitted:", payload);
     // Add API call or validation logic here
   };
 
   const fetchSubjects = async(grade) => {
     const sgrade = parseInt(grade, 10);
-  //  console.log(sgrade);
+    console.log(sgrade);
     try {
       const subjectResponse = await fetch('https://sisyabackend.in/student/get_subjects_by_grade', {
         method: 'POST',
@@ -130,12 +130,12 @@ const AddTeacher = () => {
 
       if (subjectResult.success) {
         setSubjectOptions(subjectResult.subjects);
-      //  console.log("Subjects fetched successfully");
+        console.log("Subjects fetched successfully");
       } else {
-       // console.log("Failed to fetch Subjects");
+        console.log("Failed to fetch Subjects");
       }
     } catch (error) {
-     // console.log("Error fetching Subjects:", error);
+      console.log("Error fetching Subjects:", error);
     }
   };
   const closeSuccessModal = () => {
@@ -443,7 +443,7 @@ const AddTeacher = () => {
                       onChange={(e) => {
                         const selectedId = e.target.value; // Get the selected subject ID
                         const selectedSubject = subjectOptions.find(subject => subject.id === parseInt(selectedId)); // Find the subject object
-                     //   console.log("Selected subject is: ", JSON.stringify(selectedSubject));
+                        console.log("Selected subject is: ", JSON.stringify(selectedSubject));
                         setFormData({ ...formData, selectedSubject });
                       }}
                       SelectProps={{

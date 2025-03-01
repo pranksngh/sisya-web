@@ -23,9 +23,18 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
+  Grid,
   IconButton,
+  List,
+  ListItem,
+  ListItemSecondaryAction,
+  ListItemText,
   Paper,
+  Tab,
+  Tabs,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -43,6 +52,18 @@ import {
 import { getUser } from "../../Functions/Login";
 import socketService from "../../Sockets/socketConfig";
 import "../../assets/css/liveclass.css";
+import {
+  LuCamera,
+  LuCameraOff,
+  LuLogOut,
+  LuMic,
+  LuMicOff,
+  LuMonitor,
+  LuMonitorUp,
+  LuPower,
+  LuSendHorizontal,
+} from "react-icons/lu";
+
 export default function LiveClassRoom() {
   const userInfo = getUser();
   const location = useLocation();
@@ -51,7 +72,7 @@ export default function LiveClassRoom() {
   const appID = 1500762473; // Your App ID
   const serverSecret = "175fa0e5958efde603f2ec805c7d6120"; // Your Server Secret
   const userName = userInfo.mentor.name;
-  const roomID = streamInfo.roomId;
+  const roomID = 1234;
   const videostreamID = "hostvideo_" + uuidv4();
   const screenStreamID = "hostscreen_" + uuidv4();
   const [zegoEngine, setZegoEngine] = useState(null);
@@ -69,6 +90,8 @@ export default function LiveClassRoom() {
   const [remoteStreams, setRemoteStreams] = useState([]);
   const messagesEndRef = useRef(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDialogEndClass, setOpenDialogEndClass] = useState(false);
+  const [activeTab, setActiveTab] = useState("CHAT"); // "CHAT","USERS","REQUESTS"
 
   useEffect(() => {
     const handleBeforeUnload = (event) => {
@@ -86,6 +109,7 @@ export default function LiveClassRoom() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
   useEffect(() => {
     const tokenvalue = localStorage.getItem("token");
     const token = "YOUR_AUTH_TOKEN";
@@ -337,6 +361,13 @@ export default function LiveClassRoom() {
     setOpenDialog(false);
     leaveRoom();
   };
+
+  //end class -> my addition
+  const confirmEndClass = () => {
+    setOpenDialogEndClass(false);
+    endSession();
+  };
+
   const toggleCamera = () => {
     if (localStream) {
       const videoTrack = localStream.getVideoTracks()[0]; // Get the video track
@@ -415,6 +446,7 @@ export default function LiveClassRoom() {
       screenVideoElement.innerHTML = `<div class="no-screen-share"><FaDesktop class="no-screen-icon" /> <p>Start sharing your screen</p></div>`;
     }
   };
+
   const endSession = async () => {
     try {
       const response = await fetch(
@@ -452,6 +484,7 @@ export default function LiveClassRoom() {
       console.log("error updating session", error);
     }
   };
+
   const leaveRoom = () => {
     if (zegoEngine) {
       zegoEngine.stopPublishingStream(videostreamID);
@@ -478,13 +511,15 @@ export default function LiveClassRoom() {
   };
 
   const toggleUserList = () => {
-    setIsUserListVisible(!isUserListVisible);
-    setIsSpeakRequestVisible(false);
+    // setIsUserListVisible(!isUserListVisible);
+    // setIsSpeakRequestVisible(false);
+    setActiveTab((prev) => (prev === "USERS" ? "CHAT" : "USERS"));
   };
 
   const toggleSpeakRequestList = () => {
-    setIsSpeakRequestVisible(!isSpeakRequestVisible);
-    setIsUserListVisible(false);
+    // setIsSpeakRequestVisible(!isSpeakRequestVisible);
+    // setIsUserListVisible(false);
+    setActiveTab((prev) => (prev === "REQUESTS" ? "CHAT" : "REQUESTS"));
   };
 
   const toggleUserMic = (userID) => {
@@ -540,7 +575,11 @@ export default function LiveClassRoom() {
     >
       <Box
         className={`main-content-classroom`}
-        sx={{ display: "flex", flex: 1, backgroundColor: "#f5f5f5" }}
+        sx={{
+          display: "flex",
+          flex: 1,
+          backgroundColor: "#f5f5f5",
+        }}
       >
         {/* Left Panel */}
         <Box
@@ -568,11 +607,32 @@ export default function LiveClassRoom() {
           ></video>
           {!isScreenShared && (
             <Box
-              className="no-screen-share"
-              sx={{ textAlign: "center", color: "#757575" }}
+              sx={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              <DesktopWindows sx={{ fontSize: 50, color: "#bdbdbd" }} />
-              <Typography>Start sharing your screen</Typography>
+              <Box sx={{ textAlign: "center", color: "text.secondary" }}>
+                <Box
+                  sx={{
+                    mb: 4,
+                    borderRadius: "50%",
+                    backgroundColor: "rgba(0, 0, 0, 0.1)",
+                    p: 3,
+                    mx: "auto",
+                    display: "inline-block",
+                  }}
+                >
+                  <LuMonitor size={56} color="white" />
+                </Box>
+                <Typography variant="h6">Start sharing your screen</Typography>
+                <Typography variant="body2" sx={{ mt: 2 }}>
+                  Click the screen share button to begin
+                </Typography>
+              </Box>
             </Box>
           )}
 
@@ -592,206 +652,360 @@ export default function LiveClassRoom() {
               borderRadius: 4, // Optional: rounded corners
             }}
           ></Box>
+
+          {/* Footer */}
+          <Box
+            className="footer"
+            sx={{
+              position: "absolute",
+              bottom: 16,
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              gap: 1,
+              p: 1,
+              bgcolor: "rgba(255, 255, 255, 0.7)",
+              borderRadius: 10,
+            }}
+          >
+            <Tooltip title={isMuted ? "Unmute" : "Mute"}>
+              <IconButton
+                sx={{ width: 48, height: 48 }}
+                color={isMuted ? "error" : "primary"}
+                onClick={toggleMute}
+              >
+                {isMuted ? <LuMicOff size={20} /> : <LuMic size={20} />}
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title={isCameraEnabled ? "Turn off camera" : "Turn on camera"}
+            >
+              <IconButton
+                sx={{ width: 48, height: 48 }}
+                color={!isCameraEnabled ? "error" : "primary"}
+                onClick={toggleCamera}
+              >
+                {isCameraEnabled ? <LuCamera /> : <LuCameraOff />}
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={isScreenShared ? "Stop sharing" : "Share screen"}>
+              <IconButton
+                onClick={isScreenShared ? stopScreenShare : startScreenShare}
+                sx={{ width: 48, height: 48 }}
+                color={isScreenShared ? "error" : "primary"}
+              >
+                <LuMonitorUp size={20} />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Users">
+              <IconButton
+                color={activeTab === "USERS" ? "primary" : "default"}
+                onClick={toggleUserList}
+                sx={{ width: 48, height: 48 }}
+              >
+                <Badge badgeContent={userList.length} color="primary">
+                  <Group />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Speak Request">
+              <IconButton
+                color={activeTab === "REQUESTS" ? "primary" : "default"}
+                onClick={toggleSpeakRequestList}
+                sx={{ width: 48, height: 48 }}
+              >
+                <Badge badgeContent={speakRequests.length} color="primary">
+                  <Campaign />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Leave room">
+              <IconButton
+                onClick={() => setOpenDialog(true)}
+                sx={{ width: 48, height: 48 }}
+                color="error"
+              >
+                <LuLogOut size={20} />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="End class">
+              <IconButton
+                onClick={() => setOpenDialogEndClass(true)}
+                sx={{ width: 48, height: 48 }}
+                color="error"
+              >
+                <LuPower size={20} />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
 
         {/* Right Panel */}
         <Box
           className="right-panel"
-          sx={{ flex: 3, display: "flex", flexDirection: "column", padding: 2 }}
+          sx={{
+            flex: 2,
+            display: "flex",
+            flexDirection: "column",
+            borderLeft: 1,
+            borderColor: "black",
+          }}
         >
           <video
             className="host-video"
             autoPlay
             muted
-            id="hostVideo"
             style={{
               display: isCameraEnabled ? "block" : "none",
               width: "100%",
               height: "300px", // Fixed height for the host video
               objectFit: "cover", // Ensures the video scales properly within the fixed height
+              borderBottom: "1px solid #E0E0E0",
             }}
           ></video>
-
-          {isUserListVisible ? (
-            <Paper
-              className="user-list"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                marginTop: 2,
-                height: "280px", // Fixed height
-                overflow: "auto",
-              }}
-            >
-              {userList.map((user, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 1,
-                  }}
-                >
-                  <Typography>{user.userName || user.userID}</Typography>
-                  <IconButton onClick={() => toggleUserMic(user.userID)}>
-                    {user.isMuted ? <MicOff /> : <Mic />}
-                  </IconButton>
-                </Box>
-              ))}
-            </Paper>
-          ) : isSpeakRequestVisible ? (
-            <Paper
-              className="speak-request-list"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                marginTop: 2,
-                height: "280px", // Fixed height
-                overflow: "auto",
-              }}
-            >
-              {speakRequests.map((request, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 1,
-                  }}
-                >
-                  <Typography>{request.userName || request.userID}</Typography>
-                  <Box>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                      onClick={() => handleAcceptSpeakRequest(request.userID)}
-                      sx={{ marginRight: 1 }}
-                    >
-                      Accept
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      size="small"
-                      onClick={() => handleDeclineSpeakRequest(request.userID)}
-                    >
-                      Decline
-                    </Button>
-                  </Box>
-                </Box>
-              ))}
-            </Paper>
-          ) : (
-            <Paper
-              className="chat-section"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                marginTop: 2,
-                height: "280px",
-              }}
-            >
-              <Box
-                className="messages"
-                sx={{
-                  flex: 1,
-                  overflowY: "auto", // Scrollable content
-                  padding: 2,
-                }}
+          <Box
+            sx={{
+              flex: isCameraEnabled ? "1" : "auto",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <Tabs
+                value={activeTab}
+                variant="fullWidth"
+                onChange={(e, newValue) => setActiveTab(newValue)}
+                textColor="black"
+                indicatorColor="black"
+                TabIndicatorProps={{ sx: { backgroundColor: "#333" } }}
               >
-                {messages.length === 0 ? (
-                  <Box
-                    className="no-chats"
-                    sx={{ textAlign: "center", color: "#757575" }}
-                  >
-                    <MailOutline sx={{ fontSize: 50, color: "#bdbdbd" }} />
-                    <Typography>No chats found</Typography>
-                  </Box>
-                ) : (
-                  messages.map((msg, index) => (
-                    <Typography key={index} sx={{ marginBottom: 1 }}>
-                      <strong>{msg.userName}: </strong>
-                      {msg.message}
-                    </Typography>
-                  ))
-                )}
-                <div ref={messagesEndRef} />
-              </Box>
-              <Box className="chat-input" sx={{ display: "flex", padding: 2 }}>
-                <TextField
-                  fullWidth
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Send message"
-                  variant="outlined"
-                  size="small"
-                  sx={{ marginRight: 1 }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      sendMessage();
-                    }
-                  }}
+                <Tab label="Chat" value="CHAT" />
+                <Tab
+                  label={`Users (${userList.length})`}
+                  value="USERS"
+                  sx={{ color: "black" }}
                 />
-                <IconButton color="primary" onClick={sendMessage}>
-                  <Send />
-                </IconButton>
+                <Tab
+                  label={`Requests (${speakRequests.length})`}
+                  value="REQUESTS"
+                  sx={{ color: "black" }}
+                />
+              </Tabs>
+            </Box>
+
+            <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
+              {activeTab === "CHAT" && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    height: isCameraEnabled
+                      ? "calc(100vh - 360px)"
+                      : "calc(100vh - 60px)",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      flex: 1,
+                      overflowY: "auto",
+                      p: 2,
+                      borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                    }}
+                  >
+                    {messages.length === 0 ? (
+                      <Box
+                        sx={{
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "text.secondary",
+                        }}
+                      >
+                        <Paper
+                          sx={{
+                            mb: 2,
+                            borderRadius: "50%",
+                            backgroundColor: "rgba(0,0,0,0.1)",
+                            p: 2,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ width: 32, height: 32 }}
+                          >
+                            <path d="M8 9h8" />
+                            <path d="M8 13h6" />
+                            <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z" />
+                          </svg>
+                        </Paper>
+                        <Typography align="center">No messages yet</Typography>
+                        <Typography
+                          align="center"
+                          variant="body2"
+                          sx={{ mt: 1 }}
+                        >
+                          Start the conversation!
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 2,
+                        }}
+                      >
+                        {messages.map((msg, index) => (
+                          <Box
+                            key={index}
+                            sx={{ display: "flex", flexDirection: "column" }}
+                          >
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <Typography sx={{ fontWeight: 500 }}>
+                                {msg.userName}
+                              </Typography>
+                            </Box>
+                            <Typography variant="body2" sx={{ mt: 1 }}>
+                              {msg.message}
+                            </Typography>
+                          </Box>
+                        ))}
+                        <div ref={messagesEndRef} />
+                      </Box>
+                    )}
+                  </Box>
+
+                  <Box
+                    sx={{
+                      p: 2,
+                      display: "flex",
+                      gap: 2,
+                      bgcolor: "background.paper",
+                    }}
+                  >
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      placeholder="Type a message..."
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                    />
+                    <IconButton
+                      onClick={sendMessage}
+                      disabled={!message.trim()}
+                      color="primary"
+                    >
+                      <LuSendHorizontal />
+                    </IconButton>
+                  </Box>
+                </Box>
+              )}
+
+              {activeTab === "USERS" && (
+                <List>
+                  {userList.map((user, index) => (
+                    <ListItem key={index}>
+                      <ListItemText primary={user.userName || user.userID} />
+                      <ListItemSecondaryAction>
+                        <IconButton onClick={() => toggleUserMic(user.userID)}>
+                          {user.isMuted ? (
+                            <MicOff size={20} />
+                          ) : (
+                            <Mic size={20} />
+                          )}
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+
+              {activeTab === "REQUESTS" && (
+                <List>
+                  {speakRequests.map((request, index) => (
+                    <ListItem key={index}>
+                      <ListItemText
+                        primary={request.userName || request.userID}
+                      />
+                      <ListItemSecondaryAction>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          color="success"
+                          onClick={() =>
+                            handleAcceptSpeakRequest(request.userID)
+                          }
+                          sx={{ mr: 1 }}
+                        >
+                          Accept
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="error"
+                          onClick={() =>
+                            handleDeclineSpeakRequest(request.userID)
+                          }
+                        >
+                          Decline
+                        </Button>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </Box>
+
+            {/* {activeTab === "CHAT" && (
+              <Box sx={{ p: 2, borderTop: 1, borderColor: "divider" }}>
+                <Grid container spacing={1}>
+                  <Grid item xs>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder="Type a message..."
+                      onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <IconButton onClick={sendMessage} color="primary">
+                      <Send size={20} />
+                    </IconButton>
+                  </Grid>
+                </Grid>
               </Box>
-            </Paper>
-          )}
+            )} */}
+          </Box>
         </Box>
       </Box>
 
-      {/* Footer */}
-      <Box
-        className="footer"
-        sx={{
-          display: "flex",
-          justifyContent: "space-around",
-          padding: 2,
-          backgroundColor: "#ffffff",
-          borderTop: "1px solid #e0e0e0",
-        }}
-      >
-        <IconButton
-          color={isMuted ? "secondary" : "primary"}
-          onClick={toggleMute}
-        >
-          {isMuted ? <MicOff /> : <Mic />}
-        </IconButton>
-        <IconButton
-          color={!isCameraEnabled ? "secondary" : "primary"}
-          onClick={toggleCamera}
-        >
-          {isCameraEnabled ? <Videocam /> : <VideocamOff />}
-        </IconButton>
-        <IconButton
-          color={isScreenShared ? "primary" : "default"}
-          onClick={isScreenShared ? stopScreenShare : startScreenShare}
-        >
-          <DesktopWindows />
-        </IconButton>
-        <IconButton color="default" onClick={toggleUserList}>
-          <Badge badgeContent={userList.length} color="primary">
-            <Group />
-          </Badge>
-        </IconButton>
-        <IconButton color="default" onClick={toggleSpeakRequestList}>
-          <Campaign />
-        </IconButton>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={() => setOpenDialog(true)}
-          startIcon={<ExitToApp />}
-        >
-          Leave Room
-        </Button>
-      </Box>
-
-      {/* Confirmation Dialog */}
+      {/* Confirmation Dialog for leave room*/}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Confirm Leave</DialogTitle>
         <DialogContent>
@@ -804,6 +1018,27 @@ export default function LiveClassRoom() {
             No
           </Button>
           <Button onClick={confirmLeaveRoom} color="error">
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* confirm Dialog for end class */}
+      <Dialog
+        open={openDialogEndClass}
+        onClose={() => setOpenDialogEndClass(false)}
+      >
+        <DialogTitle>End Classroom</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to end the class for all student?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialogEndClass(false)} color="primary">
+            No
+          </Button>
+          <Button onClick={confirmEndClass} color="error">
             Yes
           </Button>
         </DialogActions>

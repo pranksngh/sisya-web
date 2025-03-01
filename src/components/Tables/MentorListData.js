@@ -74,10 +74,10 @@ const MentorListData = () => {
         setSalesmanList(result.salesmen);
         setFilteredData(result.salesmen);
       } else {
-      //  console.error('Failed to fetch mentors');
+        console.error('Failed to fetch mentors');
       }
     } catch (error) {
-   //   console.error('Error fetching mentors:', error);
+      console.error('Error fetching mentors:', error);
     }
   };
 
@@ -124,7 +124,7 @@ const MentorListData = () => {
 
   const handleClassSelection = (classNumber) => {
     setSelectedClass(classNumber);
-   // console.log(`Class ${classNumber} selected`);
+    console.log(`Class ${classNumber} selected`);
   };
 
   const handleDateChange = (e) => {

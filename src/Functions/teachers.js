@@ -10,6 +10,6 @@ export  const fetchTeacherList = async () => {
 
      return result;
     } catch (error) {
-     // console.error("Error fetching mentors:", error);
+      console.error("Error fetching mentors:", error);
     }
   };

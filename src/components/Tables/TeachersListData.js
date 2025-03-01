@@ -73,14 +73,15 @@ const TeacherListData = () => {
       });
       const result = await response.json();
 
+
       if (result.success) {
         setTeacherList(result.mentors);
         setFilteredData(result.mentors);
       } else {
-     //   console.error('Failed to fetch mentors');
+        console.error('Failed to fetch mentors');
       }
     } catch (error) {
-    //  console.error('Error fetching mentors:', error);
+      console.error('Error fetching mentors:', error);
     }
   };
 

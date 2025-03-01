@@ -53,7 +53,7 @@ const AddClassData = () => {
         setCourseList(result.courses || []);
       }
     } catch (error) {
-    //  console.error('Error fetching course:', error);
+      console.error('Error fetching course:', error);
     }
   };
 
@@ -71,7 +71,7 @@ const AddClassData = () => {
         setMentorDetails(result.mentor);
       }
     } catch (error) {
-    //  console.error('Error fetching mentor details:', error);
+      console.error('Error fetching mentor details:', error);
     }
   };
 
@@ -89,7 +89,7 @@ const AddClassData = () => {
         return result.subjects[0].name;
       }
     } catch (error) {
-    //  console.error('Error fetching subject details:', error);
+      console.error('Error fetching subject details:', error);
     }
     return null;
   };
@@ -162,7 +162,7 @@ const AddClassData = () => {
         alert('Failed to add class');
       }
     } catch (error) {
-     // console.error('Error adding class:', error);
+      console.error('Error adding class:', error);
       alert('An error occurred while adding the class.');
     }
   };

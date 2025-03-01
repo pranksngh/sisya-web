@@ -27,10 +27,10 @@ function RecentOrders() {
       if (result.success) {
         setPurchases(result.subs);
       } else {
-     //   console.log('Purchase Issue', JSON.stringify(result));
+        console.log('Purchase Issue', JSON.stringify(result));
       }
     } catch (error) {
-     // console.log('Purchase Error', JSON.stringify(error));
+      console.log('Purchase Error', JSON.stringify(error));
     }
   };
 

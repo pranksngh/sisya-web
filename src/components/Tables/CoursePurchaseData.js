@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Dialog,
@@ -17,17 +17,19 @@ import {
   Typography,
   CircularProgress,
   TablePagination,
-} from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { getUser } from '../../Functions/Login';
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { getUser } from "../../Functions/Login";
 
 const CoursePurchaseListData = () => {
   const user = getUser();
   const [courseList, setCourseList] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const [studentSearchTerm, setStudentSearchTerm] = useState('');
+  const [studentSearchTerm, setStudentSearchTerm] = useState("");
   const [studentList, setStudentList] = useState([]);
-  const [filteredStudentSuggestions, setFilteredStudentSuggestions] = useState([]);
+  const [filteredStudentSuggestions, setFilteredStudentSuggestions] = useState(
+    []
+  );
   const [loading, setLoading] = useState(false);
 
   // Pagination states
@@ -37,6 +39,11 @@ const CoursePurchaseListData = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
 
+  // Filter states
+  const [orderIdSearch, setOrderIdSearch] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   useEffect(() => {
     fetchCourses();
     fetchStudentList();
@@ -44,31 +51,64 @@ const CoursePurchaseListData = () => {
 
   const fetchCourses = async () => {
     setLoading(true);
-    const response = await fetch('https://sisyabackend.in/rkadmin/get_purchases', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const response = await fetch(
+      "https://sisyabackend.in/rkadmin/get_purchases",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
     const result = await response.json();
     if (result.success) {
+      //sorting the list based on purchase date
+      result.subs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setCourseList(result.subs);
       setFilteredData(result.subs); // Load all data by default
     }
     setLoading(false);
   };
 
+  // Handle filtering
+  useEffect(() => {
+    let filtered = courseList;
+
+    // Filter by Order ID
+    if (orderIdSearch) {
+      filtered = filtered.filter((item) => {
+        return item.OrderId.toLowerCase().includes(orderIdSearch.toLowerCase());
+      });
+    }
+
+    // Filter by Date Range
+    if (startDate && endDate) {
+      filtered = filtered.filter((item) => {
+        const purchaseDate = new Date(item.createdAt);
+        return (
+          purchaseDate >= new Date(startDate) &&
+          purchaseDate <= new Date(endDate)
+        );
+      });
+    }
+
+    setFilteredData(filtered);
+  }, [courseList, orderIdSearch, startDate, endDate]);
+
   const fetchStudentList = async () => {
     try {
-      const response = await fetch('https://sisyabackend.in/rkadmin/get_recent_users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: 1, amount: 10000 }),
-      });
+      const response = await fetch(
+        "https://sisyabackend.in/rkadmin/get_recent_users",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: 1, amount: 10000 }),
+        }
+      );
       const result = await response.json();
       if (result.success) {
         setStudentList(result.studentList);
       }
     } catch (error) {
-    //  console.error('Error fetching students:', error);
+      console.error("Error fetching students:", error);
     }
   };
 
@@ -101,11 +141,13 @@ const CoursePurchaseListData = () => {
       <TableBody>
         {paginatedData.map((item, index) => (
           <TableRow key={index}>
-            <TableCell>{item.OrderId || 'N/A'}</TableCell>
-            <TableCell>{item.user?.name || 'Unknown'}</TableCell>
-            <TableCell>{item.course?.name || 'Unknown'}</TableCell>
-            <TableCell>{item.course?.grade || 'Unknown'}</TableCell>
-            <TableCell>{new Date(item.createdAt).toLocaleDateString()}</TableCell>
+            <TableCell>{item.OrderId || "N/A"}</TableCell>
+            <TableCell>{item.user?.name || "Unknown"}</TableCell>
+            <TableCell>{item.course?.name || "Unknown"}</TableCell>
+            <TableCell>{item.course?.grade || "Unknown"}</TableCell>
+            <TableCell>
+              {new Date(item.createdAt).toLocaleDateString()}
+            </TableCell>
             <TableCell>{item.PurchasePrice}</TableCell>
             <TableCell>
               <Button
@@ -130,11 +172,22 @@ const CoursePurchaseListData = () => {
         <DialogTitle>Course Purchase Info</DialogTitle>
         <DialogContent>
           <Box my={2}>
-            <Typography>Order ID: {selectedCourse?.OrderId || 'N/A'}</Typography>
-            <Typography>Student Name: {selectedCourse?.user?.name || 'Unknown'}</Typography>
-            <Typography>Course Name: {selectedCourse?.course?.name || 'Unknown'}</Typography>
-            <Typography>Grade: {selectedCourse?.course?.grade || 'Unknown'}</Typography>
-            <Typography>Purchase Date: {new Date(selectedCourse?.createdAt).toLocaleDateString()}</Typography>
+            <Typography>
+              Order ID: {selectedCourse?.OrderId || "N/A"}
+            </Typography>
+            <Typography>
+              Student Name: {selectedCourse?.user?.name || "Unknown"}
+            </Typography>
+            <Typography>
+              Course Name: {selectedCourse?.course?.name || "Unknown"}
+            </Typography>
+            <Typography>
+              Grade: {selectedCourse?.course?.grade || "Unknown"}
+            </Typography>
+            <Typography>
+              Purchase Date:{" "}
+              {new Date(selectedCourse?.createdAt).toLocaleDateString()}
+            </Typography>
             <Typography>Price: Rs {selectedCourse?.PurchasePrice}</Typography>
           </Box>
         </DialogContent>
@@ -152,6 +205,52 @@ const CoursePurchaseListData = () => {
       <Typography variant="h4" gutterBottom>
         Purchased Courses
       </Typography>
+
+      {/* Filter Inputs */}
+      <Grid
+        container
+        spacing={2}
+        my={2}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          flexWrap: "nowrap",
+        }}
+      >
+        <Grid items xs={12} sm={4} sx={{ minWidth: "250px" }}>
+          <TextField
+            variant="outlined"
+            label="Search by Order ID"
+            fullWidth
+            value={orderIdSearch}
+            onChange={(e) => setOrderIdSearch(e.target.value)}
+          />
+        </Grid>
+
+        <Grid items xs={12} sm={4} sx={{ minWidth: "250px" }}>
+          <TextField
+            variant="outlined"
+            type="date"
+            label="Start Date"
+            fullWidth
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
+        </Grid>
+
+        <Grid items xs={12} sm={4} sx={{ minWidth: "250px" }}>
+          <TextField
+            variant="outlined"
+            type="date"
+            label="End Date"
+            fullWidth
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
+        </Grid>
+      </Grid>
 
       {loading ? (
         <Box display="flex" justifyContent="center" mt={5}>

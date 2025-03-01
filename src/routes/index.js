@@ -46,12 +46,9 @@ import MentorLeaves from '../pages/HR/MentorLeaves';
 import MentorLeaveRequest from '../pages/Mentor/MentorLeaveRequest';
 import TeacherLeaves from '../pages/HR/TeacherLeaves';
 import LiveClassRoom from '../pages/Teacher/LiveClassRoom';
+import LiveClassRoomLayout4 from '../pages/Teacher/LiveClassRoomLayout4';
 import VideoCallPage from '../pages/Teacher/videocall';
 import EditClass from '../pages/Teacher/EditClass';
-import ClassRoom from '../pages/Teacher/ClassRoom';
-import ChangePassword from '../pages/Teacher/changePassword';
-import Registration from '../pages/Admin/Registrations';
-import AddClassData from '../pages/Admin/AddClass';
 
 const router = createBrowserRouter([
   {
@@ -65,11 +62,12 @@ const router = createBrowserRouter([
       LiveClassRoom
     ),
   },
-  {
-    path: 'classroom',
+  
+  {//to be deleted later
+    path: 'liveclassroomlayout4',
     element: React.createElement(
      
-      ClassRoom
+      LiveClassRoomLayout4
     ),
   },
 
@@ -180,13 +178,6 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'addclass',
-        element: React.createElement(
-         
-          AddClassData
-        ),
-      },
-      {
         path: 'addCourse',
         element: React.createElement(
          
@@ -254,13 +245,6 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           Banners
-        ),
-      },
-      {
-        path: 'registration',
-        element: React.createElement(
-         
-          Registration
         ),
       },
       {
@@ -387,13 +371,6 @@ const router = createBrowserRouter([
         element: React.createElement(
          
           EditClass
-        ),
-      },
-      {
-        path: 'change-password',
-        element: React.createElement(
-         
-          ChangePassword
         ),
       },
       

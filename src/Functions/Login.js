@@ -15,7 +15,7 @@ export const login = async (user, password) => {
     });
 
     if (!response.ok) {
-    //  console.log('Network response was not ok ' + response.statusText);
+      console.log('Network response was not ok ' + response.statusText);
     }
 
     const data = await response.json();
@@ -27,7 +27,7 @@ export const login = async (user, password) => {
     }
     return data;
   } catch (error) {
-   // console.error('There was a problem with the fetch operation:', error);
+    console.error('There was a problem with the fetch operation:', error);
     throw error;
   }
 };
@@ -44,7 +44,7 @@ export const teacherlogin = async (phone, password) => {
     });
 
     if (!response.ok) {
-    //  console.log('Network response was not ok ' + response.statusText);
+      console.log('Network response was not ok ' + response.statusText);
     }
 
     const data = await response.json();
@@ -57,7 +57,7 @@ export const teacherlogin = async (phone, password) => {
     }
     return data;
   } catch (error) {
-  //  console.error('There was a problem with the fetch operation:', error);
+    console.error('There was a problem with the fetch operation:', error);
     throw error;
   }
 };
@@ -74,7 +74,7 @@ export const mentorlogin = async (email, password) => {
     });
 
     if (!response.ok) {
-    //  console.log('Network response was not ok ' + response.statusText);
+      console.log('Network response was not ok ' + response.statusText);
     }
 
     const data = await response.json();
@@ -85,7 +85,7 @@ export const mentorlogin = async (email, password) => {
     }
     return data;
   } catch (error) {
-   // console.error('There was a problem with the fetch operation:', error);
+    console.error('There was a problem with the fetch operation:', error);
     throw error;
   }
 };
@@ -102,7 +102,7 @@ export const hrlogin = async (email, password) => {
     });
 
     if (!response.ok) {
-     // console.log('Network response was not ok ' + response.statusText);
+      console.log('Network response was not ok ' + response.statusText);
     }
 
     const data = await response.json();
@@ -113,7 +113,7 @@ export const hrlogin = async (email, password) => {
     }
     return data;
   } catch (error) {
-  //  console.error('There was a problem with the fetch operation:', error);
+    console.error('There was a problem with the fetch operation:', error);
     throw error;
   }
 };
