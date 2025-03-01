@@ -50,6 +50,7 @@ import LiveClassRoomLayout4 from '../pages/Teacher/LiveClassRoomLayout4';
 import VideoCallPage from '../pages/Teacher/videocall';
 import EditClass from '../pages/Teacher/EditClass';
 import PilotRegistration from '../pages/Admin/PilotRegistration';
+import EnrollStudent from '../pages/Admin/EnrollStudent';
 
 const router = createBrowserRouter([
   {
@@ -149,6 +150,10 @@ const router = createBrowserRouter([
          
           AddStudent
         ),
+      },
+      {
+        path: "enrollStudent",
+        element: React.createElement(EnrollStudent),
       },
       {
         path: 'teachers',

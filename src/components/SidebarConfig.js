@@ -49,6 +49,7 @@ const sidebarConfig = [
     subItems: [
       { label: "List Students", path: "students" },
       { label: "Add Student", path: "addStudent" },
+      { label: "Enroll Student", path: "enrollStudent" },
     ],
   },
   {
