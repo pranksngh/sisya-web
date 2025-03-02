@@ -90,6 +90,13 @@ const sidebarConfig = [
     expandable: false,
   },
   {
+    label: "Add Class",
+    icon: "PeopleOutline",
+    path: "addclass",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
     label: "Registration Leads",
     icon: "PeopleOutline",
     path: "pilot-course-reg",

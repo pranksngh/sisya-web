@@ -51,6 +51,7 @@ import VideoCallPage from '../pages/Teacher/videocall';
 import EditClass from '../pages/Teacher/EditClass';
 import PilotRegistration from '../pages/Admin/PilotRegistration';
 import EnrollStudent from '../pages/Admin/EnrollStudent';
+import AddClassData from '../pages/Admin/AddClass';
 
 const router = createBrowserRouter([
   {
@@ -154,6 +155,10 @@ const router = createBrowserRouter([
       {
         path: "enrollStudent",
         element: React.createElement(EnrollStudent),
+      },
+      {
+        path: "addclass",
+        element: React.createElement(AddClassData),
       },
       {
         path: 'teachers',
