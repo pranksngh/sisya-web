@@ -338,7 +338,7 @@ import {
   Grid,
   Button,
 } from "@mui/material";
-
+import { toast, ToastContainer } from "react-toastify";
 const EnrollStudent = () => {
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -409,9 +409,8 @@ const EnrollStudent = () => {
       setSelectedStudent(null);
       return;
     }
-    const studentName = value.split(" (")[0];
-    const student = students.find((s) => s.name === studentName);
-    setSelectedStudent(student || null);
+  
+    setSelectedStudent(value);
     setSelectedCourse(null);
     setOrderId(""); // Reset OrderId when student changes
   };
@@ -451,16 +450,18 @@ const EnrollStudent = () => {
         const result = await response.json();
 
         if (result.success) {
-          alert("Enrollment successful!");
+          setSelectedStudent(null);
+          setSelectedCourse(null);
+          toast.success("Student Enrolled Successfully");
         } else {
-          alert("Enrollment failed: " + result.message);
+          toast.error("something went wrong ! Try again");
         }
       } catch (error) {
-        console.error("Error enrolling student:", error);
-        alert("An error occurred while enrolling.");
+       // console.log("Error enrolling student:", error);
+       toast.error("something went wrong ! Try again");
       }
     } else {
-      alert(
+      toast.error(
         "Please select a student, a course, and enter an Order ID before enrolling."
       );
     }
@@ -470,10 +471,17 @@ const EnrollStudent = () => {
     <div style={{ maxWidth: "600px", margin: "0 auto" }}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Autocomplete
+        <Autocomplete
+          options={students}
+          getOptionLabel={(option) => `${option.id} - ${option.name} - ${option.phone}` || ''}
+          value={selectedStudent}
+          onChange={handleSelectStudent}
+          renderInput={(params) => <TextField {...params} label="Select Student" margin="normal" fullWidth />}
+        />
+          {/* <Autocomplete
             freeSolo
             options={filteredSuggestions.map(
-              (option) => `${option.name} (${option.grade})`
+              (option) => `${option.name} (${option.phone})`
             )}
             inputValue={searchText}
             onInputChange={handleSearchInputChange}
@@ -486,7 +494,7 @@ const EnrollStudent = () => {
                 fullWidth
               />
             )}
-          />
+          /> */}
         </Grid>
       </Grid>
 
@@ -502,7 +510,7 @@ const EnrollStudent = () => {
 
             <Autocomplete
               options={courses}
-              getOptionLabel={(option) => option.name}
+              getOptionLabel={(option) => `${option.id}-Class${option.grade}-${option.name}`}
               value={selectedCourse}
               onChange={(event, newValue) => setSelectedCourse(newValue)}
               renderInput={(params) => (
@@ -538,6 +546,7 @@ const EnrollStudent = () => {
           </CardContent>
         </Card>
       )}
+      <ToastContainer/>
     </div>
   );
 };
