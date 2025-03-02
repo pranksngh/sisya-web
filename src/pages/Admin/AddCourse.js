@@ -21,20 +21,26 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  IconButton
 } from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
 const defaultUserImage = "https://via.placeholder.com/100?text=User";
+
 
 const AddCourse = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
-  const steps = ["Course Banner", "Course Info", "Subjects", "Teachers"];
+  const steps = ["Course Banner", "Course Info", "Subjects", "Teachers","Additional Images"];
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [errorModalOpen, setErrorModalOpen] = useState(false);
+  const [additionalImages, setAdditionalImages] = useState([]);
   // Step 1 States
   const [banner, setBanner] = useState(null);
   const [mainImage, setMainImage] = useState(null);
-
+  const [multipleImages, setMultipleImages] = useState([]);
+  const [fileList, setFileList] = useState([]);
   // Step 2 States
   const [courseInfo, setCourseInfo] = useState({
     name: "",
@@ -60,7 +66,7 @@ const AddCourse = () => {
   const [MainImageData, setMainImageData] = useState([]);
   const [BannerImageData, setBannerImageData] = useState([]);
   const [validationError, setValidationError] = useState("");
-
+  const [additionalPreviews, setAdditionalPreviews] = useState([]);
 
   const handleNext = () => {
     // Reset validation error
@@ -229,7 +235,7 @@ const AddCourse = () => {
       const updatedTeacher = { ...teacher, subjectId: subjectId.id };
       setSelectedTeachers([...selectedTeachers, updatedTeacher]);
 
-      console.log("selected teachers", JSON.stringify(selectedTeachers))
+     // console.log("selected teachers", JSON.stringify(selectedTeachers))
     } else {
       alert("Subject ID not found!");
     }
@@ -250,17 +256,17 @@ const AddCourse = () => {
 
       if (subjectResult.success) {
         setAvailableSubjects(subjectResult.subjects);
-        console.log("Subjects fetched successfully");
+     //   console.log("Subjects fetched successfully");
       } else {
-        console.error("Failed to fetch Subjects", subjectResult.error);
+     //   console.error("Failed to fetch Subjects", subjectResult.error);
       }
     } catch (error) {
-      console.error("Error fetching Subjects:", error);
+    //  console.error("Error fetching Subjects:", error);
     }
   };
 
   const fetchTeacherList = async (selectedGrade) => {
-    console.log("selected grade is " , selectedGrade);
+   // console.log("selected grade is " , selectedGrade);
     try {
       const mentorResponse = await fetch('https://sisyabackend.in/rkadmin/get_mentors', {
         method: 'POST',
@@ -276,15 +282,15 @@ const AddCourse = () => {
           mentor.Grades.includes(selectedGrade.toString())
         );
 
-        console.log("Filtered Mentors List", JSON.stringify(filteredMentors));
+      //  console.log("Filtered Mentors List", JSON.stringify(filteredMentors));
         setAvailableTeachers(filteredMentors); // Set the filtered mentors in the state
 
-        console.log("Mentors fetched and filtered successfully");
+      //  console.log("Mentors fetched and filtered successfully");
       } else {
-        console.error("Failed to fetch Mentors");
+     //   console.error("Failed to fetch Mentors");
       }
     } catch (error) {
-      console.error("Error fetching Mentors:", error);
+     // console.error("Error fetching Mentors:", error);
     }
   };
 
@@ -338,6 +344,37 @@ const AddCourse = () => {
     alert("Kindly select at least one subject to proceed.");
     return; // Stop further execution
   }
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(',')[1]); // Extract base64 part
+      reader.onerror = error => reject(error);
+    });
+  };
+  if (!Array.isArray(additionalImages) || additionalImages.length === 0) {
+    alert("No additional images found.");
+    return;
+  }
+  const convertedFiles = await Promise.all(
+    additionalImages.map(async (file) => {
+      try {
+        const base64String = await convertToBase64(file);
+       // console.log("Converted Base64:", base64String);
+        return { name: file.name, content: base64String };
+      } catch (error) {
+      //  console.error("Base64 conversion failed for:", file.name, error);
+        return null;
+      }
+    })
+  );
+
+  // Filter out null values in case of any invalid files
+  const filteredFiles = convertedFiles.filter((file) => file !== null);
+
+  setFileList(filteredFiles);
+
+ // console.log("filteredFiles", JSON.stringify(filteredFiles));
   
     const finalData = {
       name: courseInfo.name,
@@ -369,7 +406,7 @@ const AddCourse = () => {
       }))
     };
 
-    console.log(JSON.stringify(finalData));
+   // console.log(JSON.stringify(finalData));
   
     try {
       const response = await fetch('https://sisyabackend.in/rkadmin/create_big_course', {
@@ -383,15 +420,17 @@ const AddCourse = () => {
       const result = await response.json();
 
       if (result.success) {
-         console.log("Course Added Successfully");
+        const bigCourseId = result.bigCourse?.id;
+        console.log("Course Added Successfully",JSON.stringify(result));
        //  alert("Course Added Successfully");
-       setSuccessModalOpen(true);
+        addAddtionalImages(bigCourseId,filteredFiles);
+     //  setSuccessModalOpen(true);
       } else {
-        console.log("Course Addition Failed");
+      //  console.log("Course Addition Failed");
         setErrorModalOpen(true);
       }
     } catch (error) {
-      console.log("Error adding course:", error);
+     // console.log("Error adding course:", error);
       setErrorModalOpen(true);
     }
 
@@ -405,8 +444,52 @@ const AddCourse = () => {
   const closeErrorModal = () => {
     setErrorModalOpen(false);
   };
+  const handleMultipleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+  
+    // Store actual file objects
+    setAdditionalImages((prevFiles) => [...prevFiles, ...files]);
+  
+    // Store preview URLs for UI
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAdditionalPreviews((prevPreviews) => [...prevPreviews, e.target.result]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+  
+  const handleRemoveMultipleImage = (index) => {
+    setAdditionalImages((prev) => prev.filter((_, i) => i !== index));
+  };
+  
+const addAddtionalImages = async(bigcourseId,filteredFiles) =>{
 
+  const finalInfo = {
+    bigCourseId:bigcourseId,  
+    fileList: filteredFiles
+  }
+  console.log("filelist info", JSON.stringify(finalInfo));
+  try{
+    const response = await fetch('https://sisyabackend.in/rkadmin/insert_course_banner', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(finalInfo)
+    });
+    const result = await response.json();
+    if(result.success){
+      setSuccessModalOpen(true);
+    }else{
+      setErrorModalOpen(true);
+    }
+  }catch(error){
+    setErrorModalOpen(true);
+  }
 
+}
   const renderStepContent = (step) => {
     switch (step) {
         case 0:
@@ -714,6 +797,64 @@ const AddCourse = () => {
             </Grid>
           </div>
         );
+        case 4:
+          return (
+            <div style={{ textAlign: "center", padding: "20px" }}>
+              <Typography variant="h5" style={{ marginBottom: "20px" }}>
+                Upload Additional Images
+              </Typography>
+        
+              {/* Upload Button */}
+              <label htmlFor="upload-additional-images">
+                <input
+                  accept="image/*"
+                  id="upload-additional-images"
+                  type="file"
+                  multiple
+                  style={{ display: "none" }}
+                  onChange={handleMultipleImageUpload}
+                />
+                <Button
+                  variant="contained"
+                  component="span"
+                  color="primary"
+                  startIcon={<CloudUploadIcon />}
+                >
+                  Upload Images
+                </Button>
+              </label>
+        
+              {/* Image Preview Grid */}
+              <Grid container spacing={2} style={{ marginTop: "20px" }}>
+                {additionalPreviews.map((image, index) => (
+                  <Grid item xs={6} sm={4} md={3} key={index}>
+                    <Card sx={{ position: "relative", boxShadow: 3, borderRadius: 2 }}>
+                      <CardMedia
+                        component="img"
+                        image={image}
+                        alt={`Uploaded ${index}`}
+                        sx={{ height: '300px', objectFit: "contain", borderRadius: "8px" }}
+                      />
+                      <IconButton
+                        size="small"
+                        color="error"
+                        sx={{
+                          position: "absolute",
+                          top: 5,
+                          right: 5,
+                          backgroundColor: "rgba(255, 255, 255, 0.7)",
+                        }}
+                        onClick={() => handleRemoveMultipleImage(index)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </div>
+          );
+        
       default:
         return null;
     }

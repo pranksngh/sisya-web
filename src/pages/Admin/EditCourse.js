@@ -22,17 +22,19 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  IconButton
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
+import { CloudUpload as CloudUploadIcon, Delete as DeleteIcon } from "@mui/icons-material";
 const defaultUserImage = "https://via.placeholder.com/100?text=User";
 
 const EditCourse = () => {
   const [activeStep, setActiveStep] = useState(0);
-  const steps = ["Course Banner", "Course Info", "Subjects", "Teachers"];
+  const steps = ["Course Banner", "Course Info", "Subjects", "Teachers","Additional Images"];
    const navigate = useNavigate();
   const location = useLocation();
   const courseData = location.state?.course || {};
-  console.log("Edit Course Data", courseData.id);
+ // console.log("Edit Course Data", courseData.id);
   // Step 1 States
   const [banner, setBanner] = useState(`https://sisyabackend.in/student/thumbs/courses/${courseData.id}.jpg`);
   const [mainImage, setMainImage] = useState(`https://sisyabackend.in/student/thumbs/mcourses/${courseData.id}.jpg`);
@@ -68,7 +70,7 @@ const EditCourse = () => {
   const [MainImageData, setMainImageData] = useState([]);
   const [BannerImageData, setBannerImageData] = useState([]);
   const [validationError, setValidationError] = useState("");
-
+  const [imageList, setImageList] = useState([]);
 
   useEffect(() => {
     if (courseData.grade) {
@@ -80,7 +82,7 @@ const EditCourse = () => {
   useEffect(() => {
   //  console.log("teach intro issue", JSON.stringify(courseData.TeachIntro))
     if (availableTeachers.length > 0 && courseData.TeachIntro) {
-      console.log("available teachers", JSON.stringify(availableTeachers));
+     // console.log("available teachers", JSON.stringify(availableTeachers));
       fetchSelectedTeachers();
     }
   }, [availableTeachers]); 
@@ -97,6 +99,69 @@ const EditCourse = () => {
     }
   }, [banner, mainImage]);
 
+
+  const fetchServerImages = async () => {
+    try {
+      const response = await fetch("https://sisyabackend.in/student/get_course_banners_list", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bigCourseId:courseData.id }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+
+        const convertedImages = await Promise.all(
+          result.files.map(async (fileName) => {
+            const imageUrl = `https://sisyabackend.in/student/thumbs/banners/course_banners/${courseData.id}/${fileName}`;
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+
+            return new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.readAsDataURL(blob);
+              reader.onloadend = () => {
+                resolve({
+                  name: fileName,
+                  content: reader.result, // Convert to Base64
+                  serverImage: true, // Mark as a server image
+                });
+              };
+            });
+          })
+        );
+
+        setImageList(convertedImages);
+      }
+    } catch (error) {
+      console.error("Error fetching server images:", error);
+    }
+  };
+
+  const handleMultipleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImageList((prev) => [
+          ...prev,
+          { name: file.name, content: e.target.result, serverImage: false },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleRemoveImage = (index) => {
+    setImageList((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  useEffect(() => {
+    fetchServerImages();
+  }, []);
+
   const fetchImageAsBase64 = async (url, setState) => {
     try {
       const response = await fetch(url);
@@ -106,7 +171,7 @@ const EditCourse = () => {
       const base64 = await convertToBase64(file);
       setState(base64);
     } catch (error) {
-      console.error("Error fetching and converting image:", error);
+    //  console.error("Error fetching and converting image:", error);
     }
   };
 
@@ -118,7 +183,7 @@ const EditCourse = () => {
     setErrorModalOpen(false);
   };
    const fetchSelectedTeachers = () =>{
-    console.log("default teacher", courseData.TeachIntro.length);
+   // console.log("default teacher", courseData.TeachIntro.length);
 
     setSelectedTeachers([]);
     courseData.TeachIntro.forEach((mentor) => {
@@ -131,7 +196,7 @@ const EditCourse = () => {
       // Check if teacher is found
       if (teacher) {
         handleSubjectChange(mentor.mentorId, mentor.subjectId);
-         console.log("Selected teacher", JSON.stringify(teacher));
+       //  console.log("Selected teacher", JSON.stringify(teacher));
    
          // Get the subject for the teacher
          const subjectId = selectedSubjectsForTeachers[teacher.id];
@@ -149,7 +214,7 @@ const EditCourse = () => {
          ]);
       } else {
          // Handle case where teacher is not found
-         console.log(`Teacher with id ${mentor.mentorId} not found`);
+       //  console.log(`Teacher with id ${mentor.mentorId} not found`);
       }
    });
    
@@ -163,7 +228,7 @@ const EditCourse = () => {
         .map((subjectId) => available.find((s) => s.id === subjectId))
         .filter(Boolean); // Filter out nulls for non-matching subjects
       setSelectedSubjects(selected); // Use setState here
-      console.log("Selected subjects list", JSON.stringify(selected));
+   //   console.log("Selected subjects list", JSON.stringify(selected));
     }
   };
 
@@ -183,8 +248,12 @@ const EditCourse = () => {
           setValidationError("Course description is required.");
           return;
         }
-        if (!courseInfo.currentPrice || courseInfo.currentPrice <= 0) {
+        if (courseInfo.courseType !== "free" && (!courseInfo.currentPrice || courseInfo.currentPrice <= 0)) {
           setValidationError("Please provide a valid current price.");
+          return;
+        }
+        if (courseInfo.courseType !== "free" && (!courseInfo.price || courseInfo.price <= 0)) {
+          setValidationError("Please provide a valid MRP.");
           return;
         }
        
@@ -297,7 +366,7 @@ const EditCourse = () => {
     }
     if(name ==="grade" && value !== courseInfo.grade){
 
-        console.log("my grade is " + e.target.value)
+     //   console.log("my grade is " + e.target.value)
         fetchSubjects(e.target.value);
         fetchTeacherList(e.target.value);
     }
@@ -319,12 +388,12 @@ const EditCourse = () => {
       const updatedTeacher = { ...teacher, subjectId: subjectId.id };
    setSelectedTeachers([...selectedTeachers, updatedTeacher]);
      //  selectedTeachers.push(updatedTeacher);
-     console.log("selectd teachers length", JSON.stringify(selectedTeachers.length))
-      console.log("selectd teachers", JSON.stringify(selectedTeachers))
+    // console.log("selectd teachers length", JSON.stringify(selectedTeachers.length))
+    //  console.log("selectd teachers", JSON.stringify(selectedTeachers))
     } else {
-      alert("Subject ID not found!");
+      alert("Subject not found!");
     }
-  
+    
   };
 
   const fetchSubjects = async (grade) => {
@@ -338,15 +407,15 @@ const EditCourse = () => {
       const result = await response.json();
       if (result.success) {
         setAvailableSubjects(result.subjects);
-        console.log("Subjects fetched successfully");
+      //  console.log("Subjects fetched successfully");
         fetchSelectedSubjects(result.subjects); // Only once
       }
     } catch (error) {
-      console.error("Error fetching Subjects:", error);
+     // console.error("Error fetching Subjects:", error);
     }
   };
   const fetchTeacherList = async (selectedGrade) => {
-    console.log("selected grade is " , selectedGrade);
+   // console.log("selected grade is " , selectedGrade);
     
     try {
       const mentorResponse = await fetch('https://sisyabackend.in/rkadmin/get_mentors', {
@@ -369,12 +438,12 @@ const EditCourse = () => {
 
        
 
-        console.log("Mentors fetched and filtered successfully",);
+      //  console.log("Mentors fetched and filtered successfully",);
       } else {
-        console.error("Failed to fetch Mentors");
+      //  console.error("Failed to fetch Mentors");
       }
     } catch (error) {
-      console.error("Error fetching Mentors:", error);
+     // console.error("Error fetching Mentors:", error);
     }
   };
 
@@ -425,6 +494,19 @@ const EditCourse = () => {
     alert("Kindly select at least one teacher to proceed.");
     return; // Stop further execution
   }
+  const formattedImages = await Promise.all(
+    imageList.map(async (image) => {
+      if (image.serverImage) {
+        // If it's a server image, content is already Base64
+        return { name: image.name, content: image.content.split(",")[1] };
+      } else {
+        // If it's an uploaded image, ensure it's Base64
+        return { name: image.name, content: image.content.split(",")[1] };
+      }
+    })
+  );
+
+  console.log("Formatted images for API:", formattedImages);
     const finalData = {
        id:courseInfo.id,
       name: courseInfo.name,
@@ -458,7 +540,7 @@ const EditCourse = () => {
       }))
     };
 
-    console.log("selected teacher length", JSON.stringify(finalData));
+   console.log("selected teacher length", JSON.stringify(finalData));
   
     try {
       const response = await fetch('https://sisyabackend.in/rkadmin/update_course', {
@@ -472,21 +554,49 @@ const EditCourse = () => {
       const result = await response.json();
 
       if (result.success) {
-         console.log("Course Updated Successfully");
-         setSuccessModalOpen(true); 
+      //   console.log("Course Updated Successfully");
+     addAddtionalImages(courseInfo.id,formattedImages);
+      //   setSuccessModalOpen(true); 
       } else {
         setErrorModalOpen(true);
        // alert(JSON.stringify(result.error));
       }
     } catch (error) {
-      console.log("Error adding course:", error);
+   //   console.log("Error adding course:", error);
       setErrorModalOpen(true);
     }
 
  // setResultModalOpen(true); // Open the result modal
   }; 
 
+  const addAddtionalImages = async(bigcourseId,filteredFiles) =>{
 
+    const finalInfo = {
+      bigCourseId:bigcourseId,  
+      fileList: filteredFiles
+    }
+    console.log("filelist info", JSON.stringify(finalInfo));
+    try{
+      const response = await fetch('https://sisyabackend.in/rkadmin/insert_course_banner', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(finalInfo)
+      });
+      const result = await response.json();
+      console.log("my response", JSON.stringify(result));
+  
+      if(result.success){
+        setSuccessModalOpen(true);
+      }else{
+       // console.log(JSON.stringify(response));
+        setErrorModalOpen(true);
+      }
+    }catch(error){
+      setErrorModalOpen(true);
+    }
+  };  
   const renderStepContent = (step) => {
     switch (step) {
         case 0:
@@ -792,6 +902,59 @@ const EditCourse = () => {
             </Grid>
           </div>
         );
+        case 4:
+          return (
+            <div style={{ textAlign: "center", padding: "20px" }}>
+              <Typography variant="h5" style={{ marginBottom: "20px" }}>
+                Upload Additional Images
+              </Typography>
+        
+              {/* Upload Button */}
+              <label htmlFor="upload-additional-images">
+                <input
+                  accept="image/*"
+                  id="upload-additional-images"
+                  type="file"
+                  multiple
+                  style={{ display: "none" }}
+                  onChange={handleMultipleImageUpload}
+                />
+                <Button variant="contained" component="span" color="primary" startIcon={<CloudUploadIcon />}>
+                  Upload Images
+                </Button>
+              </label>
+        
+              {/* Image Preview Grid */}
+              <Grid container spacing={2} style={{ marginTop: "20px" }}>
+                {imageList.map((image, index) => (
+                  <Grid item xs={6} sm={4} md={3} key={index}>
+                    <Card sx={{ position: "relative", boxShadow: 3, borderRadius: 2 }}>
+                      <CardMedia
+                        component="img"
+                        image={image.content}
+                        alt={image.name}
+                        sx={{ height: "300px", objectFit: "contain", borderRadius: "8px" }}
+                      />
+                      <IconButton
+                        size="small"
+                        color="error"
+                        sx={{
+                          position: "absolute",
+                          top: 5,
+                          right: 5,
+                          backgroundColor: "rgba(255, 255, 255, 0.7)",
+                        }}
+                        onClick={() => handleRemoveImage(index)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </div>
+          );
+        
       default:
         return null;
     }
