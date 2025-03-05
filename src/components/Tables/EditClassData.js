@@ -167,7 +167,7 @@ const EditClassData = () => {
     const formattedEndTime = new Date(formData.endTime).toISOString();
 
     const submissionData = {
-        id:sessionInfo.id,
+      id:sessionInfo.id,
       mentorId: user.mentor.id,
       bigCourseId: selectedCourse.id,
       detail: formData.title,
@@ -180,7 +180,7 @@ const EditClassData = () => {
     };
 
     try {
-      const response = await fetch('https://sisyabackend.in/rkadmin/edit_session', {
+      const response = await fetch('https://sisyabackend.in/student/edit_session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

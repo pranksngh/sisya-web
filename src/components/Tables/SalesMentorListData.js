@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -22,25 +22,25 @@ import {
   MenuItem,
   Autocomplete,
   Chip,
-} from '@mui/material';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { getUser } from '../../Functions/Login';
+} from "@mui/material";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { getUser } from "../../Functions/Login";
 
 const SalesMentorListData = () => {
   const user = getUser();
   const [salesmenList, setSalesmenList] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    country: 'India',
+    name: "",
+    email: "",
+    password: "",
+    country: "India",
     isActive: true,
     classes: [], // To store multiple class selection
   });
@@ -53,17 +53,23 @@ const SalesMentorListData = () => {
 
   const fetchSalesmenData = async () => {
     try {
-      const response = await fetch('https://sisyabackend.in/rkadmin/list_salesmen', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const response = await fetch(
+        "https://sisyabackend.in/rkadmin/list_salesmen",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       const result = await response.json();
+      console.log(result);
       if (result?.success) {
+        console.log("salesman", result?.salesman);
         setSalesmenList(result?.salesmen);
         setFilteredData(result?.salesmen);
+        console.log(filteredData);
       }
     } catch (error) {
-      console.error('Error fetching salesmen:', error);
+      console.error("Error fetching salesmen:", error);
     }
   };
 
@@ -82,17 +88,17 @@ const SalesMentorListData = () => {
       setFormData({
         name: salesman.name,
         email: salesman.email,
-        password: '',
-        country: 'India',
+        password: "",
+        country: "India",
         isActive: salesman.isActive,
         classes: salesman.classes || [],
       });
     } else {
       setFormData({
-        name: '',
-        email: '',
-        password: '',
-        country: 'India',
+        name: "",
+        email: "",
+        password: "",
+        country: "India",
         isActive: true,
         classes: [],
       });
@@ -114,27 +120,72 @@ const SalesMentorListData = () => {
   const handleSubmit = async () => {
     setLoading(true);
     const url = isEditMode
-      ? 'https://sisyabackend.in/rkadmin/update_salesman'
-      : 'https://sisyabackend.in/rkadmin/insert_salesman';
+      ? "https://sisyabackend.in/rkadmin/update_salesman"
+      : "https://sisyabackend.in/rkadmin/insert_salesman";
 
     try {
       const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const result = await response.json();
       if (result.success) {
-        toast.success(isEditMode ? 'Mentor updated successfully!' : 'Mentor added successfully!');
+        toast.success(
+          isEditMode
+            ? "Mentor updated successfully!"
+            : "Mentor added successfully!"
+        );
         handleCloseModal();
         fetchSalesmenData();
       } else {
-        toast.error('Operation failed. Please try again');
+        toast.error("Operation failed. Please try again");
       }
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('An error occurred!');
+      console.error("Error:", error);
+      toast.error("An error occurred!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleStatus = async (salesman) => {
+    setLoading(true);
+    try {
+      const updatedData = {
+        id: salesman.id,
+        name: salesman.name,
+        email: salesman.email,
+        country: salesman.country || "India",
+        isActive: !salesman.isActive,
+        classes: salesman.classes || [],
+        password: "",
+      };
+
+      const response = await fetch(
+        "https://sisyabackend.in/rkadmin/update_salesman",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedData),
+        }
+      );
+
+      const result = await response.json();
+      if (result.success) {
+        toast.success(
+          `Mentor ${
+            !salesman.isActive ? "activated" : "inactivated"
+          } successfully!`
+        );
+        fetchSalesmenData();
+      } else {
+        toast.error("Failed to update status");
+      }
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      toast.error("An error occurred while updating status");
     } finally {
       setLoading(false);
     }
@@ -159,7 +210,7 @@ const SalesMentorListData = () => {
         variant="contained"
         color="primary"
         onClick={() => handleOpenModal()}
-        style={{ marginBottom: '15px' }}
+        style={{ marginBottom: "15px" }}
       >
         Add Mentor
       </Button>
@@ -185,7 +236,7 @@ const SalesMentorListData = () => {
                   <TableCell>{item.id}</TableCell>
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{item.email}</TableCell>
-                  <TableCell>{item.isActive ? 'Active' : 'Inactive'}</TableCell>
+                  <TableCell>{item.isActive ? "Active" : "Inactive"}</TableCell>
                   <TableCell>
                     <Button
                       variant="outlined"
@@ -193,6 +244,15 @@ const SalesMentorListData = () => {
                       onClick={() => handleOpenModal(item)}
                     >
                       Edit
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color={item.isActive ? "error" : "success"}
+                      onClick={() => toggleStatus(item)}
+                      disabled={loading}
+                      style={{ marginLeft: "8px" }}
+                    >
+                      {item.isActive ? "Inactivate" : "Activate"}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -202,7 +262,9 @@ const SalesMentorListData = () => {
       </TableContainer>
       {/* Modal */}
       <Dialog open={isModalOpen} onClose={handleCloseModal}>
-        <DialogTitle>{isEditMode ? 'Edit Sales Mentor' : 'Add Sales Mentor'}</DialogTitle>
+        <DialogTitle>
+          {isEditMode ? "Edit Sales Mentor" : "Add Sales Mentor"}
+        </DialogTitle>
         <DialogContent>
           <TextField
             margin="dense"
@@ -264,7 +326,7 @@ const SalesMentorListData = () => {
             variant="contained"
             disabled={loading}
           >
-            {loading ? 'Loading...' : isEditMode ? 'Update' : 'Add'}
+            {loading ? "Loading..." : isEditMode ? "Update" : "Add"}
           </Button>
         </DialogActions>
       </Dialog>

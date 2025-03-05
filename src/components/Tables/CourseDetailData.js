@@ -140,8 +140,8 @@ const CourseDetailsData = () => {
     //   return;
     // }
 
-    // // if joining on correct time
-    // setLoading(true);
+    // if joining on correct time
+    setLoading(true);
 
     try {
       const response = await fetch(
