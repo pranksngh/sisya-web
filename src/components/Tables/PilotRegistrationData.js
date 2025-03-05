@@ -40,6 +40,7 @@ function PilotRegistrationData() {
         headers: { 'Content-Type': 'application/json' },
       });
       const result = await response.json();
+      console.log(result);
       result.leads.sort((a, b) => {
         return new Date(b.createdOn) - new Date(a.createdOn);
       });
@@ -69,6 +70,16 @@ function PilotRegistrationData() {
     return `${day}${suffix} ${month} ${year}`;
   }
 
+  const formatTime=(isoDateString)=> {
+    const date = new Date(isoDateString);
+    let hours = date.getHours(); 
+    const minutes = date.getMinutes().toString().padStart(2, "0"); 
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    return `${hours}:${minutes} ${ampm}`;
+  }
+
   // Filter leads based on search term (name or phone)
   const filteredLeads = leads.filter((lead) => {
     const searchLower = searchTerm.toLowerCase();
@@ -79,9 +90,16 @@ function PilotRegistrationData() {
   });
 
   return (
-    <Paper elevation={0} variant="elevation" sx={{ padding: '16px' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+    <Paper elevation={0} variant="elevation" sx={{ padding: "16px" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
           Pilot Course Registration Info
         </Typography>
       </Box>
@@ -104,6 +122,7 @@ function PilotRegistrationData() {
               <TableCell>Class</TableCell>
               <TableCell>Phone Number</TableCell>
               <TableCell>Created On</TableCell>
+              <TableCell>Time</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -117,6 +136,7 @@ function PilotRegistrationData() {
                     <TableCell>{row.class}</TableCell>
                     <TableCell>{row.phone}</TableCell>
                     <TableCell>{formatDate(row.createdOn)}</TableCell>
+                    <TableCell>{formatTime(row.createdOn)}</TableCell>
                   </TableRow>
                 );
               })}
