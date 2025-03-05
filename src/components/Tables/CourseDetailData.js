@@ -28,6 +28,7 @@ import {
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { getUser } from "../../Functions/Login";
 import HomeworkQuestionsModal from "../DialogBoxes/ViewHomeWorkDialog";
+import { CloudUploadIcon } from "lucide-react";
 
 const COLORS = ["#36A2EB", "#FF6384"];
 
@@ -47,6 +48,10 @@ const CourseDetailsData = () => {
   const [courseid, setCourseId] = useState(null);
   const [tabValue, setTabValue] = useState(0);
   const [homeworkModalOpen, sethomeworkModalOpen] = useState(false);
+
+  //states for material upload
+  const [file, setFile] = useState(null);
+  const [uploadError, setUploadError] = useState("");
 
   console.log("course Id is ", courseId);
   console.log(course);
@@ -176,6 +181,7 @@ const CourseDetailsData = () => {
       alert("Error starting session");
     }
   };
+
   const closeModal = () => {
     setSelectedSessionTest(null);
     setIsUserListModalOpen(false);
@@ -257,6 +263,85 @@ const CourseDetailsData = () => {
     } else {
       setAttendeeUserList(userList);
       setIsUserListModalOpen(true);
+    }
+  };
+
+  const handleFileUpload = async (event) => {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpeg",
+      "image/png",
+      "application/pdf",
+    ];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      setUploadError("Only JPG, JPEG, PNG, and PDF files are allowed");
+      return;
+    }
+
+    setUploadError("");
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target.result.split(",")[1];
+      console.log("Base64 string:", base64);
+      setFile({
+        name: selectedFile.name,
+        size: selectedFile.size,
+        type: selectedFile.type,
+        base64,
+      });
+    };
+    reader.readAsDataURL(selectedFile);
+  };
+
+  const handleUpload = async () => {
+    if (!file) {
+      setUploadError("Please select a file to upload.");
+      return;
+    }
+
+    const payload = {
+      fileData: [
+        {
+          fileName: file.name,
+          fileData: file.base64,
+        },
+      ],
+      bigCourseId: courseId.toString(),
+    };
+
+    console.log("my upload material is", JSON.stringify(payload));
+   // console.log(typeof file.base64);
+
+    try {
+      const response = await fetch(
+        "https://sisyabackend.in/rkadmin/upload_course_material",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Upload failed, please try again.");
+      }
+
+      const result = await response.text();
+      if(result === "Files uploaded successfully"){
+         toast.success("File Uploaded Successfully");
+      }else{
+        toast.error("Something went wrong !");
+        console.log(result);
+      }
+    } catch (error) {
+      console.error("Error during upload:", error);
+      setUploadError(error.message);
     }
   };
 
@@ -384,6 +469,7 @@ const CourseDetailsData = () => {
         <Tab label="Homework" />
         <Tab label="Attendance" />
         <Tab label="Course Tests" />
+        <Tab label="Upload Material" />
       </Tabs>
 
       {/* Tab Panels */}
@@ -762,6 +848,60 @@ const CourseDetailsData = () => {
           </Table>
         </TableContainer>
       </TabPanel>
+      <TabPanel value={tabValue} index={5}>
+        <Card variant="outlined" sx={{ p: 3, mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Upload Course Material
+          </Typography>
+
+          <input
+            accept=".jpg,.jpeg,.png,.pdf"
+            style={{ display: "none" }}
+            id="upload-material"
+            type="file"
+            onChange={handleFileUpload}
+          />
+
+          <label htmlFor="upload-material">
+            <Button
+              variant="contained"
+              component="span"
+              startIcon={<CloudUploadIcon />}
+              sx={{ mb: 2 }}
+            >
+              Select File
+            </Button>
+          </label>
+
+          {file && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2">
+                Selected file: {file.name} ({Math.round(file.size / 1024)}KB)
+              </Typography>
+            </Box>
+          )}
+
+          {uploadError && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              {uploadError}
+            </Typography>
+          )}
+
+          {file && (
+            <>
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ mt: 2 }}
+                disabled={!file}
+                onClick={handleUpload}
+              >
+                Upload
+              </Button>
+            </>
+          )}
+        </Card>
+      </TabPanel>
 
       <HomeworkQuestionsModal
         selectedSessionTest={selectedSessionTest}
@@ -769,17 +909,17 @@ const CourseDetailsData = () => {
         onClose={closehomeworkModal}
       />
 
-       <ToastContainer 
-      position="top-right"
-      autoClose={5000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-    />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };
