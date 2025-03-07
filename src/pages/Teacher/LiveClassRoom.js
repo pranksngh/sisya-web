@@ -532,7 +532,14 @@ export default function LiveClassRoom() {
       prevRequests.filter((req) => req.userID !== userID)
     );
   };
-
+const sendBuyNowLink = () =>{
+  socketService.emit("teacher:announce",{
+    token: roomID,
+    data:{
+      link:"https://sisyaclass.com/registration/"
+    }
+  })
+}
   return (
     <Box
       className="App"
@@ -781,6 +788,14 @@ export default function LiveClassRoom() {
         <IconButton color="default" onClick={toggleSpeakRequestList}>
           <Campaign />
         </IconButton>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={() => sendBuyNowLink()}
+          startIcon={<ExitToApp />}
+        >
+          Send Link
+        </Button>
         <Button
           variant="contained"
           color="error"
