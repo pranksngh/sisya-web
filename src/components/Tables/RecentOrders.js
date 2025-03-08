@@ -24,8 +24,12 @@ function RecentOrders() {
   const purchaseList = async () => {
     try {
       const result = await fetchPurchases();
+      console.log(result);
       if (result.success) {
-        setPurchases(result.subs);
+        const sortedPurchases = result.subs.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setPurchases(sortedPurchases);
       } else {
         console.log('Purchase Issue', JSON.stringify(result));
       }

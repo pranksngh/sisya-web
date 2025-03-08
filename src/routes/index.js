@@ -55,27 +55,22 @@ import AddClassData from '../pages/Admin/AddClass';
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: React.createElement(LoginPage), // Use React.createElement for consistency
   },
   {
-    path: 'liveclassroom',
-    element: React.createElement(
-     
-      LiveClassRoom
-    ),
-  },
-  
-  {//to be deleted later
-    path: 'liveclassroomlayout4',
-    element: React.createElement(
-     
-      LiveClassRoomLayout4
-    ),
+    path: "liveclassroom",
+    element: React.createElement(LiveClassRoom),
   },
 
   {
-    path: '/videocall',
+    //to be deleted later
+    path: "liveclassroomlayout4",
+    element: React.createElement(LiveClassRoomLayout4),
+  },
+
+  {
+    path: "/videocall",
     element: React.createElement(
       ProtectedRoute,
       { allowedRoles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.MENTOR, ROLES.HR] },
@@ -83,74 +78,52 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/dashboard',
+    path: "/dashboard",
     element: React.createElement(
       ProtectedRoute,
       { allowedRoles: [ROLES.ADMIN, ROLES.HR, ROLES.TEACHER, ROLES.MENTOR] },
       React.createElement(DashboardLayout)
-    ),// Wrap in React.createElement
+    ), // Wrap in React.createElement
     children: [
       {
-        path: '',
-        element: React.createElement(ProtectedRoute,
+        path: "",
+        element: React.createElement(
+          ProtectedRoute,
           { allowedRoles: [ROLES.ADMIN] },
-          React.createElement(AdminPage)), // Default dashboard content
+          React.createElement(AdminPage)
+        ), // Default dashboard content
       },
       {
-        path: 'teacher',
-        element: React.createElement(
-          
-          Teacher
-        ),
+        path: "teacher",
+        element: React.createElement(Teacher),
       },
       {
-        path: 'hr',
-        element: React.createElement(
-          
-        HrPage
-        ),
+        path: "hr",
+        element: React.createElement(HrPage),
       },
       {
-        path: 'mentor',
-        element: React.createElement(
-         
-        MentorPage
-        ),
+        path: "mentor",
+        element: React.createElement(MentorPage),
       },
       {
-        path: 'admin',
-        element: React.createElement(
-         
-         AdminPage
-        ),
+        path: "admin",
+        element: React.createElement(AdminPage),
       },
       {
-        path: 'boards',
-        element: React.createElement(
-         
-          Boards
-        ),
+        path: "boards",
+        element: React.createElement(Boards),
       },
       {
-        path: 'subjects',
-        element: React.createElement(
-         
-          Subjects
-        ),
+        path: "subjects",
+        element: React.createElement(Subjects),
       },
       {
-        path: 'students',
-        element: React.createElement(
-         
-          Students
-        ),
+        path: "students",
+        element: React.createElement(Students),
       },
       {
-        path: 'addStudent',
-        element: React.createElement(
-         
-          AddStudent
-        ),
+        path: "addStudent",
+        element: React.createElement(AddStudent),
       },
       {
         path: "enrollStudent",
@@ -161,238 +134,137 @@ const router = createBrowserRouter([
         element: React.createElement(AddClassData),
       },
       {
-        path: 'teachers',
-        element: React.createElement(
-         
-          Teachers
-        ),
+        path: "teachers",
+        element: React.createElement(Teachers),
       },
       {
-        path: 'addTeacher',
-        element: React.createElement(
-         
-          AddTeacher
-        ),
+        path: "addTeacher",
+        element: React.createElement(AddTeacher),
       },
       {
-        path: 'edit-teacher',
-        element: React.createElement(
-         
-          EditTeacher
-        ),
+        path: "edit-teacher",
+        element: React.createElement(EditTeacher),
       },
       {
-        path: 'courses',
-        element: React.createElement(
-         
-          Courses
-        ),
+        path: "courses",
+        element: React.createElement(Courses),
       },
       {
-        path: 'addCourse',
-        element: React.createElement(
-         
-          AddCourse
-        ),
+        path: "addCourse",
+        element: React.createElement(AddCourse),
       },
       {
-        path: 'edit-course',
-        element: React.createElement(
-         
-          EditCourse
-        ),
+        path: "edit-course",
+        element: React.createElement(EditCourse),
       },
       {
-        path: 'student-report',
-        element: React.createElement(
-         
-          StudentReport
-        ),
+        path: "student-report",
+        element: React.createElement(StudentReport),
       },
       {
-        path: 'teacher-report',
-        element: React.createElement(
-         
-          TeacherReport
-        ),
+        path: "teacher-report",
+        element: React.createElement(TeacherReport),
       },
       {
-        path: 'course-purchase-list',
-        element: React.createElement(
-         
-          CoursePurchaseList
-        ),
+        path: "course-purchase-list",
+        element: React.createElement(CoursePurchaseList),
       },
       {
-        path: 'pilot-course-reg',
-        element: React.createElement(
-         
-          PilotRegistration
-        ),
+        path: "pilot-course-reg",
+        element: React.createElement(PilotRegistration),
       },
       {
-        path: 'sales-mentor-list',
-        element: React.createElement(
-         
-          SalesMentorList
-        ),
+        path: "sales-mentor-list",
+        element: React.createElement(SalesMentorList),
       },
       {
-        path: 'lead-manager',
-        element: React.createElement(
-         
-          LeadManager
-        ),
+        path: "lead-manager",
+        element: React.createElement(LeadManager),
       },
       {
-        path: 'doubts',
-        element: React.createElement(
-         
-          Doubts
-        ),
+        path: "doubts",
+        element: React.createElement(Doubts),
       },
       {
-        path: 'enquiry',
-        element: React.createElement(
-         
-          Enquiry
-        ),
+        path: "enquiry",
+        element: React.createElement(Enquiry),
       },
       {
-        path: 'banners',
-        element: React.createElement(
-         
-          Banners
-        ),
+        path: "banners",
+        element: React.createElement(Banners),
       },
       {
-        path: 'pushNotification',
-        element: React.createElement(
-         
-          PushNotification
-        ),
+        path: "pushNotification",
+        element: React.createElement(PushNotification),
       },
       {
-        path: 'enrolled-courses',
-        element: React.createElement(
-         
-          EnrolledCourses
-        ),
+        path: "enrolled-courses",
+        element: React.createElement(EnrolledCourses),
       },
       {
-        path: 'course-details',
-        element: React.createElement(
-         
-          CourseDetails
-        ),
+        path: "course-details",
+        element: React.createElement(CourseDetails),
       },
       {
-        path: 'add-homework',
-        element: React.createElement(
-         
-          AddHomeWork
-        ),
+        path: "add-homework",
+        element: React.createElement(AddHomeWork),
       },
       {
-        path: 'add-test',
-        element: React.createElement(
-          AddTest
-          
-        ),
+        path: "add-test",
+        element: React.createElement(AddTest),
       },
       {
-        path: 'add-class',
-        element: React.createElement(
-         
-          AddClass
-        ),
+        path: "add-class",
+        element: React.createElement(AddClass),
       },
       {
-        path: 'Chats',
-        element: React.createElement(
-         
-          ChatLayout
-        ),
+        path: "Chats",
+        element: React.createElement(ChatLayout),
       },
       {
-        path: 'group-chat',
-        element: React.createElement(
-         
-          GroupChatLayout
-        ),
+        path: "group-chat",
+        element: React.createElement(GroupChatLayout),
       },
       {
-        path: 'doubtscreen',
-        element: React.createElement(
-         
-          DoubtScreen
-        ),
+        path: "doubtscreen",
+        element: React.createElement(DoubtScreen),
       },
       {
-        path: 'myleaves',
-        element: React.createElement(
-         
-          MyLeaves
-        ),
+        path: "myleaves",
+        element: React.createElement(MyLeaves),
       },
       {
-        path: 'teachersList',
-        element: React.createElement(
-         
-          TeachersList
-        ),
+        path: "teachersList",
+        element: React.createElement(TeachersList),
       },
       {
-        path: 'teacherInfo',
-        element: React.createElement(
-         
-          TeacherProfile
-        ),
+        path: "teacherInfo",
+        element: React.createElement(TeacherProfile),
       },
       {
-        path: 'mentorInfo',
-        element: React.createElement(
-         
-          MentorProfile
-        ),
+        path: "mentorInfo",
+        element: React.createElement(MentorProfile),
       },
       {
-        path: 'mentorList',
-        element: React.createElement(
-         
-          MentorList
-        ),
+        path: "mentorList",
+        element: React.createElement(MentorList),
       },
       {
-        path: 'mentorLeaves',
-        element: React.createElement(
-         
-          MentorLeaves
-        ),
+        path: "mentorLeaves",
+        element: React.createElement(MentorLeaves),
       },
       {
-        path: 'teacherLeaves',
-        element: React.createElement(
-         
-          TeacherLeaves
-        ),
+        path: "teacherLeaves",
+        element: React.createElement(TeacherLeaves),
       },
       {
-        path: 'mentorLeaveRequest',
-        element: React.createElement(
-         
-          MentorLeaveRequest
-        ),
+        path: "mentorLeaveRequest",
+        element: React.createElement(MentorLeaveRequest),
       },
       {
-        path: 'edit-session',
-        element: React.createElement(
-         
-          EditClass
-        ),
+        path: "edit-session",
+        element: React.createElement(EditClass),
       },
-      
-      
     ],
   },
 ]);

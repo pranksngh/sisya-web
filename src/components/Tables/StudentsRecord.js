@@ -24,8 +24,12 @@ function StudentRecords() {
   const studentList = async () => {
     try {
       const result = await fetchStudentList();
+      console.log(result);
       if (result.success) {
-        setStudents(result.studentList);
+        const sortedStudents = result.studentList.sort(
+          (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
+        );
+        setStudents(sortedStudents);
       } else {
         console.log('Student List Issues', JSON.stringify(result));
       }

@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
-import { List, ListItem, ListItemIcon, ListItemText, Collapse, Typography, Avatar, Box } from '@mui/material';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import * as Icons from '@mui/icons-material';
-import sidebarConfig from './SidebarConfig'; // Your sidebar config file
-import { getUser } from '../Functions/Login';
+import React, { useState } from "react";
+import {
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Collapse,
+  Typography,
+  Avatar,
+  Box,
+} from "@mui/material";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import * as Icons from "@mui/icons-material";
+import sidebarConfig from "./SidebarConfig"; // Your sidebar config file
+import { getUser } from "../Functions/Login";
 
 const Sidebar = ({ userRole }) => {
   const user = getUser();
@@ -17,9 +26,43 @@ const Sidebar = ({ userRole }) => {
     setOpen((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
-  const handleNavigation = (path) => {
+  const markLogout = async () => {
+    const user = getUser();
+    const role = localStorage.getItem("role");
+
+    console.log("Logging out...");
+    console.log("User Role:", role);
+    console.log("User Data:", user);
+
+    if (role === "teacher" && user?.mentor?.id) {
+      console.log("Sending logout request for mentorId:", user.mentor.id);
+
+      try {
+        const response = await fetch(
+          "https://sisyabackend.in/teacher/mark_logout",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ mentorId: user.mentor.id }),
+          }
+        );
+
+        const result = await response.json();
+        console.log("Logout API Response:", result);
+      } catch (error) {
+        console.error("Error marking logout:", error);
+      }
+    } else {
+      console.log("No logout request needed.");
+    }
+  };
+
+  const handleNavigation = async (path) => {
     if (path === "/") {
       // Clear localStorage on logout
+      await markLogout();
       localStorage.clear();
     }
     navigate(path);
@@ -89,7 +132,8 @@ const Sidebar = ({ userRole }) => {
                     color: isActive(item.path) ? "#1976d2" : "#333",
                   }}
                 />
-                {item.expandable && (open[item.label] ? <ExpandLess /> : <ExpandMore />)}
+                {item.expandable &&
+                  (open[item.label] ? <ExpandLess /> : <ExpandMore />)}
               </ListItem>
 
               {item.expandable && (
@@ -164,6 +208,5 @@ const Sidebar = ({ userRole }) => {
     </Box>
   );
 };
-
 
 export default Sidebar;

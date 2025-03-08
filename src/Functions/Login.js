@@ -119,11 +119,45 @@ export const hrlogin = async (email, password) => {
 };
 
 
-export const logout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  
+export const logout = async () => {
+  const user = getUser(); 
+  const role = localStorage.getItem("role");
+
+  console.log("Logging out...");
+  console.log("User Role:", role);
+  console.log("User Data:", user);
+
+  if (role === "teacher" && user?.mentor?.id) {
+    console.log("Sending logout request for mentorId:", user.mentor.id);
+
+    try {
+      const response = await fetch(
+        "https://sisyabackend.in/teacher/mark_logout",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ mentorId: user.mentor.id }),
+        }
+      );
+
+      const result = await response.json();
+      console.log("Logout API Response:", result);
+    } catch (error) {
+      console.error("Error marking logout:", error);
+    }
+  } else {
+    console.log("No logout request needed.");
+  }
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  localStorage.removeItem("user");
+
+  console.log("User logged out successfully.");
 };
+
 
 export const isAuthenticated = () => {
   const token = localStorage.getItem('token');

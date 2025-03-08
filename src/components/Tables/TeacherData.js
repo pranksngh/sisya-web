@@ -11,6 +11,8 @@ import {
   Box,
   Button,
   TextField,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import AddStudentDialog from "../DialogBoxes/AddStudentDialog";
 import EditStudentDialog from "../DialogBoxes/EditStudentDialog";
@@ -19,6 +21,13 @@ import { useNavigate } from "react-router-dom";
 import DeleteBoardDialog from "../DialogBoxes/DeleteBoardDialog";
 import UpdateTeacherDialog from "../DialogBoxes/UpdateTeacherDialog";
 import * as XLSX from "xlsx";
+import TeacherAttendanceDialog from "../DialogBoxes/TeacherAttendanceDialog";
+import {
+  Edit as EditIcon,
+  CheckCircleOutline as ActiveIcon,
+  HighlightOff as InactiveIcon,
+  AssignmentInd as AttendanceIcon,
+} from "@mui/icons-material";
 
 function TeacherData() {
   const [boards, setBoards] = useState([]);
@@ -41,6 +50,9 @@ function TeacherData() {
 
   //new state for filtering teacher
   const [teacherSearch, setTeacherSearch] = useState("");
+
+  const [attendanceModalOpen, setAttendanceModalOpen] = useState(false);
+  const [teacherAttendance, setTeacherAttendance] = useState([]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -333,6 +345,34 @@ function TeacherData() {
     XLSX.writeFile(wb, "teachers.xlsx");
   };
 
+  const fetchTeacherAttendance = async (mentorId) => {
+    try {
+      const response = await fetch(
+        "https://sisyabackend.in/rkadmin/hr/get_all_attendance_records_mentor",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ mentorId }),
+        }
+      );
+      const result = await response.json();
+      console.log(response);
+      if (result.success) {
+        console.log({ result });
+        setTeacherAttendance(result.records);
+        setAttendanceModalOpen(true);
+      } else {
+        console.error("Failed to fetch attendance:", result.error);
+        setTeacherAttendance([]);
+      }
+    } catch (error) {
+      console.error("Error fetching attendance:", error);
+      setTeacherAttendance([]);
+    }
+  };
+
   return (
     <Paper elevation={0} variant="elevation" sx={{ padding: "10px" }}>
       <Box
@@ -450,76 +490,76 @@ function TeacherData() {
                   {row.isActive === true ? "Active" : "Inactive"}
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() =>
-                      navigate("/dashboard/edit-teacher", {
-                        state: { teacher: row },
-                      })
-                    }
-                    sx={{
-                      textTransform: "capitalize",
-                      fontWeight: "bold",
-                      borderRadius: 2,
-                      borderWidth: 2,
-                      boxShadow: "none",
-                      minWidth: "60px",
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    {/* Edit Button */}
+                    <Tooltip title="Edit">
+                      <IconButton
+                        color="secondary"
+                        onClick={() =>
+                          navigate("/dashboard/edit-teacher", {
+                            state: { teacher: row },
+                          })
+                        }
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
 
-                      mx: 1,
-                      px: 1,
-                      "&:hover": {
-                        borderColor: "secondary.main",
-                        backgroundColor: "rgba(255, 0, 0, 0.04)",
-                      },
-                    }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleDeleteModalOpen(row)}
-                    sx={{
-                      textTransform: "capitalize",
-                      fontWeight: "normal",
-                      borderRadius: 2,
-                      boxShadow: "0 3px 6px rgba(0,0,0,0.1)",
-                      mx: 0.5, // Add horizontal margin between buttons
-                      px: 0.8, // Padding inside the button for a balanced look
-                    }}
-                  >
-                    {row.isActive === true ? "Inactive" : "Active"}
-                  </Button>
-                  <UpdateTeacherDialog
-                    open={openDeleteModal}
-                    handleClose={handleDeleteModalClose}
-                    handleDelete={handleDelete}
-                    teacherInfo={selectedTeacher}
-                  />
-                  <EditStudentDialog
-                    open={openEditModal}
-                    onClose={handleEditModalClose}
-                    onSubmit={handleEditSubmit}
-                    boards={boards}
-                    handleChange={handleChange}
-                    handleFileChange={handleFileChange}
-                    formData={formData}
-                  />
+                    {/* Active/Inactive Button */}
+                    <Tooltip title={row.isActive ? "Deactivate" : "Activate"}>
+                      <IconButton
+                        color={row.isActive ? "success" : "error"}
+                        onClick={() => handleDeleteModalOpen(row)}
+                      >
+                        {row.isActive ? <ActiveIcon /> : <InactiveIcon />}
+                      </IconButton>
+                    </Tooltip>
 
-                  <ViewStudentDialog
-                    open={openViewModal}
-                    onClose={handleViewModalClose}
-                    boards={boards}
-                    handleChange={handleChange}
-                    formData={formData}
-                  />
+                    {/* Attendance Button */}
+                    <Tooltip title="Attendance">
+                      <IconButton
+                        color="info"
+                        onClick={() => fetchTeacherAttendance(row.id)}
+                      >
+                        <AttendanceIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
+      <UpdateTeacherDialog
+        open={openDeleteModal}
+        handleClose={handleDeleteModalClose}
+        handleDelete={handleDelete}
+        teacherInfo={selectedTeacher}
+      />
+      <EditStudentDialog
+        open={openEditModal}
+        onClose={handleEditModalClose}
+        onSubmit={handleEditSubmit}
+        boards={boards}
+        handleChange={handleChange}
+        handleFileChange={handleFileChange}
+        formData={formData}
+      />
+
+      <ViewStudentDialog
+        open={openViewModal}
+        onClose={handleViewModalClose}
+        boards={boards}
+        handleChange={handleChange}
+        formData={formData}
+      />
+      <TeacherAttendanceDialog
+        open={attendanceModalOpen}
+        onClose={() => setAttendanceModalOpen(false)}
+        attendanceData={teacherAttendance}
+      />
     </Paper>
   );
 }

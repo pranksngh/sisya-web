@@ -48,6 +48,8 @@ const CourseDetailsData = () => {
   const [courseid, setCourseId] = useState(null);
   const [tabValue, setTabValue] = useState(0);
   const [homeworkModalOpen, sethomeworkModalOpen] = useState(false);
+  const [uploadedMaterials, setUploadedMaterials] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   //states for material upload
   const [file, setFile] = useState(null);
@@ -188,11 +190,36 @@ const CourseDetailsData = () => {
     setAttendeeUserList([]);
   };
 
+  const fetchCourseMaterials = async () => {
+    try {
+      const response = await fetch(
+        "https://sisyabackend.in/student/get_materials",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ bigCourseId: courseId }),
+        }
+      );
+      const result = await response.json();
+      if (result.success) {
+        setUploadedMaterials(result.files);
+        setErrorMessage("");
+      } else {
+        setErrorMessage("No Material Found");
+      }
+    } catch (error) {
+      setErrorMessage("Something Went Wrong! Try Again");
+    }
+  };
+
   useEffect(() => {
     setCourseId(courseId);
     if (courseId) {
       fetchCourseData();
       fetchEnrolledStudents();
+      fetchCourseMaterials();
     }
   }, [courseId]);
 
@@ -314,7 +341,6 @@ const CourseDetailsData = () => {
     };
 
     console.log("my upload material is", JSON.stringify(payload));
-   // console.log(typeof file.base64);
 
     try {
       const response = await fetch(
@@ -333,9 +359,11 @@ const CourseDetailsData = () => {
       }
 
       const result = await response.text();
-      if(result === "Files uploaded successfully"){
-         toast.success("File Uploaded Successfully");
-      }else{
+      if (result === "Files uploaded successfully") {
+        toast.success("File Uploaded Successfully");
+        setFile(null);
+        fetchCourseMaterials();
+      } else {
         toast.error("Something went wrong !");
         console.log(result);
       }
@@ -899,6 +927,57 @@ const CourseDetailsData = () => {
                 Upload
               </Button>
             </>
+          )}
+        </Card>
+
+        <Card variant="outlined" sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Uploaded Materials
+          </Typography>
+
+          {errorMessage ? (
+            <Typography color="error">{errorMessage}</Typography>
+          ) : (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>File Name</TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {uploadedMaterials.length > 0 ? (
+                    uploadedMaterials.map((fileName, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{fileName}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            size="small"
+                            onClick={() =>
+                              window.open(
+                                `https://sisyabackend.in/student/mg_mat/${courseId}/${fileName}`,
+                                "_blank"
+                              )
+                            }
+                          >
+                            View
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={2} align="center">
+                        No materials uploaded yet
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
         </Card>
       </TabPanel>
