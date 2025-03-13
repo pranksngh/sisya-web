@@ -86,6 +86,7 @@ const SalesMentorListData = () => {
     setIsEditMode(!!salesman);
     if (salesman) {
       setFormData({
+        id: salesman.id,
         name: salesman.name,
         email: salesman.email,
         password: "",
@@ -95,6 +96,7 @@ const SalesMentorListData = () => {
       });
     } else {
       setFormData({
+        id:"",
         name: "",
         email: "",
         password: "",

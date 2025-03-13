@@ -15,12 +15,20 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  IconButton,
+  Tooltip,
+  Pagination,
 } from "@mui/material";
 import AddBoardDialog from "../DialogBoxes/AddBoardDialog";
 import { addBoardFunction } from "../../Functions/AddBoard";
 import DeleteBoardDialog from "../DialogBoxes/DeleteBoardDialog";
 import EditBoardDialog from "../DialogBoxes/EditBoardDialog";
 import { useNavigate } from "react-router-dom";
+import {
+  Edit as EditIcon,
+  CheckCircleOutline as ActiveIcon,
+  HighlightOff as InactiveIcon,
+} from "@mui/icons-material";
 
 function CourseData() {
   const navigate = useNavigate();
@@ -32,9 +40,11 @@ function CourseData() {
   const [formData, setFormData] = useState({ name: "", country: "India" });
   const [selectedBoard, setSelectedBoard] = useState({});
 
-  const [searchTerm,setSearchTerm]=useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [searchClass, setSearchClass] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all");//"all","active" & "inactive"
+  const [activeFilter, setActiveFilter] = useState("all"); //"all","active" & "inactive"
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -164,7 +174,7 @@ function CourseData() {
 
   const fetchCourses = async () => {
     const courseResponse = await fetch(
-      "https://sisyabackend.in/rkadmin//get_all_courses",
+      "https://sisyabackend.in/rkadmin/get_all_courses",
       {
         method: "POST",
         headers: {
@@ -173,6 +183,7 @@ function CourseData() {
       }
     );
     const courseResult = await courseResponse.json();
+    console.log(courseResult);
 
     if (courseResult.success) {
       //sorting the courses based on updatedOn timestamp
@@ -203,6 +214,23 @@ function CourseData() {
     }
     return matchesName && matchesClass && matchesStatus;
   });
+
+  // Pagination calculations
+  const pageCount = Math.ceil(filteredCourses.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentCourses = filteredCourses.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, searchClass, activeFilter, itemsPerPage]);
 
   return (
     <Paper elevation={0} variant="elevation" sx={{ padding: "16px" }}>
@@ -263,7 +291,6 @@ function CourseData() {
             <TableRow>
               <TableCell>ID</TableCell>
               <TableCell>Board Name</TableCell>
-
               <TableCell>Created On</TableCell>
               <TableCell>Updated On</TableCell>
               <TableCell>Class</TableCell>
@@ -272,7 +299,7 @@ function CourseData() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredCourses.map((row, index) => (
+            {currentCourses.map((row, index) => (
               <TableRow key={index}>
                 <TableCell>{row.id}</TableCell>
                 <TableCell>{row.name}</TableCell>
@@ -295,46 +322,28 @@ function CourseData() {
                   {row.isActive === true ? "Active" : "Inactive"}
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() =>
-                      navigate("/dashboard/edit-course", {
-                        state: { course: row },
-                      })
-                    }
-                    sx={{
-                      textTransform: "capitalize",
-                      fontWeight: "bold",
-                      borderRadius: 2,
-                      borderWidth: 2,
-                      boxShadow: "none",
-
-                      mx: 0,
-                      px: 0,
-                      "&:hover": {
-                        borderColor: "secondary.main",
-                        backgroundColor: "rgba(255, 0, 0, 0.04)",
-                      },
-                    }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleDeleteModalOpen(row)}
-                    sx={{
-                      textTransform: "capitalize",
-                      fontWeight: "normal",
-                      borderRadius: 2,
-                      boxShadow: "0 3px 6px rgba(0,0,0,0.1)",
-                      mx: 0.5, // Add horizontal margin between buttons
-                      px: 0.8, // Padding inside the button for a balanced look
-                    }}
-                  >
-                    {row.isActive === true ? "Inactive" : "Active"}
-                  </Button>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Tooltip title="Edit">
+                      <IconButton
+                        color="primary"
+                        onClick={() =>
+                          navigate("/dashboard/edit-course", {
+                            state: { course: row },
+                          })
+                        }
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={row.isActive ? "Deactivate" : "Activate"}>
+                      <IconButton
+                        color={row.isActive ? "success" : "error"}
+                        onClick={() => handleDeleteModalOpen(row)}
+                      >
+                        {row.isActive ? <ActiveIcon /> : <InactiveIcon />}
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                   <DeleteBoardDialog
                     open={openDeleteModal}
                     handleClose={handleDeleteModalClose}
@@ -354,6 +363,36 @@ function CourseData() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mt: 2,
+        }}
+      >
+        <Select
+          value={itemsPerPage}
+          onChange={(e) => setItemsPerPage(e.target.value)}
+          size="small"
+        >
+          <MenuItem value={5}>5</MenuItem>
+          <MenuItem value={10}>10</MenuItem>
+          <MenuItem value={20}>20</MenuItem>
+          <MenuItem value={50}>50</MenuItem>
+        </Select>
+
+        <Pagination
+          count={pageCount}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+          showFirstButton
+          showLastButton
+          sx={{ my: 2 }}
+        />
+      </Box>
     </Paper>
   );
 }

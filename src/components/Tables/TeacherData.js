@@ -13,6 +13,9 @@ import {
   TextField,
   Tooltip,
   IconButton,
+  Select,
+  MenuItem,
+  Pagination,
 } from "@mui/material";
 import AddStudentDialog from "../DialogBoxes/AddStudentDialog";
 import EditStudentDialog from "../DialogBoxes/EditStudentDialog";
@@ -53,6 +56,10 @@ function TeacherData() {
 
   const [attendanceModalOpen, setAttendanceModalOpen] = useState(false);
   const [teacherAttendance, setTeacherAttendance] = useState([]);
+
+  //pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -230,7 +237,7 @@ function TeacherData() {
     fetchTeacherData();
     fetchBoardData();
   }, []);
-
+  
   const fetchBoardData = async () => {
     try {
       const boardResponse = await fetch(
@@ -373,6 +380,23 @@ function TeacherData() {
     }
   };
 
+  // Pagination calculations
+  const pageCount = Math.ceil(filteredTeachers.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentTeachers = filteredTeachers.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [teacherSearch, itemsPerPage]);
+
   return (
     <Paper elevation={0} variant="elevation" sx={{ padding: "10px" }}>
       <Box
@@ -467,7 +491,7 @@ function TeacherData() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredTeachers.map((row, index) => (
+            {currentTeachers.map((row, index) => (
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{row.name}</TableCell>
@@ -531,6 +555,37 @@ function TeacherData() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* pagination control */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mt: 2,
+        }}
+      >
+        <Select
+          value={itemsPerPage}
+          onChange={(e) => setItemsPerPage(e.target.value)}
+          size="small"
+        >
+          <MenuItem value={5}>5</MenuItem>
+          <MenuItem value={10}>10</MenuItem>
+          <MenuItem value={20}>20</MenuItem>
+          <MenuItem value={50}>50</MenuItem>
+        </Select>
+
+        <Pagination
+          count={pageCount}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+          showFirstButton
+          showLastButton
+          sx={{ my: 2 }}
+        />
+      </Box>
 
       <UpdateTeacherDialog
         open={openDeleteModal}

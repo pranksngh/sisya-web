@@ -179,6 +179,7 @@ function SubjectData() {
       });
       const result = await response.json();
       if (result.success) {
+        console.log(result);
         setSubjects(result.subjects);
       } else {
         console.error("Failed to fetch subjects");

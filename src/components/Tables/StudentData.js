@@ -11,11 +11,18 @@ import {
   Box,
   TextField,
   Button,
+  Tooltip,
+  IconButton,
+  Select,
+  MenuItem,
+  Pagination,
 } from "@mui/material";
 import AddStudentDialog from "../DialogBoxes/AddStudentDialog";
 import EditStudentDialog from "../DialogBoxes/EditStudentDialog";
 import ViewStudentDialog from "../DialogBoxes/ViewStudentModal";
 import * as XLSX from "xlsx";
+import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 function StudentData() {
   const [boards, setBoards] = useState([]);
@@ -37,6 +44,10 @@ function StudentData() {
   //new state for filtering purpose
   const [searchName, setSearchName] = useState("");
   const [searchGrade, setSearchGrade] = useState("");
+
+  //pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -299,6 +310,23 @@ function StudentData() {
     XLSX.writeFile(wb, "students.xlsx");
   };
 
+  // Pagination calculations
+  const pageCount = Math.ceil(filteredStudents.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentStudents = filteredStudents.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchName, searchGrade, itemsPerPage]);
+
   return (
     <Paper elevation={0} variant="elevation" sx={{ padding: "10px" }}>
       <Box
@@ -401,7 +429,7 @@ function StudentData() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredStudents.map((row, index) => (
+            {currentStudents.map((row, index) => (
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{row.name}</TableCell>
@@ -424,45 +452,25 @@ function StudentData() {
                   {row.isActive === true ? "Active" : "Inactive"}
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => handleEditModalOpen(row)}
-                    sx={{
-                      textTransform: "capitalize",
-                      fontWeight: "bold",
-                      borderRadius: 2,
-                      borderWidth: 2,
-                      boxShadow: "none",
-                      minWidth: "60px",
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Tooltip title="Edit">
+                      <IconButton
+                        color="secondary"
+                        onClick={() => handleEditModalOpen(row)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="View">
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleViewModalOpen(row)}
+                      >
+                        <VisibilityIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
 
-                      mx: 1,
-                      px: 1,
-                      "&:hover": {
-                        borderColor: "secondary.main",
-                        backgroundColor: "rgba(255, 0, 0, 0.04)",
-                      },
-                    }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleViewModalOpen(row)}
-                    sx={{
-                      textTransform: "capitalize",
-                      fontWeight: "normal",
-                      borderRadius: 2,
-                      boxShadow: "0 3px 6px rgba(0,0,0,0.1)",
-                      mx: 1, // Add horizontal margin between buttons
-                      px: 1, // Padding inside the button for a balanced look
-                      minWidth: "40px",
-                      marginY: "10px",
-                    }}
-                  >
-                    View
-                  </Button>
                   <EditStudentDialog
                     open={openEditModal}
                     onClose={handleEditModalClose}
@@ -472,7 +480,6 @@ function StudentData() {
                     handleFileChange={handleFileChange}
                     formData={formData}
                   />
-
                   <ViewStudentDialog
                     open={openViewModal}
                     onClose={handleViewModalClose}
@@ -486,6 +493,36 @@ function StudentData() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mt: 2,
+        }}
+      >
+        <Select
+          value={itemsPerPage}
+          onChange={(e) => setItemsPerPage(e.target.value)}
+          size="small"
+        >
+          <MenuItem value={5}>5</MenuItem>
+          <MenuItem value={10}>10</MenuItem>
+          <MenuItem value={20}>20</MenuItem>
+          <MenuItem value={50}>50</MenuItem>
+        </Select>
+
+        <Pagination
+          count={pageCount}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+          showFirstButton
+          showLastButton
+          sx={{ my: 2 }}
+        />
+      </Box>
     </Paper>
   );
 }

@@ -152,24 +152,6 @@ const AddCourse = () => {
         }
         break;
 
-      // case 3:
-      //   // Validate Step 3 (Teachers)
-      //   if (selectedTeachers.length === 0) {
-      //     setValidationError("Please assign at least one teacher.");
-      //     return;
-      //   }
-      //   if (
-      //     selectedTeachers.some(
-      //       (teacher) => !teacher.assignedSubject || !teacher.assignedSubject.id
-      //     )
-      //   ) {
-      //     setValidationError(
-      //       "All selected teachers must have an assigned subject."
-      //     );
-      //     return;
-      //   }
-      //   break;
-
       case 3:
         // Validate all subjects have teachers assigned
         const allAssigned = selectedSubjects.every(
@@ -191,15 +173,43 @@ const AddCourse = () => {
 
   const handleBack = () => setActiveStep((prevStep) => prevStep - 1);
 
+  const checkImageDimensions = (file, expectedWidth, expectedHeight) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const valid =
+            img.naturalWidth === expectedWidth &&
+            img.naturalHeight === expectedHeight;
+          resolve(valid);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleBannerFileUpload = async (e, setFile) => {
     const file = e.target.files[0];
-    if (file) {
-      const base64 = await convertToBase64(file);
+    if (!file) return;
 
-      setFile(URL.createObjectURL(file));
-      setBannerImageData(base64);
+    console.log(file);
+
+    setValidationError(""); // Clear previous errors
+
+    // Check dimensions (1024x500)
+    const isValid = await checkImageDimensions(file, 1024, 500);
+    if (!isValid) {
+      setValidationError("Banner must be exactly 1024x500 pixels.");
+      return;
     }
+
+    const base64 = await convertToBase64(file);
+    setFile(URL.createObjectURL(file));
+    setMainImageData(base64);
   };
+
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -211,12 +221,22 @@ const AddCourse = () => {
 
   const handleMainFileUpload = async (e, setFile) => {
     const file = e.target.files[0];
-    if (file) {
-      const base64 = await convertToBase64(file);
+    if (!file) return;
 
-      setFile(URL.createObjectURL(file));
-      setMainImageData(base64);
+    console.log(file);
+
+    setValidationError(""); // Clear previous errors
+
+    // Check dimensions (1024x1024)
+    const isValid = await checkImageDimensions(file, 1024, 1024);
+    if (!isValid) {
+      setValidationError("Main image must be exactly 1024x1024 pixels.");
+      return;
     }
+
+    const base64 = await convertToBase64(file);
+    setFile(URL.createObjectURL(file));
+    setMainImageData(base64);
   };
 
   const handleRemoveFile = (setFile) => setFile(null);
@@ -405,10 +425,10 @@ const AddCourse = () => {
         reader.onerror = (error) => reject(error);
       });
     };
-    if (!Array.isArray(additionalImages) || additionalImages.length === 0) {
-      alert("No additional images found.");
-      return;
-    }
+    // if (!Array.isArray(additionalImages) || additionalImages.length === 0) {
+    //   alert("No additional images found.");
+    //   return;
+    // }
     const convertedFiles = await Promise.all(
       additionalImages.map(async (file) => {
         try {
@@ -501,6 +521,7 @@ const AddCourse = () => {
   const closeErrorModal = () => {
     setErrorModalOpen(false);
   };
+
   const handleMultipleImageUpload = (event) => {
     const files = Array.from(event.target.files);
 

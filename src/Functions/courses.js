@@ -8,6 +8,8 @@ export const fetchCoursesList = async () => {
          
           });
           const courseResult = await courseResponse.json();
+
+          console.log(courseResult);
       
           return courseResult;
     }catch(error){

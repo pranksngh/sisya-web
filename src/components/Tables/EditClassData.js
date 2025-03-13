@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -13,22 +13,22 @@ import {
   CardMedia,
   Grid,
   Autocomplete,
-} from '@mui/material';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { getUser } from '../../Functions/Login';
+} from "@mui/material";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getUser } from "../../Functions/Login";
+import { toast, ToastContainer } from "react-toastify";
 const defaultProfileImage = "https://via.placeholder.com/150"; // Placeholder image URL
 
-
 const EditClassData = () => {
-    const formatDateTimeLocal = (isoString) => {
-        const date = new Date(isoString);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        const hours = String(date.getHours()).padStart(2, "0");
-        const minutes = String(date.getMinutes()).padStart(2, "0");
-        return `${year}-${month}-${day}T${hours}:${minutes}`;
-      };
+  const formatDateTimeLocal = (isoString) => {
+    const date = new Date(isoString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
   const navigate = useNavigate();
   const user = getUser();
   const location = useLocation();
@@ -36,77 +36,89 @@ const EditClassData = () => {
   const [courseList, setCourseList] = useState([]);
   const [subjectList, setSubjectList] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(courseInfo);
-  const [selectedSubject, setSelectedSubject] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState("");
   const [mentorDetails, setMentorDetails] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [subjectNames, setSubjectNames] = useState({});
   const [formData, setFormData] = useState({
     title: sessionInfo.detail,
     startTime: formatDateTimeLocal(sessionInfo.startTime),
     endTime: formatDateTimeLocal(sessionInfo.endTime),
-    description:sessionInfo.description,
+    description: sessionInfo.description,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  console.log(sessionInfo);
 
   useEffect(() => {
     console.log("my session info is ", JSON.stringify(sessionInfo));
     fetchCourses();
   }, []);
-  useEffect(()=>{
+  useEffect(() => {
     getSubjectInfo();
     handleCourseSelect(courseInfo);
     handleSubjectSelect(sessionInfo.subjectId);
-  },[]);
+  }, []);
 
   const fetchCourses = async () => {
     try {
-      const response = await fetch('https://sisyabackend.in/rkadmin/get_course', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        "https://sisyabackend.in/rkadmin/get_course",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const result = await response.json();
       if (result.success) {
         setCourseList(result.courses || []);
       }
     } catch (error) {
-      console.error('Error fetching course:', error);
+      console.error("Error fetching course:", error);
     }
   };
- 
+
   const getMentorById = async (mentorId) => {
     try {
-      const response = await fetch('https://sisyabackend.in/rkadmin/get_mentor_by_id', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ mentorId }),
-      });
+      const response = await fetch(
+        "https://sisyabackend.in/rkadmin/get_mentor_by_id",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ mentorId }),
+        }
+      );
       const result = await response.json();
       if (result.success) {
         setMentorDetails(result.mentor);
       }
     } catch (error) {
-      console.error('Error fetching mentor details:', error);
+      console.error("Error fetching mentor details:", error);
     }
   };
 
   const getSubjectById = async (id) => {
     try {
-      const response = await fetch('https://sisyabackend.in/student/get_subject_by_id', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id }),
-      });
+      const response = await fetch(
+        "https://sisyabackend.in/student/get_subject_by_id",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id }),
+        }
+      );
       const result = await response.json();
       if (result.success) {
         return result.subjects[0].name;
       }
     } catch (error) {
-      console.error('Error fetching subject details:', error);
+      console.error("Error fetching subject details:", error);
     }
     return null;
   };
@@ -114,7 +126,7 @@ const EditClassData = () => {
   const handleCourseSelect = (course) => {
     setSelectedCourse(course);
     setSubjectList(course.subjectList || []);
-    setSelectedSubject('');
+    setSelectedSubject("");
     setMentorDetails(null);
 
     course.subjectList.forEach(async (subjectId) => {
@@ -127,23 +139,24 @@ const EditClassData = () => {
       }
     });
   };
-// storing the default subject values 
-  const getSubjectInfo =async ()=>{
+  // storing the default subject values
+  const getSubjectInfo = async () => {
     courseInfo.subjectList.forEach(async (subjectId) => {
-        const subjectName = await getSubjectById(subjectId);
-        if (subjectName) {
-          setSubjectNames((prevState) => ({
-            ...prevState,
-            [subjectId]: subjectName,
-          }));
-        }
-      });
-  }
+      const subjectName = await getSubjectById(subjectId);
+      if (subjectName) {
+        setSubjectNames((prevState) => ({
+          ...prevState,
+          [subjectId]: subjectName,
+        }));
+      }
+    });
+  };
 
   const handleSubjectSelect = (subjectId) => {
     setSelectedSubject(subjectId);
     const teachIntro = selectedCourse.TeachIntro.find(
-      (intro) => intro.subjectId === subjectId && intro.bigCourseId === selectedCourse.id
+      (intro) =>
+        intro.subjectId === subjectId && intro.bigCourseId === selectedCourse.id
     );
     if (teachIntro) {
       getMentorById(teachIntro.mentorId);
@@ -163,44 +176,67 @@ const EditClassData = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validation: start time must not be in the past and end time must be after start time.
+    const now = new Date();
+    const startTime = new Date(formData.startTime);
+    const endTime = new Date(formData.endTime);
+
+    if (startTime < now) {
+      toast.error(
+        "Bro you can't start class in past OR you invented the time machine"
+      );
+      return;
+    }
+    if (endTime <= startTime) {
+      toast.error(
+        "Bro you can't end before starting OR entropy inversion possible now."
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+
     const formattedStartTime = new Date(formData.startTime).toISOString();
     const formattedEndTime = new Date(formData.endTime).toISOString();
 
     const submissionData = {
-      id:sessionInfo.id,
-      mentorId: user.mentor.id,
+      id: sessionInfo.id,
+      mentorId: sessionInfo.mentorId, //user.mentor.id,
       bigCourseId: selectedCourse.id,
       detail: formData.title,
       subjectId: selectedSubject,
       startTime: formattedStartTime,
       endTime: formattedEndTime,
-      description:formData.description,
-      isGoingOn:false,
-      isDone:false
+      // description:formData.description,
+      isGoingOn: false,
+      isDone: false,
     };
 
     try {
-      const response = await fetch('https://sisyabackend.in/student/edit_session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(submissionData),
-      });
+      const response = await fetch(
+        "https://sisyabackend.in/student/edit_session",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(submissionData),
+        }
+      );
       const result = await response.json();
       if (result.success) {
-        navigate('../teacher');
+        navigate("../teacher");
       } else {
-        alert('Failed to add class');
+        alert("Failed to add class");
       }
     } catch (error) {
-      console.error('Error adding class:', error);
-      alert('An error occurred while adding the class.');
+      console.error("Error adding class:", error);
+      alert("An error occurred while adding the class.");
     }
   };
 
   return (
-    <Box sx={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
+    <Box sx={{ maxWidth: "600px", margin: "0 auto", padding: "20px" }}>
       <Typography variant="h4" gutterBottom>
         Edit Class
       </Typography>
@@ -254,7 +290,7 @@ const EditClassData = () => {
               </Select>
             </FormControl>
 
-            <TextField
+            {/* <TextField
           label="Description"
           name="description"
           value={formData.description}
@@ -262,7 +298,7 @@ const EditClassData = () => {
           fullWidth
           margin="normal"
           required
-        />
+        /> */}
             <TextField
               label="Start Time"
               type="datetime-local"
@@ -299,6 +335,7 @@ const EditClassData = () => {
           </>
         )}
       </Box>
+      <ToastContainer position="top-right" autoClose={6000} />
     </Box>
   );
 };

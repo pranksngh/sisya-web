@@ -70,24 +70,73 @@ function UpcomingClasses() {
     }
   };
 
-  const extractSessions = async (courses) => {
-    const allSessions = await Promise.all(courses.flatMap(async (course) => {
-      return await Promise.all(course.session.map(async (session) => ({
+  //orignal
+  // const extractSessions = async (courses) => {
+  //   const allSessions = await Promise.all(courses.flatMap(async (course) => {
+  //     return await Promise.all(course.session.map(async (session) => ({
+  //       id: session.id,
+  //       detail: session.detail,
+  //       startTime: new Date(session.startTime),
+  //       endTime: new Date(session.endTime),
+  //       courseId: course.id,
+  //       subjectId: await getSubjectById(session.subjectId),
+  //       status: session.isDone ? 'Complete' : 'Not Started Yet',
+  //       isDone:session.isDone
+
+  //     })));
+  //   }));
+
+  //   const today = new Date();
+  //   const filteredSessions = allSessions.flat().filter((session) => session.startTime >= today);
+  //   setSessions(filteredSessions);
+  // };
+
+  const MAX_CONCURRENT_REQUESTS = 5; 
+
+  const processSubjectQueue = async (sessions) => {
+    const queue = [...sessions]; 
+    const activeRequests = [];
+
+    const processNext = async () => {
+      if (queue.length === 0) return; 
+
+      const session = queue.shift(); 
+      const request = getSubjectById(session.subjectId).then((subjectName) => {
+        setSessions((prevSessions) =>
+          prevSessions.map((s) =>
+            s.id === session.id ? { ...s, subjectId: subjectName } : s
+          )
+        );
+      });
+
+      activeRequests.push(request);
+
+      await request;
+      activeRequests.splice(activeRequests.indexOf(request), 1); 
+      processNext(); 
+    };
+
+    for (let i = 0; i < Math.min(MAX_CONCURRENT_REQUESTS, queue.length); i++) {
+      processNext();
+    }
+  };
+
+  const extractSessions = (courses) => {
+    const allSessions = courses.flatMap((course) =>
+      course.session.map((session) => ({
         id: session.id,
         detail: session.detail,
         startTime: new Date(session.startTime),
         endTime: new Date(session.endTime),
         courseId: course.id,
-        subjectId: await getSubjectById(session.subjectId),
-        status: session.isDone ? 'Complete' : 'Not Started Yet',
-        isDone:session.isDone
+        subjectId: session.subjectId, 
+        status: session.isDone ? "Complete" : "Not Started Yet",
+        isDone: session.isDone,
+      }))
+    );
 
-      })));
-    }));
-
-    const today = new Date();
-    const filteredSessions = allSessions.flat().filter((session) => session.startTime >= today);
-    setSessions(filteredSessions);
+    setSessions(allSessions); 
+    processSubjectQueue(allSessions); 
   };
 
   const formatDateTime = (date) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,9 +9,9 @@ import {
   Typography,
   Paper,
   CircularProgress,
-} from '@mui/material';
-import { getUser } from '../../Functions/Login';
-import { useNavigate } from 'react-router-dom';
+} from "@mui/material";
+import { getUser } from "../../Functions/Login";
+import { useNavigate } from "react-router-dom";
 
 function EnrolledCourse() {
   const user = getUser();
@@ -24,15 +24,18 @@ function EnrolledCourse() {
 
   const fetchTecherCourses = async () => {
     try {
-      const response = await fetch('https://sisyabackend.in/teacher/get_all_courses', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ mentorId: user.mentor.id }),
-      });
+      const response = await fetch(
+        "https://sisyabackend.in/teacher/get_all_courses",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ mentorId: user.mentor.id }),
+        }
+      );
       const result = await response.json();
-      console.log('Enrolled Courses API Response:', result);
+      console.log("Enrolled Courses API Response:", result);
 
       if (result.success && result.bigCourses) {
         setMyCourses(result.bigCourses);
@@ -40,7 +43,7 @@ function EnrolledCourse() {
         setMyCourses([]);
       }
     } catch (error) {
-      console.log('Error fetching teacher courses:', error);
+      console.log("Error fetching teacher courses:", error);
     } finally {
       setLoadingCourses(false);
     }
@@ -50,25 +53,24 @@ function EnrolledCourse() {
     navigate("../course-details", { state: { courseId } });
   };
 
-
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString();
   };
 
   return (
     <>
-      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>
+      <Typography variant="h6" sx={{ fontWeight: "bold", mb: 3 }}>
         Assigned Courses
       </Typography>
       <Paper elevation={0}>
         <TableContainer
           sx={{
-            border: '1px solid #ddd',
-            borderRadius: '12px',
-            overflowY: 'auto',
-            height: '510px',
-            scrollbarWidth: 'none',
-            '&::-webkit-scrollbar': { display: 'none' },
+            border: "1px solid #ddd",
+            borderRadius: "12px",
+            overflowY: "auto",
+            height: "510px",
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": { display: "none" },
           }}
         >
           <Table aria-label="my-courses-table">
@@ -78,8 +80,7 @@ function EnrolledCourse() {
                 <TableCell>Type</TableCell>
                 <TableCell>Course Name</TableCell>
                 <TableCell>Grade</TableCell>
-               
-              
+
                 <TableCell>Status</TableCell>
               </TableRow>
             </TableHead>
@@ -92,9 +93,14 @@ function EnrolledCourse() {
                 </TableRow>
               ) : myCourses.length > 0 ? (
                 myCourses.map((item) => (
-                  <TableRow key={item.id} sx={{ '&:hover': { backgroundColor: '#f5f5f5' } }}>
+                  <TableRow
+                    key={item.id}
+                    sx={{ "&:hover": { backgroundColor: "#f5f5f5" } }}
+                  >
                     <TableCell>{item.id}</TableCell>
-                    <TableCell>{item.isLongTerm ? 'Long Term' : 'Short Term'}</TableCell>
+                    <TableCell>
+                      {item.isLongTerm ? "Long Term" : "Short Term"}
+                    </TableCell>
                     <TableCell>
                       <a
                         href="#"
@@ -102,17 +108,25 @@ function EnrolledCourse() {
                           e.preventDefault();
                           handleViewCourseDetails(item.id);
                         }}
-                        style={{ textDecoration: 'none', color: '#1976d2', fontWeight: 'bold' }}
+                        style={{
+                          textDecoration: "none",
+                          color: "#1976d2",
+                          fontWeight: "bold",
+                        }}
                       >
                         {item.name}
                       </a>
                     </TableCell>
                     <TableCell>{item.grade}</TableCell>
-                   
-                   
+
                     <TableCell>
-                      <span style={{ color: item.isActive ? 'green' : 'red', fontWeight: 'bold' }}>
-                        {item.isActive ? 'Active' : 'Inactive'}
+                      <span
+                        style={{
+                          color: item.isActive ? "green" : "red",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {item.isActive ? "Active" : "Inactive"}
                       </span>
                     </TableCell>
                   </TableRow>
@@ -133,3 +147,4 @@ function EnrolledCourse() {
 }
 
 export default EnrolledCourse;
+

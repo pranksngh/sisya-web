@@ -8,6 +8,7 @@ import {
   Typography,
   Avatar,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
@@ -22,17 +23,17 @@ const Sidebar = ({ userRole }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [logoutLoading, setLogoutLoading] = useState(false);
+
   const handleToggle = (label) => {
     setOpen((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
   const markLogout = async () => {
+    setLogoutLoading(true);
     const user = getUser();
     const role = localStorage.getItem("role");
 
-    console.log("Logging out...");
-    console.log("User Role:", role);
-    console.log("User Data:", user);
 
     if (role === "teacher" && user?.mentor?.id) {
       console.log("Sending logout request for mentorId:", user.mentor.id);
@@ -53,6 +54,8 @@ const Sidebar = ({ userRole }) => {
         console.log("Logout API Response:", result);
       } catch (error) {
         console.error("Error marking logout:", error);
+      } finally {
+        setLogoutLoading(false);
       }
     } else {
       console.log("No logout request needed.");
@@ -62,6 +65,7 @@ const Sidebar = ({ userRole }) => {
   const handleNavigation = async (path) => {
     if (path === "/") {
       // Clear localStorage on logout
+      setLogoutLoading(true);
       await markLogout();
       localStorage.clear();
     }
@@ -90,8 +94,28 @@ const Sidebar = ({ userRole }) => {
         flexDirection: "column",
         justifyContent: "space-between",
         boxShadow: "2px 0 5px rgba(0,0,0,0.1)",
+        position: "relative",
       }}
     >
+      {/* loader */}
+      {logoutLoading && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+        >
+          <CircularProgress size={60} thickness={4} />
+        </Box>
+      )}
       <Box sx={{ overflowY: "auto", flexGrow: 1 }}>
         <Typography
           variant="h6"
@@ -200,7 +224,7 @@ const Sidebar = ({ userRole }) => {
             {userRole === "teacher"
               ? user.mentor.email
               : userRole === "mentor"
-              ? user.salesman.email
+              ? `${user.salesman.email.slice(0, 15)}...`
               : ""}
           </Typography>
         </Box>

@@ -100,7 +100,7 @@ const sidebarConfig = [
     label: "Registration Leads",
     icon: "PeopleOutline",
     path: "pilot-course-reg",
-    roles: ["admin"],
+    roles: ["admin","mentor"],
     expandable: false,
   },
   {
@@ -213,6 +213,13 @@ const sidebarConfig = [
     icon: "EventBusy",
     path: "teacherLeaves",
     roles: ["hr"],
+    expandable: false,
+  },
+  {
+    label: "Assigned Courses",
+    icon: "LibraryBooks",
+    path: "assignedCourseMentor",
+    roles: ["mentor"],
     expandable: false,
   },
   {

@@ -13,7 +13,6 @@ import {
   Select,
   MenuItem,
   Pagination,
-  LinearProgress,
   CircularProgress,
   Alert,
   Typography,
@@ -32,7 +31,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const EnrolledCoursesData = () => {
+const AssignedCourseData = () => {
   const [courses, setCourses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,8 +39,20 @@ const EnrolledCoursesData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [assignedClasses, setAssignedClasses] = useState([]);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    console.log("User data from localStorage:", userData);
+
+    if (userData && userData.salesman && userData.salesman.classes) {
+      const classes = userData.salesman.classes;
+      console.log("Assigned classes from localStorage:", classes);
+      setAssignedClasses(classes);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,6 +69,7 @@ const EnrolledCoursesData = () => {
 
         const result = await response.json();
         if (result.success) {
+          console.log("Raw courses data:", result.bigCourses);
           setCourses(result.bigCourses);
         }
       } catch (err) {
@@ -71,10 +83,17 @@ const EnrolledCoursesData = () => {
   }, []);
 
   const filteredData = useMemo(() => {
-    let computedData = courses.filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    let computedData = courses
+      .filter((item) => {
+        const gradeNumber = Number(item.grade);
+        return assignedClasses.some((cls) => Number(cls) === gradeNumber);
+      })
+      // .filter((item) => item.isActive) //uncomment this to show only active course
+      .filter((item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
 
+    // Sorting logic 
     if (sortConfig.key) {
       computedData.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
@@ -87,8 +106,33 @@ const EnrolledCoursesData = () => {
       });
     }
 
+    console.log("Filtered courses with sessions:", computedData);
     return computedData;
-  }, [courses, searchTerm, sortConfig]);
+  }, [courses, searchTerm, sortConfig, assignedClasses]);
+
+  // const filteredData = useMemo(() => {
+  //   let computedData = courses
+  //     .filter((item) => assignedClasses.includes(+(item.grade)))
+  //     .filter((item) => item.isActive)
+  //     .filter((item) =>
+  //       item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
+
+  //   if (sortConfig.key) {
+  //     computedData.sort((a, b) => {
+  //       if (a[sortConfig.key] < b[sortConfig.key]) {
+  //         return sortConfig.direction === "asc" ? -1 : 1;
+  //       }
+  //       if (a[sortConfig.key] > b[sortConfig.key]) {
+  //         return sortConfig.direction === "asc" ? 1 : -1;
+  //       }
+  //       return 0;
+  //     });
+  //   }
+
+  //   console.log("Filtered and sorted courses:", computedData);
+  //   return computedData;
+  // }, [courses, searchTerm, sortConfig, assignedClasses]);
 
   const handleSort = (key) => {
     let direction = "asc";
@@ -103,7 +147,7 @@ const EnrolledCoursesData = () => {
   };
 
   const handleViewCourseDetails = (courseId) => {
-    navigate(`../course-details`, { state: { courseId } });
+    navigate(`../assigned-course-detail`, { state: { courseId } });
   };
 
   const formatDate = (dateString) => {
@@ -126,7 +170,7 @@ const EnrolledCoursesData = () => {
   return (
     <Paper sx={{ p: 3, m: 2 }}>
       <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
-        My Courses
+        Assigned Courses
       </Typography>
 
       <div
@@ -193,7 +237,6 @@ const EnrolledCoursesData = () => {
                     </TableSortLabel>
                   </TableCell>
                   <TableCell>End Date</TableCell>
-                  <TableCell>Status</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -215,13 +258,6 @@ const EnrolledCoursesData = () => {
                     <TableCell>{item.grade}</TableCell>
                     <TableCell>{formatDate(item.startDate)}</TableCell>
                     <TableCell>{formatDate(item.endDate)}</TableCell>
-                    <TableCell
-                      sx={{
-                        color: item.isActive ? "success.main" : "error.main",
-                      }}
-                    >
-                      {item.isActive ? "Active" : "Inactive"}
-                    </TableCell>
                   </StyledTableRow>
                 ))}
               </TableBody>
@@ -241,4 +277,4 @@ const EnrolledCoursesData = () => {
   );
 };
 
-export default EnrolledCoursesData;
+export default AssignedCourseData;

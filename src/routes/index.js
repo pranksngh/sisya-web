@@ -52,6 +52,8 @@ import EditClass from '../pages/Teacher/EditClass';
 import PilotRegistration from '../pages/Admin/PilotRegistration';
 import EnrollStudent from '../pages/Admin/EnrollStudent';
 import AddClassData from '../pages/Admin/AddClass';
+import AssignedCourse from '../pages/Mentor/AssignedCourse';
+import AssignedCourseDetail from '../pages/Mentor/AssignedCourseDetail';
 
 const router = createBrowserRouter([
   {
@@ -264,6 +266,14 @@ const router = createBrowserRouter([
       {
         path: "edit-session",
         element: React.createElement(EditClass),
+      },
+      {
+        path: "assignedCourseMentor",
+        element: React.createElement(AssignedCourse),
+      },
+      {
+        path: "assigned-course-detail",
+        element: React.createElement(AssignedCourseDetail),
       },
     ],
   },
