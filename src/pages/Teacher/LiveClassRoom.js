@@ -533,6 +533,13 @@ export default function LiveClassRoom() {
     );
   };
 
+  const showBuyNowButton = ()=>{
+    socketService.emit("teacher:announce",{
+      token: roomID,
+      data:{link:"https://sisyaclass.com/registration"}
+    });
+  }
+
   return (
     <Box
       className="App"
@@ -788,6 +795,14 @@ export default function LiveClassRoom() {
           startIcon={<ExitToApp />}
         >
           Leave Room
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={() => showBuyNowButton()}
+          startIcon={<ExitToApp />}
+        >
+         Push Button
         </Button>
       </Box>
 
