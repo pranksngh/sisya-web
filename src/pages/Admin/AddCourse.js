@@ -199,9 +199,9 @@ const AddCourse = () => {
     setValidationError(""); // Clear previous errors
 
     // Check dimensions (1024x500)
-    const isValid = await checkImageDimensions(file, 1024, 500);
+    const isValid = await checkImageDimensions(file, 1024, 1280);
     if (!isValid) {
-      setValidationError("Banner must be exactly 1024x500 pixels.");
+      setValidationError("Banner must be exactly 1024x1280 pixels.");
       return;
     }
 
@@ -228,9 +228,9 @@ const AddCourse = () => {
     setValidationError(""); // Clear previous errors
 
     // Check dimensions (1024x1024)
-    const isValid = await checkImageDimensions(file, 1024, 1024);
+    const isValid = await checkImageDimensions(file, 2560, 1440);
     if (!isValid) {
-      setValidationError("Main image must be exactly 1024x1024 pixels.");
+      setValidationError("Main image must be exactly 2560x1440 pixels.");
       return;
     }
 

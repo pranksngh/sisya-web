@@ -536,7 +536,7 @@ export default function LiveClassRoom() {
   const showBuyNowButton = ()=>{
     socketService.emit("teacher:announce",{
       token: roomID,
-      data:{link:"https://sisyaclass.com/registration"}
+      data:{link:"https://sisyaclass.com/registration",isActivated:true}
     });
   }
 
