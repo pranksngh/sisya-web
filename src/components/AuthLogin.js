@@ -82,8 +82,10 @@ export default function AuthLogin() {
     setLoading(false);
 
     if (response.success) {
+      console.log("redirecting to dashboard to admin")
       navigate("/dashboard/admin");
     } else {
+    console.log(JSON.stringify(response));
       showToast(response.error || "Admin Login Failed.");
     }
   };

@@ -174,7 +174,7 @@ function CourseData() {
 
   const fetchCourses = async () => {
     const courseResponse = await fetch(
-      "https://sisyabackend.in/rkadmin/get_all_courses",
+      "https://sisyabackend.in/rkadmin/get_course",
       {
         method: "POST",
         headers: {
@@ -187,10 +187,10 @@ function CourseData() {
 
     if (courseResult.success) {
       //sorting the courses based on updatedOn timestamp
-      courseResult.bigCourses.sort(
+      courseResult.courses.sort(
         (a, b) => new Date(b.modifiedOn) - new Date(a.modifiedOn)
       );
-      setCourses(courseResult.bigCourses);
+      setCourses(courseResult.courses);
       // setFilteredData(courseResult.bigCourses);
 
       console.log(JSON.stringify(courseResult));
