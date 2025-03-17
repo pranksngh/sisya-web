@@ -47,7 +47,7 @@ const EnrolledCoursesData = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "https://sisyabackend.in/teacher/get_all_courses",
+          "https://sisyabackend.in/rkadmin/get_course",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -58,7 +58,7 @@ const EnrolledCoursesData = () => {
 
         const result = await response.json();
         if (result.success) {
-          setCourses(result.bigCourses);
+          setCourses(result.courses);
         }
       } catch (err) {
         setError(err.message);
