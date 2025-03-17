@@ -438,10 +438,10 @@ const EditCourse = () => {
 
    // Check dimensions (1024x500)
    const isValid = await checkImageDimensions(file, 1024, 500);
-   if (!isValid) {
-     setValidationError("Banner must be exactly 1024x500 pixels.");
-     return;
-   }
+  //  if (!isValid) {
+  //    setValidationError("Banner must be exactly 1024x500 pixels.");
+  //    return;
+  //  }
 
    const base64 = await convertToBase64(file);
    setFile(URL.createObjectURL(file));
@@ -467,10 +467,10 @@ const EditCourse = () => {
 
     // Check dimensions (1024x1024)
     const isValid = await checkImageDimensions(file, 1024, 1024);
-    if (!isValid) {
-      setValidationError("Main image must be exactly 1024x1024 pixels.");
-      return;
-    }
+    // if (!isValid) {
+    //   setValidationError("Main image must be exactly 1024x1024 pixels.");
+    //   return;
+    // }
 
     const base64 = await convertToBase64(file);
     setFile(URL.createObjectURL(file));
