@@ -207,7 +207,7 @@ const AddCourse = () => {
 
     const base64 = await convertToBase64(file);
     setFile(URL.createObjectURL(file));
-    setMainImageData(base64);
+    setBannerImageData(base64);
   };
 
   const convertToBase64 = (file) => {
