@@ -69,7 +69,9 @@ export default function LiveClassRoom() {
   const [remoteStreams, setRemoteStreams] = useState([]);
   const messagesEndRef = useRef(null);
   const [openDialog, setOpenDialog] = useState(false);
-
+  const [openBuyDialog, setOpenBuyDialog] = useState(false);
+  const [buyNowLink, setBuyNowLink] = useState("");
+  const [isBuyNowActive, setIsBuyNowActive] = useState(false);
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       event.preventDefault();
@@ -533,12 +535,33 @@ export default function LiveClassRoom() {
     );
   };
 
-  const showBuyNowButton = ()=>{
-    socketService.emit("teacher:announce",{
+  // const showBuyNowButton = ()=>{
+  //   socketService.emit("teacher:announce",{
+  //     token: roomID,
+  //     data:{link:"https://sisyaclass.com/registration",isActivated:true}
+  //   });
+  // }
+
+  const handleBuyNowSubmit = () => {
+    if (buyNowLink.trim() === "") {
+      alert("add a link first");
+      return;
+    }
+    socketService.emit("teacher:announce", {
       token: roomID,
-      data:{link:"https://sisyaclass.com/registration",isActivated:true}
+      data: { link: buyNowLink, isActivated: true },
     });
-  }
+    setIsBuyNowActive(true);
+    setOpenBuyDialog(false);
+  };
+
+  const stopBuyNow = () => {
+    socketService.emit("teacher:announce", {
+      token: roomID,
+      data: { link: buyNowLink, isActivated: false },
+    });
+    setIsBuyNowActive(false);
+  };
 
   return (
     <Box
@@ -796,14 +819,33 @@ export default function LiveClassRoom() {
         >
           Leave Room
         </Button>
-        <Button
+        {/* <Button
           variant="contained"
           color="error"
           onClick={() => showBuyNowButton()}
           startIcon={<ExitToApp />}
         >
          Push Button
-        </Button>
+        </Button> */}
+        {!isBuyNowActive ? (
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => setOpenBuyDialog(true)}
+            startIcon={<ExitToApp />}
+          >
+            Push Button
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            color="error"
+            onClick={stopBuyNow}
+            startIcon={<ExitToApp />}
+          >
+            Stop Buy
+          </Button>
+        )}
       </Box>
 
       {/* Confirmation Dialog */}
@@ -820,6 +862,34 @@ export default function LiveClassRoom() {
           </Button>
           <Button onClick={confirmLeaveRoom} color="error">
             Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+         {/* Buy Now Link Dialog */}
+         <Dialog open={openBuyDialog} onClose={() => setOpenBuyDialog(false)}>
+        <DialogTitle>Enter Buy Now Link</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please enter the URL for the Buy Now button.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Buy Now Link"
+            type="url"
+            fullWidth
+            variant="standard"
+            value={buyNowLink}
+            onChange={(e) => setBuyNowLink(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenBuyDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleBuyNowSubmit} color="error">
+            Submit
           </Button>
         </DialogActions>
       </Dialog>

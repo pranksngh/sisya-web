@@ -54,6 +54,7 @@ import EnrollStudent from '../pages/Admin/EnrollStudent';
 import AddClassData from '../pages/Admin/AddClass';
 import AssignedCourse from '../pages/Mentor/AssignedCourse';
 import AssignedCourseDetail from '../pages/Mentor/AssignedCourseDetail';
+import ChangePassword from '../pages/Admin/ChangePassword';
 
 const router = createBrowserRouter([
   {
@@ -198,6 +199,10 @@ const router = createBrowserRouter([
       {
         path: "pushNotification",
         element: React.createElement(PushNotification),
+      },
+      {
+        path: "changeAdminPassword",
+        element: React.createElement(ChangePassword),
       },
       {
         path: "enrolled-courses",

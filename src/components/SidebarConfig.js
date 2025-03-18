@@ -146,6 +146,13 @@ const sidebarConfig = [
     expandable: false,
   },
   {
+    label: "Change Password",
+    icon: "NotificationsActive",
+    path: "changeAdminPassword",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
     label: "Assigned Courses",
     icon: "LibraryBooks",
     path: "enrolled-courses",
