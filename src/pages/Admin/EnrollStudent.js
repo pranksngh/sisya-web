@@ -367,7 +367,7 @@ const EnrollStudent = () => {
         }
 
         const courseResponse = await fetch(
-          "https://sisyabackend.in/rkadmin/get_all_courses",
+          "https://sisyabackend.in/rkadmin/get_course",
           {
             method: "POST",
             headers: {
@@ -376,8 +376,8 @@ const EnrollStudent = () => {
           }
         );
         const courseData = await courseResponse.json();
-        if (courseData.bigCourses) {
-          setCourses(courseData.bigCourses);
+        if (courseData.courses) {
+          setCourses(courseData.courses);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
