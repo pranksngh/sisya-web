@@ -164,7 +164,7 @@ function PilotRegistrationData() {
         },
         body: JSON.stringify({
           phone: phoneNumber,
-          templateId: templateId,
+          template: templateId,
         }),
       })
         .then((response) => response.json())
