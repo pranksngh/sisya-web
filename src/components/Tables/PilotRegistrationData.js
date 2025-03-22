@@ -154,6 +154,8 @@ function PilotRegistrationData() {
       templateId = "67c964f7d6fc054f966d7cf2";
     } else if (courseName === "SISYA VEDIC MATHS"){
       templateId = "67dec4a5d6fc0517be3a0333";
+    } else if(courseName === "Best Summer Camp For Maths + Chemistry + Physics + 2 Free STEM Class"){
+      templateId = "67dec862d6fc0549c91514e2";
     } else {
       console.error("Unknown course type");
       return;
