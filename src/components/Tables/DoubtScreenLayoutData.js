@@ -309,8 +309,8 @@ const DoubtScreenLayoutData = () => {
     }
   };
 
-const generateVideoToken = async(userData, roomid)=>{
-
+const generateVideoToken = async(userData)=>{
+  const randomRoomId = Math.random().toString(36).substring(2, 10);
   const username = user.mentor.name; // Replace with dynamic username if needed
   const randomNumber = Math.floor(1000 + Math.random() * 9000); // Generate a random 4-digit number
   const userId = `${randomNumber}`;
@@ -338,7 +338,7 @@ const generateVideoToken = async(userData, roomid)=>{
             userData,
             user, // here user means mentor info
             videotoken,
-            roomid,
+            randomRoomId,
             userId
 
         }
@@ -404,7 +404,7 @@ const generateVideoToken = async(userData, roomid)=>{
       const result = await response.json();
        if(result.success){
         console.log("notification sent successfully");
-        generateVideoToken(userData, randomRoomId);
+       // generateVideoToken(userData, randomRoomId);
        
        }
     
@@ -483,8 +483,8 @@ const generateVideoToken = async(userData, roomid)=>{
               <Box display="flex" justifyContent="flex-end" flex={1}>
                 {doubtStatus === 1 && (
                   <>
-                    <IconButton onClick={()=>initiateCall(selectedUser)} ><VideoIcon /></IconButton>
-                    <IconButton onClick={()=>initiateCall(selectedUser)} ><PhoneIcon /></IconButton>
+                    <IconButton onClick={()=>generateVideoToken(selectedUser)} ><VideoIcon /></IconButton>
+                    <IconButton onClick={()=>generateVideoToken(selectedUser)} ><PhoneIcon /></IconButton>
                     <Button
                       variant="contained"
                       color="secondary"
