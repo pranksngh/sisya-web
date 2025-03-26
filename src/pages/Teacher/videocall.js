@@ -62,9 +62,9 @@ export default function VideoCallPage() {
         }
 
      
-        const token = videotoken;
-
-        zg.loginRoom(roomID, token, { userId, userName }, { userUpdate: true });
+        const userID = "prashant706966";
+        const token = "04AAAAAGflivgADKP4WcMRPYs4YTqLlgC5QprAUtbjmIuX5USqu2rK3roKABREynDSsf9s3YiZunjiLfWJcOKI8SQ0+204BYyaWMtBmLUA8aob3lUSSMRKAe2HPwzh0hPAI/UxdJhWr517Q6pTzLP8LYCPukH4iNVxSexMkApK59zXRKV+vEBIDX6Yl1nO7F8GcSrlB6bDnpoFtUjIM7MYZDCMHJgnkwe9Iaf+pUF/fc7GCqgvyElZKFySa4CIr4YgV8S4o22d3/j7TL60DOnWbdUB"
+        zg.loginRoom(roomID, token, { userID, userName }, { userUpdate: true });
 
         zg.setDebugVerbose(false);
 
@@ -262,6 +262,23 @@ const initiateCall = async()=>{
        type: 'video_call',
        callerName: userInfo.mentor.name,
        teacherToken: token
+      },
+      apns: {
+        headers: {
+          "apns-priority": "10",
+          "apns-push-type": "background"
+        },
+        payload: {
+          aps: {
+            "content-available": 1,
+            sound: "default",
+            // Include a minimal alert for when app is in foreground
+            alert: {
+              title: `${userInfo.mentor.name} is calling`,
+              body: "Doubt Call"
+            }
+          }
+        }
       },
       
       // imageData: imageFile
