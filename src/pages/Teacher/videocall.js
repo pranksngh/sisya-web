@@ -288,7 +288,8 @@ export default function VideoCallPage() {
         data:{
          type: 'video_call',
          callerName: userInfo.mentor.name,
-         teacherToken: token
+         teacherToken: token,
+         roomId: randomRoomId,
         },
         apns: {
           headers: {
