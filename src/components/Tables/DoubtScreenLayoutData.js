@@ -353,7 +353,7 @@ const generateVideoToken = async(userData, roomid)=>{
   const initiateCall = async (userData)=>{
   // console.log(userData);
     const randomRoomId = Math.random().toString(36).substring(2, 10); // Generate a random 8-character alphanumeric string
-
+    const fcmToken = localStorage.getItem("notificationToken");
     try {
 
       const data = {
@@ -364,7 +364,8 @@ const generateVideoToken = async(userData, roomid)=>{
         data:{
          type: 'video_call',
          callerName: user.mentor.name,
-         roomId: randomRoomId
+         roomId: randomRoomId,
+         teacherToken:fcmToken
         },
         apns: {
           headers: {
