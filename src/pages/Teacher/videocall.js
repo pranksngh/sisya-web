@@ -303,8 +303,7 @@ const endCall = async()=>{
         body: "Doubt Call"
       },
       data:{
-       type: 'end_call'
-  
+       type: 'end_call' 
       },
       
       // imageData: imageFile

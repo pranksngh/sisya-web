@@ -100,6 +100,8 @@ const DoubtScreenLayoutData = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const teacherToken = localStorage.getItem("notificationToken");
+    console.log("my FCM Token is",teacherToken);
     socketService.initializeSocket(token, fromUUID);
 
     socketService.on('connect', () => console.log('Socket connected'));
@@ -311,20 +313,25 @@ const generateVideoToken = async(userData, roomid)=>{
 
   const username = user.mentor.name; // Replace with dynamic username if needed
   const randomNumber = Math.floor(1000 + Math.random() * 9000); // Generate a random 4-digit number
-  const userId = `${username}_${randomNumber}`;
+  const userId = `${randomNumber}`;
 
   const data = {
     userId: userId,
   };
+  console.log("my video data is ", JSON.stringify(data));
   try{
-    const response = await   fetch('https://sisyabackend.in/student/get_token', {
+    const response = await fetch('https://sisyabackend.in/student/get_token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     });
-    if(response.success){
+    console.log(response);
+
+    const result = await response.json();
+    if(result.success){
+      console.log("video token generated successfully");
       const videotoken = response.token;
       navigate("/videocall",{
         state: {
@@ -336,13 +343,15 @@ const generateVideoToken = async(userData, roomid)=>{
 
         }
     });
+    }else{
+      console.log("video token generation failed", JSON.stringify(response));
     }
   }catch(error){
     console.log("something went wrong", error);
   }
 }
   const initiateCall = async (userData)=>{
-
+  // console.log(userData);
     const randomRoomId = Math.random().toString(36).substring(2, 10); // Generate a random 8-character alphanumeric string
 
     try {
@@ -393,6 +402,7 @@ const generateVideoToken = async(userData, roomid)=>{
 
       const result = await response.json();
        if(result.success){
+        console.log("notification sent successfully");
         generateVideoToken(userData, randomRoomId);
        
        }

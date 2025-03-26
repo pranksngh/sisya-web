@@ -43,7 +43,7 @@ const TimeTable = () => {
       );
       const result = await response.json();
       if (result.success && result.mentor) {
-        console.log("Mentor detail:", JSON.stringify(result));
+      //  console.log("Mentor detail:", JSON.stringify(result));
         return result.mentor.name;
       }
       return "Unknown Mentor";
