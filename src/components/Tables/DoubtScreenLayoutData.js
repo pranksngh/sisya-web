@@ -357,6 +357,23 @@ const generateVideoToken = async(userData, roomid)=>{
          callerName: user.mentor.name,
          roomId: randomRoomId
         },
+        apns: {
+          headers: {
+            "apns-priority": "10",
+            "apns-push-type": "background"
+          },
+          payload: {
+            aps: {
+              "content-available": 1,
+              sound: "default",
+              // Include a minimal alert for when app is in foreground
+              alert: {
+                title: `${user.mentor.name} is calling`,
+                body: "Doubt Call"
+              }
+            }
+          }
+        },
         
         // imageData: imageFile
         //   ? {
