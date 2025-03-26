@@ -12,11 +12,11 @@ export default function VideoCallPage() {
   const userInfo = getUser();
   const location = useLocation();
   const navigate = useNavigate();
-  const { userData, user, videotoken, roomid, userId } = location.state || {};
+  const { userData, user, videotoken, randomRoomId, userId } = location.state || {};
   const appID = 1500762473; // Your App ID
   const serverSecret = "175fa0e5958efde603f2ec805c7d6120"; // Your Server Secret
   const userName = user?.mentor?.name || "Unknown User";
-  const roomID = roomid;
+  const roomID = randomRoomId;
   const videostreamID = "hostvideo_" + uuidv4();
   const screenStreamID = "hostscreen_" + uuidv4();
   
