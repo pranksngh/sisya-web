@@ -52,6 +52,28 @@ export default function VideoCallPage() {
   // User data
   const studentName = userData?.name || "Student";
   const studentAvatar = userData?.profilePic || null;
+  onMessage(messaging, (payload) => {
+    console.log('Message received in the foreground:', payload);
+      const notificationData = payload.data;
+      console.log('Notification Data:', notificationData);
+
+      if (notificationData.type === 'end_call') {
+        console.log('The call has ended.');
+        showAlert('Call ended by the other participant', 'info');
+        setCallStatus('ended');
+        leaveRoom();
+      } else if (notificationData.type === 'call_accepted') {
+        console.log('Call was accepted');
+        showAlert('Call connected', 'success');
+        setCallStatus('connected');
+        startCallTimer();
+      } else if (notificationData.type === 'call_declined') {
+        console.log('Call was declined');
+        showAlert('Call declined by recipient', 'warning');
+        setCallStatus('ended');
+        setTimeout(() => leaveRoom(), 2000);
+      }
+   });
   
   // Function to show alerts
   const showAlert = (message, severity = "info") => {
@@ -80,34 +102,6 @@ export default function VideoCallPage() {
       setCallDuration(prev => prev + 1);
     }, 1000);
   };
-
-  // Handle Firebase notifications
-  useEffect(() => {
-    const unsubscribe = onMessage(messaging, (payload) => {
-      console.log('Message received in the foreground:', payload);
-      const notificationData = payload.data;
-      console.log('Notification Data:', notificationData);
-
-      if (notificationData.type === 'end_call') {
-        console.log('The call has ended.');
-        showAlert('Call ended by the other participant', 'info');
-        setCallStatus('ended');
-        leaveRoom();
-      } else if (notificationData.type === 'call_accepted') {
-        console.log('Call was accepted');
-        showAlert('Call connected', 'success');
-        setCallStatus('connected');
-        startCallTimer();
-      } else if (notificationData.type === 'call_declined') {
-        console.log('Call was declined');
-        showAlert('Call declined by recipient', 'warning');
-        setCallStatus('ended');
-        setTimeout(() => leaveRoom(), 2000);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
 
   // Initialize Zego engine
   useEffect(() => {
