@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { 
   FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash, 
-  FaSignOutAlt, FaPhoneSlash, FaPhone 
+  FaPhoneSlash, FaPhone 
 } from "react-icons/fa";
 
 export default function VideoCallPage() {
@@ -84,7 +84,6 @@ export default function VideoCallPage() {
       const notificationData = payload.data;
       console.log('Notification Data:', notificationData);
 
-      // Check if the notification type is 'end_call'
       if (notificationData.type === 'end_call') {
         console.log('The call has ended.');
         showAlert('Call ended by the other participant', 'info');
@@ -110,9 +109,11 @@ export default function VideoCallPage() {
   useEffect(() => {
     const initZego = async () => {
       try {
+        // Create Zego Express Engine instance
         const zg = new ZegoExpressEngine(appID, serverSecret);
         setZegoEngine(zg);
 
+        // Check system requirements
         const result = await zg.checkSystemRequirements();
         if (!result.webRTC) {
           console.log("Browser does not support required WebRTC features.");
@@ -120,8 +121,9 @@ export default function VideoCallPage() {
           return;
         }
 
-        const token = videotoken;
-        
+        // Set debug level
+        zg.setDebugVerbose(false);
+
         // Register room state change callback
         zg.on('roomStateUpdate', (roomID, state, errorCode, extendedData) => {
           if (state === 'CONNECTED') {
@@ -131,29 +133,40 @@ export default function VideoCallPage() {
             if (errorCode !== 0) {
               showAlert(`Failed to connect to room: Error ${errorCode}`, "error");
             }
+          } else if (state === 'CONNECTING') {
+            console.log('Connecting to room:', roomID);
           }
         });
 
-        // Login to room
-        zg.loginRoom(roomID, token, { userId, userName }, { userUpdate: true });
+        // Login to room with token
+        const token = videotoken;
+        await zg.loginRoom(roomID, token, { userId, userName }, { userUpdate: true });
+        console.log('Logged into room:', roomID);
 
-        // Create local stream
+        // Create local stream with camera and microphone
         try {
+          console.log('Creating local stream...');
           const stream = await zg.createStream({
             camera: {
               video: true,
               audio: true,
             }
           });
+          
+          console.log('Local stream created successfully');
           setLocalStream(stream);
           
           // Set up local video display
           const localVideoElement = document.getElementById('localVideo');
           if (localVideoElement) {
             localVideoElement.srcObject = stream;
+            console.log('Local video element set up');
+          } else {
+            console.warn('Local video element not found');
           }
           
           // Start publishing stream
+          console.log('Starting to publish stream with ID:', videostreamID);
           zg.startPublishingStream(videostreamID, stream);
           
         } catch (streamError) {
@@ -163,8 +176,9 @@ export default function VideoCallPage() {
 
         // Publisher state updates
         zg.on('publisherStateUpdate', (result) => {
+          console.log('Publisher state update:', result);
           if (result.state === 'PUBLISHING') {
-            console.log('Publishing started');
+            console.log('Publishing started successfully');
             initiateCall();
           } else if (result.state === 'NO_PUBLISH') {
             console.log(`Publishing failed with error code: ${result.errorCode}`);
@@ -174,38 +188,54 @@ export default function VideoCallPage() {
 
         // Room stream updates
         zg.on('roomStreamUpdate', async (roomID, updateType, streamList) => {
+          console.log(`Room stream update: ${updateType}`, streamList);
+          
           if (updateType === 'ADD') {
             streamList.forEach(async (stream) => {
               console.log("New stream added:", stream.streamID);
-              const remoteStream = await zg.startPlayingStream(stream.streamID);
-              setRemoteStreams((prevStreams) => [...prevStreams, remoteStream]);
-              
-              // When remote stream is added, update call status to connected
-              if (callStatus === 'calling') {
-                setCallStatus('connected');
-                startCallTimer();
-              }
-              
-              // Display remote stream
-              const remoteVideoElement = document.getElementById('remoteVideo');
-              if (remoteVideoElement && !stream.streamID.startsWith("hostscreen")) {
-                remoteVideoElement.srcObject = remoteStream;
-              }
-              
-              // Display screen share if applicable
-              if (stream.streamID.startsWith("hostscreen")) {
-                const screenVideoElement = document.getElementById('screenVideo');
-                if (screenVideoElement) {
-                  screenVideoElement.srcObject = remoteStream;
+              try {
+                const remoteStream = await zg.startPlayingStream(stream.streamID);
+                setRemoteStreams((prevStreams) => [...prevStreams, remoteStream]);
+                
+                // When remote stream is added, update call status to connected
+                if (callStatus === 'calling') {
+                  setCallStatus('connected');
+                  startCallTimer();
                 }
+                
+                // Display remote stream
+                const remoteVideoElement = document.getElementById('remoteVideo');
+                if (remoteVideoElement && !stream.streamID.startsWith("hostscreen")) {
+                  remoteVideoElement.srcObject = remoteStream;
+                  console.log('Remote video element set up');
+                }
+                
+                // Display screen share if applicable
+                if (stream.streamID.startsWith("hostscreen")) {
+                  const screenVideoElement = document.getElementById('screenVideo');
+                  if (screenVideoElement) {
+                    screenVideoElement.srcObject = remoteStream;
+                  }
+                }
+              } catch (error) {
+                console.error("Error playing remote stream:", error);
               }
             });
           } else if (updateType === 'DELETE') {
             // Handle stream removal
+            streamList.forEach((stream) => {
+              console.log(`Stream removed: ${stream.streamID}`);
+            });
+            
             setRemoteStreams((prevStreams) =>
               prevStreams.filter(s => !streamList.find(st => st.streamID === s.streamID))
             );
           }
+        });
+
+        // Room user updates
+        zg.on('roomUserUpdate', (roomID, updateType, userList) => {
+          console.log(`Room user update: ${updateType}`, userList);
         });
         
       } catch (error) {
@@ -214,6 +244,7 @@ export default function VideoCallPage() {
       }
     };
 
+    // Initialize Zego engine
     initZego();
 
     // Set a timeout to automatically end the call if not answered
@@ -595,6 +626,7 @@ export default function VideoCallPage() {
     </Box>
   );
 
+  // Main render
   return (
     <Box sx={{ height: '100vh', overflow: 'hidden' }}>
       {/* Alert/Snackbar for notifications */}
