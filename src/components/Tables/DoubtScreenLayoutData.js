@@ -332,7 +332,8 @@ const generateVideoToken = async(userData)=>{
     const result = await response.json();
     if(result.success){
       console.log("video token generated successfully");
-      const videotoken = response.token;
+      const videotoken = result.token;
+     // console.log("token is", result);
       navigate("/videocall",{
         state: {
             userData,
