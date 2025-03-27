@@ -5,24 +5,16 @@ import { v4 as uuidv4 } from 'uuid';
 import { onMessage } from 'firebase/messaging';
 import { messaging } from '../../firebaseConfig';
 import { getUser } from '../../Functions/Login';
-import { 
-  Button, Box, IconButton, Alert, Snackbar, Typography, 
-  Paper, Avatar, Fade, Tooltip 
-} from "@mui/material";
-import { 
-  FaMicrophone, FaMicrophoneSlash, 
-  FaVideo, FaVideoSlash, 
-  FaSignOutAlt, FaUserFriends,
-  FaComments, FaDesktop, FaStopCircle
-} from "react-icons/fa";
+import { Button, Box, IconButton, Alert, Snackbar } from "@mui/material";
+import { FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash, FaSignOutAlt } from "react-icons/fa";
 
 export default function VideoCallPage() {
   const userInfo = getUser();
   const location = useLocation();
   const navigate = useNavigate();
   const { userData, user, videotoken, randomRoomId, userId } = location.state || {};
-  const appID = 1500762473;
-  const serverSecret = "175fa0e5958efde603f2ec805c7d6120";
+  const appID = 1500762473; // Your App ID
+  const serverSecret = "175fa0e5958efde603f2ec805c7d6120"; // Your Server Secret
   const userName = user?.mentor?.name || "Unknown User";
   const roomID = randomRoomId;
   const videostreamID = "hostvideo_" + uuidv4();
@@ -41,13 +33,11 @@ export default function VideoCallPage() {
   const [speakRequests, setSpeakRequests] = useState([]);
   const [isSpeakRequestVisible, setIsSpeakRequestVisible] = useState(false);
   const [remoteStreams, setRemoteStreams] = useState([]);
-  const [callActive, setCallActive] = useState(true);
-  const [callDuration, setCallDuration] = useState(0);
   
-  // Alert state
+  // New state for alerts
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [alertSeverity, setAlertSeverity] = useState("info");
+  const [alertSeverity, setAlertSeverity] = useState("info"); // "success", "error", "warning", "info"
 
   // Function to show alerts
   const showAlert = (message, severity = "info") => {
@@ -61,25 +51,6 @@ export default function VideoCallPage() {
     setAlertOpen(false);
   };
 
-  // Call duration timer
-  useEffect(() => {
-    let timer;
-    if (callActive) {
-      timer = setInterval(() => {
-        setCallDuration(prev => prev + 1);
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [callActive]);
-
-  // Format call duration
-  const formatDuration = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  // Firebase message listener
   onMessage(messaging, (payload) => {
     console.log('Message received in the foreground:', payload);
     const notificationData = payload.data;
@@ -93,7 +64,6 @@ export default function VideoCallPage() {
     }
   });
 
-  // Initialize Zego engine
   useEffect(() => {
     const initZego = async () => {
       try {
@@ -161,12 +131,6 @@ export default function VideoCallPage() {
           const videoElement = document.getElementById(`video_${videostreamID}`);
           if (videoElement) {
             videoElement.srcObject = stream;
-          }
-          
-          // Set local video preview
-          const localVideoElement = document.getElementById('localVideo');
-          if (localVideoElement) {
-            localVideoElement.srcObject = stream;
           }
           
           // Start publishing the stream
@@ -269,14 +233,6 @@ export default function VideoCallPage() {
       }
     };
 
-    // Create remote streams container if it doesn't exist
-    if (!document.getElementById('remoteStreams')) {
-      const remoteStreamsDiv = document.createElement('div');
-      remoteStreamsDiv.id = 'remoteStreams';
-      remoteStreamsDiv.style.display = 'none';
-      document.body.appendChild(remoteStreamsDiv);
-    }
-
     initZego();
 
     return () => {
@@ -287,12 +243,6 @@ export default function VideoCallPage() {
         }
         zegoEngine.logoutRoom(roomID);
         zegoEngine.destroyEngine();
-      }
-      
-      // Clean up the remote streams container
-      const remoteStreamsDiv = document.getElementById('remoteStreams');
-      if (remoteStreamsDiv) {
-        document.body.removeChild(remoteStreamsDiv);
       }
     };
   }, []);
@@ -543,90 +493,32 @@ export default function VideoCallPage() {
     showAlert(`Declined speak request from user ${userID}`, "info");
   };
 
-  // Student name from userData
-  const studentName = userData?.name || "Student";
-
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
         height: '100vh',
-        backgroundColor: "#121212",
-        position: "relative",
-        overflow: "hidden",
+        backgroundColor: "#f4f4f4",
       }}
     >
       {/* Alert/Snackbar for notifications */}
       <Snackbar 
         open={alertOpen} 
-        autoHideDuration={4000} 
+        autoHideDuration={6000} 
         onClose={handleAlertClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        TransitionComponent={Fade}
       >
         <Alert 
           onClose={handleAlertClose} 
           severity={alertSeverity} 
-          sx={{ 
-            width: '100%',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
-          }}
-          variant="filled"
+          sx={{ width: '100%' }}
         >
           {alertMessage}
         </Alert>
       </Snackbar>
 
-      {/* Call Info Bar */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "12px 20px",
-          backgroundColor: "rgba(0,0,0,0.5)",
-          backdropFilter: "blur(10px)",
-          zIndex: 10,
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Avatar 
-            sx={{ 
-              width: 36, 
-              height: 36, 
-              marginRight: 2,
-              bgcolor: 'primary.main',
-              border: '2px solid white'
-            }}
-          >
-            {studentName.charAt(0)}
-          </Avatar>
-          <Typography variant="subtitle1" color="white">
-            {studentName}
-          </Typography>
-        </Box>
-        <Paper
-          elevation={0}
-          sx={{
-            backgroundColor: "rgba(255,255,255,0.2)",
-            color: "white",
-            padding: "4px 12px",
-            borderRadius: 16,
-            backdropFilter: "blur(5px)",
-          }}
-        >
-          <Typography variant="body2" fontWeight="medium">
-            {formatDuration(callDuration)}
-          </Typography>
-        </Paper>
-      </Box>
-
-      {/* Main Video Container */}
+      {/* Video Section */}
       <Box
         sx={{
           flexGrow: 1,
@@ -634,218 +526,84 @@ export default function VideoCallPage() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "#000",
         }}
       >
-        {/* Main Remote Video */}
         <video
-          id="hostVideo"
+          className="receiver-host-video"
           autoPlay
-          playsInline
+          id="hostVideo"
           style={{
             width: "100%",
             height: "100%",
-            objectFit: "contain", // Changed from cover to contain as requested
+            objectFit: "cover",
+            borderRadius: "8px",
             backgroundColor: "#000",
           }}
-        />
+        ></video>
 
-        {/* Local Video Preview */}
+        {/* Control Buttons Overlay */}
         <Box
           sx={{
             position: "absolute",
-            top: 70, // Below the top bar
-            right: 20,
-            width: 120,
-            height: 180,
-            borderRadius: 2,
-            overflow: "hidden",
-            border: "2px solid rgba(255,255,255,0.5)",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-            zIndex: 5,
-          }}
-        >
-          <video
-            id="localVideo"
-            autoPlay
-            playsInline
-            muted
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              transform: "scaleX(-1)", // Mirror effect
-            }}
-          />
-          {!isCameraEnabled && (
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: "rgba(0,0,0,0.7)",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Typography variant="caption" color="white">
-                Camera Off
-              </Typography>
-            </Box>
-          )}
-        </Box>
-
-        {/* Screen Share Video (hidden by default) */}
-        <video
-          id="screenVideo"
-          style={{ 
-            display: isScreenShared ? "block" : "none",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            zIndex: 4,
-          }}
-          autoPlay
-          playsInline
-        />
-
-        {/* Secondary Control Buttons */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: 70,
-            left: 20,
+            bottom: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
             display: "flex",
-            flexDirection: "column",
             gap: 2,
-          }}
-        >
-          <Tooltip title="Participants" placement="right">
-            <IconButton
-              onClick={toggleUserList}
-              sx={{
-                backgroundColor: isUserListVisible ? "primary.main" : "rgba(0,0,0,0.6)",
-                color: "#fff",
-                "&:hover": { backgroundColor: "primary.dark" },
-                width: 40,
-                height: 40,
-              }}
-            >
-              <FaUserFriends size={18} />
-            </IconButton>
-          </Tooltip>
-          
-          <Tooltip title="Chat" placement="right">
-            <IconButton
-              sx={{
-                backgroundColor: "rgba(0,0,0,0.6)",
-                color: "#fff",
-                "&:hover": { backgroundColor: "rgba(0,0,0,0.8)" },
-                width: 40,
-                height: 40,
-              }}
-            >
-              <FaComments size={18} />
-            </IconButton>
-          </Tooltip>
-          
-          <Tooltip title={isScreenShared ? "Stop Sharing" : "Share Screen"} placement="right">
-            <IconButton
-              onClick={isScreenShared ? stopScreenShare : startScreenShare}
-              sx={{
-                backgroundColor: isScreenShared ? "error.main" : "rgba(0,0,0,0.6)",
-                color: "#fff",
-                "&:hover": { backgroundColor: isScreenShared ? "error.dark" : "rgba(0,0,0,0.8)" },
-                width: 40,
-                height: 40,
-              }}
-            >
-              {isScreenShared ? <FaStopCircle size={18} /> : <FaDesktop size={18} />}
-            </IconButton>
-          </Tooltip>
-        </Box>
-
-        {/* Main Control Buttons */}
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 30,
-            left: 0,
-            right: 0,
-            display: "flex",
-            justifyContent: "center",
-            gap: 3,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            padding: "10px 20px",
+            borderRadius: "30px",
           }}
         >
           <IconButton
             onClick={toggleMute}
             sx={{
-              backgroundColor: isMuted ? "#f44336" : "#4caf50",
-              color: "white",
-              width: 56,
-              height: 56,
-              boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
-              "&:hover": { 
-                backgroundColor: isMuted ? "#d32f2f" : "#388e3c",
-                transform: "scale(1.05)" 
-              },
-              transition: "transform 0.2s",
+              backgroundColor: isMuted ? "#f44336" : "#1976d2",
+              color: "#fff",
+              "&:hover": { backgroundColor: isMuted ? "#d32f2f" : "#1565c0" },
             }}
           >
-            {isMuted ? <FaMicrophoneSlash size={22} /> : <FaMicrophone size={22} />}
+            {isMuted ? <FaMicrophoneSlash /> : <FaMicrophone />}
           </IconButton>
-          
-          <IconButton
-            onClick={endCall}
-            sx={{
-              backgroundColor: "#f44336",
-              color: "white",
-              width: 64,
-              height: 64,
-              boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
-              "&:hover": { 
-                backgroundColor: "#d32f2f",
-                transform: "scale(1.05)" 
-              },
-              transition: "transform 0.2s",
-            }}
-          >
-            <FaSignOutAlt size={26} />
-          </IconButton>
-          
           <IconButton
             onClick={toggleCamera}
             sx={{
-              backgroundColor: isCameraEnabled ? "#4caf50" : "#f44336",
-              color: "white",
-              width: 56,
-              height: 56,
-              boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
-              "&:hover": { 
-                backgroundColor: isCameraEnabled ? "#388e3c" : "#d32f2f",
-                transform: "scale(1.05)" 
-              },
-              transition: "transform 0.2s",
+              backgroundColor: !isCameraEnabled ? "#f44336" : "#1976d2",
+              color: "#fff",
+              "&:hover": { backgroundColor: !isCameraEnabled ? "#d32f2f" : "#1565c0" },
             }}
           >
-            {isCameraEnabled ? <FaVideo size={22} /> : <FaVideoSlash size={22} />}
+            {isCameraEnabled ? <FaVideo /> : <FaVideoSlash />}
           </IconButton>
+          <Button
+            onClick={endCall}
+            variant="contained"
+            color="error"
+            startIcon={<FaSignOutAlt />}
+            sx={{
+              borderRadius: "30px",
+              padding: "6px 16px",
+            }}
+          >
+            End Call
+          </Button>
         </Box>
       </Box>
 
-      {/* Hidden container for remote streams */}
+      {/* Remote Streams */}
       <Box
-        id="remoteStreamsContainer"
+        id="remoteStreams"
         sx={{
-          display: "none",
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 2,
+          mt: 2,
+          padding: 2,
         }}
-      />
+      >
+        {/* Remote video streams will be dynamically added here */}
+      </Box>
     </Box>
   );
 }
