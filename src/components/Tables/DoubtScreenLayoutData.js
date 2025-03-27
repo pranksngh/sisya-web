@@ -313,7 +313,7 @@ const generateVideoToken = async(userData)=>{
   const randomRoomId = Math.random().toString(36).substring(2, 10);
   const username = user.mentor.name; // Replace with dynamic username if needed
   const randomNumber = Math.floor(1000 + Math.random() * 9000); // Generate a random 4-digit number
-  const userId = `${randomNumber}`;
+  const userId = `host_${randomNumber}`;
 
   const data = {
     userId: userId,
@@ -333,7 +333,7 @@ const generateVideoToken = async(userData)=>{
     if(result.success){
       console.log("video token generated successfully");
       const videotoken = result.token;
-     // console.log("token is", result);
+      console.log("USERID is", userId);
       navigate("/videocall",{
         state: {
             userData,

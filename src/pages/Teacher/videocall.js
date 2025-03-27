@@ -136,9 +136,9 @@ export default function VideoCallPage() {
         }
 
       
+        const userID = userId;
         const token = videotoken;
-        const USERID = userId;
-        console.log("assigned userid is ", USERID);
+            console.log("assigned userid is ", userID);
         // Register room state change callback
         zg.on('roomStateUpdate', (roomID, state, errorCode, extendedData) => {
           if (state === 'CONNECTED') {
@@ -155,7 +155,7 @@ export default function VideoCallPage() {
         });
 
         // Login to room
-        zg.loginRoom(roomID, token, { USERID, userName }, { userUpdate: true });
+        zg.loginRoom(roomID, token, { userID, userName }, { userUpdate: true });
 
         zg.setDebugVerbose(false);
 
