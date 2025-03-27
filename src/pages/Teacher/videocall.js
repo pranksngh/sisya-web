@@ -26,6 +26,8 @@ export default function VideoCallPage() {
   const videostreamID = "hostvideo_" + uuidv4();
   const screenStreamID = "hostscreen_" + uuidv4();
   
+  console.log("my userid is ", userId);
+  console.log("my video token is ", videotoken);
   // Call state management
   const [callStatus, setCallStatus] = useState('calling'); // 'calling', 'connected', 'ended'
   const [callDuration, setCallDuration] = useState(0);
