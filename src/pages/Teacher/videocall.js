@@ -1,44 +1,56 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ZegoExpressEngine } from "zego-express-engine-webrtc";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { onMessage } from 'firebase/messaging';
 import { messaging } from '../../firebaseConfig';
 import { getUser } from '../../Functions/Login';
-import { Button, Box, IconButton, Alert, Snackbar } from "@mui/material";
-import { FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash, FaSignOutAlt } from "react-icons/fa";
+import { 
+  Button, Box, IconButton, Alert, Snackbar, Typography, Avatar, 
+  CircularProgress, Paper 
+} from "@mui/material";
+import { 
+  FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash, 
+  FaPhoneSlash, FaPhone 
+} from "react-icons/fa";
 
 export default function VideoCallPage() {
   const userInfo = getUser();
   const location = useLocation();
   const navigate = useNavigate();
   const { userData, user, videotoken, randomRoomId, userId } = location.state || {};
-  const appID = 1500762473; // Your App ID
-  const serverSecret = "175fa0e5958efde603f2ec805c7d6120"; // Your Server Secret
+  const appID = 1500762473;
+  const serverSecret = "175fa0e5958efde603f2ec805c7d6120";
   const userName = user?.mentor?.name || "Unknown User";
   const roomID = randomRoomId;
   const videostreamID = "hostvideo_" + uuidv4();
   const screenStreamID = "hostscreen_" + uuidv4();
   
+  // Call state management
+  const [callStatus, setCallStatus] = useState('calling'); // 'calling', 'connected', 'ended'
+  const [callDuration, setCallDuration] = useState(0);
+  const durationTimerRef = useRef(null);
+  
+  // Zego engine state
   const [zegoEngine, setZegoEngine] = useState(null);
+  const [localStream, setLocalStream] = useState(null);
+  const [remoteStreams, setRemoteStreams] = useState([]);
+  const [screenStream, setScreenStream] = useState(null);
   const [isScreenShared, setIsScreenShared] = useState(false);
-  const [isUserListVisible, setIsUserListVisible] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [userList, setUserList] = useState([]);
+  
+  // UI controls
   const [isMuted, setIsMuted] = useState(false);
   const [isCameraEnabled, setIsCameraEnabled] = useState(true);
-  const [localStream, setLocalStream] = useState(null);
-  const [screenStream, setScreenStream] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState("");
-  const [userList, setUserList] = useState([]);
-  const [speakRequests, setSpeakRequests] = useState([]);
-  const [isSpeakRequestVisible, setIsSpeakRequestVisible] = useState(false);
-  const [remoteStreams, setRemoteStreams] = useState([]);
-  
-  // New state for alerts
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [alertSeverity, setAlertSeverity] = useState("info"); // "success", "error", "warning", "info"
-
+  const [alertSeverity, setAlertSeverity] = useState("info");
+  
+  // User data
+  const studentName = userData?.name || "Student";
+  const studentAvatar = userData?.profilePic || null;
+  
   // Function to show alerts
   const showAlert = (message, severity = "info") => {
     setAlertMessage(message);
@@ -51,20 +63,64 @@ export default function VideoCallPage() {
     setAlertOpen(false);
   };
 
-  onMessage(messaging, (payload) => {
-    console.log('Message received in the foreground:', payload);
-    const notificationData = payload.data;
-    console.log('Notification Data:', notificationData);
+  // Format call duration
+  const formatDuration = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
-    // Check if the notification type is 'end_call'
-    if (notificationData.type === 'end_call') {
-      console.log('The call has ended.');
-      showAlert('Call ended by the other participant', 'info');
-      leaveRoom();
-    }
-  });
+  // Start call duration timer when connected
+  const startCallTimer = () => {
+    if (durationTimerRef.current) clearInterval(durationTimerRef.current);
+    
+    durationTimerRef.current = setInterval(() => {
+      setCallDuration(prev => prev + 1);
+    }, 1000);
+  };
 
+  // Handle Firebase notifications
   useEffect(() => {
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log('Message received in the foreground:', payload);
+      const notificationData = payload.data;
+      console.log('Notification Data:', notificationData);
+
+      if (notificationData.type === 'end_call') {
+        console.log('The call has ended.');
+        showAlert('Call ended by the other participant', 'info');
+        setCallStatus('ended');
+        leaveRoom();
+      } else if (notificationData.type === 'call_accepted') {
+        console.log('Call was accepted');
+        showAlert('Call connected', 'success');
+        setCallStatus('connected');
+        startCallTimer();
+      } else if (notificationData.type === 'call_declined') {
+        console.log('Call was declined');
+        showAlert('Call declined by recipient', 'warning');
+        setCallStatus('ended');
+        setTimeout(() => leaveRoom(), 2000);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Initialize Zego engine
+  useEffect(() => {
+    // Create container for remote streams if it doesn't exist
+    const createRemoteStreamContainer = () => {
+      if (!document.getElementById('remoteStreams')) {
+        const remoteStreamsDiv = document.createElement('div');
+        remoteStreamsDiv.id = 'remoteStreams';
+        remoteStreamsDiv.style.display = 'none';
+        document.body.appendChild(remoteStreamsDiv);
+      }
+    };
+
+    createRemoteStreamContainer();
+
     const initZego = async () => {
       try {
         const zg = new ZegoExpressEngine(appID, serverSecret);
@@ -77,10 +133,10 @@ export default function VideoCallPage() {
           return;
         }
 
-        const userID = "prashant706966";
-        const token = "04AAAAAGflivgADKP4WcMRPYs4YTqLlgC5QprAUtbjmIuX5USqu2rK3roKABREynDSsf9s3YiZunjiLfWJcOKI8SQ0+204BYyaWMtBmLUA8aob3lUSSMRKAe2HPwzh0hPAI/UxdJhWr517Q6pTzLP8LYCPukH4iNVxSexMkApK59zXRKV+vEBIDX6Yl1nO7F8GcSrlB6bDnpoFtUjIM7MYZDCMHJgnkwe9Iaf+pUF/fc7GCqgvyElZKFySa4CIr4YgV8S4o22d3/j7TL60DOnWbdUB";
+        const userID = userId || "prashant706966";
+        const token = videotoken || "04AAAAAGflivgADKP4WcMRPYs4YTqLlgC5QprAUtbjmIuX5USqu2rK3roKABREynDSsf9s3YiZunjiLfWJcOKI8SQ0+204BYyaWMtBmLUA8aob3lUSSMRKAe2HPwzh0hPAI/UxdJhWr517Q6pTzLP8LYCPukH4iNVxSexMkApK59zXRKV+vEBIDX6Yl1nO7F8GcSrlB6bDnpoFtUjIM7MYZDCMHJgnkwe9Iaf+pUF/fc7GCqgvyElZKFySa4CIr4YgV8S4o22d3/j7TL60DOnWbdUB";
         
-        // Register room state change callback to monitor login status
+        // Register room state change callback
         zg.on('roomStateUpdate', (roomID, state, errorCode, extendedData) => {
           if (state === 'CONNECTED') {
             console.log('Successfully logged into room:', roomID);
@@ -95,12 +151,13 @@ export default function VideoCallPage() {
           }
         });
 
-        // Attempt to login to the room
+        // Login to room
         zg.loginRoom(roomID, token, { userID, userName }, { userUpdate: true });
 
         zg.setDebugVerbose(false);
 
         try {
+          // Create local stream
           const stream = await zg.createStream({
             camera: {
               video: true,
@@ -109,6 +166,7 @@ export default function VideoCallPage() {
           });
           setLocalStream(stream);
           
+          // Create container for local video
           const remoteDivID = `remoteStream_${videostreamID}`;
           let remoteDiv = document.getElementById(remoteDivID);
           
@@ -128,9 +186,16 @@ export default function VideoCallPage() {
             console.log(`User stream added with ID: ${videostreamID}`);
           }
           
+          // Set local stream to video element
           const videoElement = document.getElementById(`video_${videostreamID}`);
           if (videoElement) {
             videoElement.srcObject = stream;
+          }
+          
+          // Set local stream to UI video element
+          const localVideoElement = document.getElementById('localVideo');
+          if (localVideoElement) {
+            localVideoElement.srcObject = stream;
           }
           
           // Start publishing the stream
@@ -141,6 +206,7 @@ export default function VideoCallPage() {
           showAlert("Failed to access camera and microphone. Please check permissions.", "error");
         }
 
+        // Publisher state updates
         zg.on('publisherStateUpdate', (result) => {
           if (result.state === 'PUBLISHING') {
             console.log('Publishing started');
@@ -152,29 +218,49 @@ export default function VideoCallPage() {
           }
         });
 
+        // Room stream updates
         zg.on('roomStreamUpdate', async (roomID, updateType, streamList) => {
           console.log("Room stream update type is " + JSON.stringify(updateType));
         
           if (updateType === 'ADD') {
             showAlert(`New stream(s) added to the room`, "info");
-            streamList.forEach(async (stream) => {
+            
+            // When a stream is added, update call status to connected
+            if (callStatus === 'calling') {
+              setCallStatus('connected');
+              startCallTimer();
+            }
+            
+            for (const stream of streamList) {
               console.log("stream id is " + stream.streamID);
-              const remoteStream = await zg.startPlayingStream(stream.streamID);
-              setRemoteStreams((prevStreams) => [...prevStreams, remoteStream]);
-        
-              const streamType = stream.streamID.startsWith("hostvideo") ? 'Video' : 
-                                stream.streamID.startsWith("hostscreen") ? 'Screen' : 'User';
-        
-              console.log("stream type is " + streamType);
-              if (streamType === 'User') {
-                const videoElement = document.getElementById('hostVideo');
-                if (videoElement) {
-                  videoElement.srcObject = remoteStream;
-                } else {
-                  console.log('Video element with ID "hostVideo" not found');
+              try {
+                const remoteStream = await zg.startPlayingStream(stream.streamID);
+                setRemoteStreams((prevStreams) => [...prevStreams, remoteStream]);
+          
+                const streamType = stream.streamID.startsWith("hostvideo") ? 'Video' : 
+                                  stream.streamID.startsWith("hostscreen") ? 'Screen' : 'User';
+          
+                console.log("stream type is " + streamType);
+                
+                // Set remote stream to UI video element
+                const remoteVideoElement = document.getElementById('remoteVideo');
+                if (remoteVideoElement && streamType === 'User') {
+                  remoteVideoElement.srcObject = remoteStream;
+                  console.log('Remote video element set up');
+                } else if (streamType === 'User') {
+                  // If the element doesn't exist yet, try again after a short delay
+                  setTimeout(() => {
+                    const delayedElement = document.getElementById('remoteVideo');
+                    if (delayedElement) {
+                      delayedElement.srcObject = remoteStream;
+                      console.log('Remote video element set up after delay');
+                    }
+                  }, 500);
                 }
+              } catch (error) {
+                console.error(`Error playing stream ${stream.streamID}:`, error);
               }
-            });
+            }
           } else if (updateType === 'DELETE') {
             streamList.forEach((stream) => {
               const streamDiv = document.getElementById(`remoteStream_${stream.streamID}`);
@@ -191,6 +277,7 @@ export default function VideoCallPage() {
           }
         });
 
+        // Message handling
         zg.on('IMRecvBroadcastMessage', (roomID, chatData) => {
           if (chatData && chatData.length > 0) {
             chatData.forEach(data => {
@@ -203,6 +290,7 @@ export default function VideoCallPage() {
           }
         });
 
+        // Room user updates
         zg.on('roomUserUpdate', (roomID, updateType, userList) => {
           console.log("Usertype is " + JSON.stringify(updateType));
           if (updateType === 'ADD') {
@@ -217,6 +305,7 @@ export default function VideoCallPage() {
           }
         });
 
+        // Stream extra info updates
         zg.on('streamExtraInfoUpdate', (roomID, streamList) => {
           streamList.forEach((stream) => {
             if (stream.extraInfo && stream.extraInfo.reason === '18') {
@@ -235,7 +324,18 @@ export default function VideoCallPage() {
 
     initZego();
 
+    // Set a timeout to automatically end the call if not answered
+    const callTimeoutId = setTimeout(() => {
+      if (callStatus === 'calling') {
+        showAlert("Call not answered", "warning");
+        leaveRoom();
+      }
+    }, 60000); // 60 seconds timeout
+
     return () => {
+      clearTimeout(callTimeoutId);
+      if (durationTimerRef.current) clearInterval(durationTimerRef.current);
+      
       if (zegoEngine) {
         zegoEngine.stopPublishingStream(videostreamID);
         if (screenStream) {
@@ -244,9 +344,16 @@ export default function VideoCallPage() {
         zegoEngine.logoutRoom(roomID);
         zegoEngine.destroyEngine();
       }
+      
+      // Clean up the remote streams container
+      const remoteStreamsDiv = document.getElementById('remoteStreams');
+      if (remoteStreamsDiv) {
+        document.body.removeChild(remoteStreamsDiv);
+      }
     };
   }, []);
 
+  // Toggle microphone
   const toggleMute = () => {
     if (localStream) {
       if (isMuted) {
@@ -261,6 +368,7 @@ export default function VideoCallPage() {
     }
   };
 
+  // Toggle camera
   const toggleCamera = () => {
     if (localStream) {
       const videoTrack = localStream.getVideoTracks()[0];
@@ -277,6 +385,7 @@ export default function VideoCallPage() {
     }
   };
   
+  // Send call notification
   const initiateCall = async() => {
     const token = localStorage.getItem('notificationToken');
     try {
@@ -322,7 +431,7 @@ export default function VideoCallPage() {
 
       if(result.success){
         console.log("calling notification sent");
-        showAlert("Call notification sent to recipient", "success");
+        showAlert("Calling...", "info");
       } else {
         console.log("calling notification sent failed");
         showAlert("Failed to send call notification", "warning");
@@ -333,6 +442,7 @@ export default function VideoCallPage() {
     }
   }  
 
+  // End call
   const endCall = async() => {
     try {
       const data = {
@@ -358,72 +468,23 @@ export default function VideoCallPage() {
 
       if(result.success){
         console.log("call end working fine !!");
-        showAlert("Call ended successfully", "success");
+        showAlert("Call ended", "info");
+        setCallStatus('ended');
         leaveRoom();
       } else {
         console.log("end call not working");
-        showAlert("Failed to end call properly", "warning");
-        leaveRoom(); // Still try to leave the room
+        leaveRoom();
       }
     } catch (error) {
       console.log('JSON Stringify Error:', error);
-      showAlert("Error ending call", "error");
-      leaveRoom(); // Still try to leave the room
+      leaveRoom();
     }
   }  
 
-  const startScreenShare = async () => {
-    if (zegoEngine) {
-      try {
-        const screenStream = await zegoEngine.createStream({
-          screen: true,
-          video: {
-            quality: 4,
-            frameRate: 15,
-          },
-        });
-        setScreenStream(screenStream);
-        setIsScreenShared(true);
-  
-        const screenVideoElement = document.getElementById('screenVideo');
-        if (screenVideoElement) {
-          screenVideoElement.srcObject = screenStream;
-        } else {
-          console.error("Screen video element not found in DOM");
-          showAlert("Screen sharing element not found", "error");
-        }
-  
-        zegoEngine.startPublishingStream(screenStreamID, screenStream);
-        showAlert("Screen sharing started", "success");
-  
-        screenStream.onended = () => {
-          stopScreenShare();
-        };
-      } catch (error) {
-        console.error('Error sharing screen:', error);
-        showAlert(`Failed to share screen: ${error.message}`, "error");
-      }
-    }
-  };
-  
-  const stopScreenShare = () => {
-    if (zegoEngine && screenStream) {
-      zegoEngine.stopPublishingStream(screenStreamID);
-      setIsScreenShared(false);
-      setScreenStream(null);
-
-      // Reset the screen share element
-      const screenVideoElement = document.getElementById('screenVideo');
-      if (screenVideoElement) {
-        screenVideoElement.srcObject = null;
-        screenVideoElement.innerHTML = `<div class="no-screen-share"><p>Start sharing your screen</p></div>`;
-      }
-      
-      showAlert("Screen sharing stopped", "info");
-    }
-  };
-
+  // Leave room and navigate back
   const leaveRoom = () => {
+    if (durationTimerRef.current) clearInterval(durationTimerRef.current);
+    
     if (zegoEngine) {
       zegoEngine.stopPublishingStream(videostreamID);
       if (screenStream) {
@@ -432,80 +493,234 @@ export default function VideoCallPage() {
       zegoEngine.logoutRoom(roomID);
       zegoEngine.destroyEngine();
       console.log('Left room and stopped publishing' + roomID);
-      showAlert("You have left the video call", "info");
       navigate("../teacher");
     }
   };
 
-  const sendMessage = () => {
-    if (zegoEngine && message.trim() !== "") {
-      zegoEngine.sendBroadcastMessage(roomID, message).then(() => {
-        setMessages([...messages, { userID: "prashant90654", userName, message }]);
-        setMessage("");
-        showAlert("Message sent", "success");
-      }).catch(error => {
-        console.error("Failed to send message", error);
-        showAlert("Failed to send message", "error");
-      });
-    }
-  };
-
-  const toggleUserList = () => {
-    setIsUserListVisible(!isUserListVisible);
-    setIsSpeakRequestVisible(false);
-  };
-
-  const toggleSpeakRequestList = () => {
-    setIsSpeakRequestVisible(!isSpeakRequestVisible);
-    setIsUserListVisible(false);
-  };
-
-  const toggleUserMic = (userID) => {
-    setUserList(prevList =>
-      prevList.map(user =>
-        user.userID === userID ? { ...user, isMuted: !user.isMuted } : user
-      )
-    );
-    const user = userList.find(user => user.userID === userID);
-    const newMicStatus = user ? !user.isMuted : false;
-    showAlert(`User ${userID} microphone ${newMicStatus ? 'muted' : 'unmuted'}`, "info");
-  };
-
-  const handleAcceptSpeakRequest = (userID) => {
-    console.log('Accepted speak request for user:', userID);
-    setUserList(prevList =>
-      prevList.map(user =>
-        user.userID === userID ? { ...user, isMuted: false } : user
-      )
-    );
-    setSpeakRequests((prevRequests) => prevRequests.filter(req => req.userID !== userID));
-    showAlert(`Accepted speak request from user ${userID}`, "success");
-  };
-
-  const handleDeclineSpeakRequest = (userID) => {
-    console.log('Declined speak request for user:', userID);
-    setUserList(prevList =>
-      prevList.map(user =>
-        user.userID === userID ? { ...user, isMuted: true } : user
-      )
-    );
-    setSpeakRequests((prevRequests) => prevRequests.filter(req => req.userID !== userID));
-    showAlert(`Declined speak request from user ${userID}`, "info");
-  };
-
-  return (
+  // Render calling UI
+  const renderCallingUI = () => (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: '100vh',
-        backgroundColor: "#f4f4f4",
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#1a1a1a',
+        padding: 3,
       }}
     >
+      <Avatar
+        src={studentAvatar}
+        alt={studentName}
+        sx={{
+          width: 120,
+          height: 120,
+          marginBottom: 3,
+          border: '4px solid #4caf50',
+          backgroundColor: '#2196f3',
+          fontSize: '3rem'
+        }}
+      >
+        {studentName.charAt(0)}
+      </Avatar>
+      
+      <Typography variant="h4" sx={{ color: 'white', marginBottom: 1, textAlign: 'center' }}>
+        {studentName}
+      </Typography>
+      
+      <Typography variant="body1" sx={{ color: '#bdbdbd', marginBottom: 4 }}>
+        Calling...
+      </Typography>
+      
+      <Box sx={{ marginBottom: 3 }}>
+        <CircularProgress size={36} sx={{ color: '#4caf50' }} />
+      </Box>
+      
+      <Box sx={{ display: 'flex', gap: 3, marginTop: 4 }}>
+        <IconButton
+          onClick={endCall}
+          sx={{
+            backgroundColor: '#f44336',
+            color: 'white',
+            width: 60,
+            height: 60,
+            '&:hover': { backgroundColor: '#d32f2f' },
+          }}
+        >
+          <FaPhoneSlash size={24} />
+        </IconButton>
+      </Box>
+      
+      {/* Hidden local video during calling state */}
+      <Box sx={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}>
+        <video id="localVideo" autoPlay playsInline muted></video>
+      </Box>
+    </Box>
+  );
+
+  // Render connected call UI
+  const renderConnectedUI = () => (
+    <Box sx={{ height: '100%', position: 'relative' }}>
+      {/* Remote Video (Full Screen) */}
+      <video
+        id="remoteVideo"
+        autoPlay
+        playsInline
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          backgroundColor: '#000',
+        }}
+      />
+      
+      {/* Call Duration */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 20,
+          left: 0,
+          right: 0,
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            color: 'white',
+            padding: '4px 12px',
+            borderRadius: 16,
+          }}
+        >
+          <Typography variant="body2">
+            {formatDuration(callDuration)}
+          </Typography>
+        </Paper>
+      </Box>
+      
+      {/* Local Video (PiP) */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 20,
+          right: 20,
+          width: 100,
+          height: 150,
+          borderRadius: 2,
+          overflow: 'hidden',
+          border: '2px solid white',
+        }}
+      >
+        <video
+          id="localVideo"
+          autoPlay
+          playsInline
+          muted
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            transform: 'scaleX(-1)', // Mirror effect
+          }}
+        />
+      </Box>
+      
+      {/* Call Controls */}
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 30,
+          left: 0,
+          right: 0,
+          display: 'flex',
+          justifyContent: 'center',
+          gap: 2,
+        }}
+      >
+        <IconButton
+          onClick={toggleMute}
+          sx={{
+            backgroundColor: isMuted ? '#f44336' : '#4caf50',
+            color: 'white',
+            width: 56,
+            height: 56,
+            '&:hover': { backgroundColor: isMuted ? '#d32f2f' : '#388e3c' },
+          }}
+        >
+          {isMuted ? <FaMicrophoneSlash size={20} /> : <FaMicrophone size={20} />}
+        </IconButton>
+        
+        <IconButton
+          onClick={endCall}
+          sx={{
+            backgroundColor: '#f44336',
+            color: 'white',
+            width: 64,
+            height: 64,
+            '&:hover': { backgroundColor: '#d32f2f' },
+          }}
+        >
+          <FaPhoneSlash size={24} />
+        </IconButton>
+        
+        <IconButton
+          onClick={toggleCamera}
+          sx={{
+            backgroundColor: isCameraEnabled ? '#4caf50' : '#f44336',
+            color: 'white',
+            width: 56,
+            height: 56,
+            '&:hover': { backgroundColor: isCameraEnabled ? '#388e3c' : '#d32f2f' },
+          }}
+        >
+          {isCameraEnabled ? <FaVideo size={20} /> : <FaVideoSlash size={20} />}
+        </IconButton>
+      </Box>
+    </Box>
+  );
+
+  // Render ended call UI
+  const renderEndedUI = () => (
+    <Box
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#1a1a1a',
+        padding: 3,
+      }}
+    >
+      <Typography variant="h4" sx={{ color: 'white', marginBottom: 2 }}>
+        Call Ended
+      </Typography>
+      
+      <Typography variant="body1" sx={{ color: '#bdbdbd', marginBottom: 4 }}>
+        {callDuration > 0 ? `Duration: ${formatDuration(callDuration)}` : 'Call was not connected'}
+      </Typography>
+      
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => navigate("../teacher")}
+        sx={{ marginTop: 3 }}
+      >
+        Return to Dashboard
+      </Button>
+    </Box>
+  );
+
+  // Main render
+  return (
+    <Box sx={{ height: '100vh', overflow: 'hidden' }}>
       {/* Alert/Snackbar for notifications */}
       <Snackbar 
         open={alertOpen} 
-        autoHideDuration={6000} 
+        autoHideDuration={3000} 
         onClose={handleAlertClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
@@ -517,93 +732,14 @@ export default function VideoCallPage() {
           {alertMessage}
         </Alert>
       </Snackbar>
-
-      {/* Video Section */}
-      <Box
-        sx={{
-          flexGrow: 1,
-          position: "relative",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <video
-          className="receiver-host-video"
-          autoPlay
-          id="hostVideo"
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            borderRadius: "8px",
-            backgroundColor: "#000",
-          }}
-        ></video>
-
-        {/* Control Buttons Overlay */}
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: "20px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            display: "flex",
-            gap: 2,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            padding: "10px 20px",
-            borderRadius: "30px",
-          }}
-        >
-          <IconButton
-            onClick={toggleMute}
-            sx={{
-              backgroundColor: isMuted ? "#f44336" : "#1976d2",
-              color: "#fff",
-              "&:hover": { backgroundColor: isMuted ? "#d32f2f" : "#1565c0" },
-            }}
-          >
-            {isMuted ? <FaMicrophoneSlash /> : <FaMicrophone />}
-          </IconButton>
-          <IconButton
-            onClick={toggleCamera}
-            sx={{
-              backgroundColor: !isCameraEnabled ? "#f44336" : "#1976d2",
-              color: "#fff",
-              "&:hover": { backgroundColor: !isCameraEnabled ? "#d32f2f" : "#1565c0" },
-            }}
-          >
-            {isCameraEnabled ? <FaVideo /> : <FaVideoSlash />}
-          </IconButton>
-          <Button
-            onClick={endCall}
-            variant="contained"
-            color="error"
-            startIcon={<FaSignOutAlt />}
-            sx={{
-              borderRadius: "30px",
-              padding: "6px 16px",
-            }}
-          >
-            End Call
-          </Button>
-        </Box>
-      </Box>
-
-      {/* Remote Streams */}
-      <Box
-        id="remoteStreams"
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: 2,
-          mt: 2,
-          padding: 2,
-        }}
-      >
-        {/* Remote video streams will be dynamically added here */}
-      </Box>
+      
+      {/* Render appropriate UI based on call status */}
+      {callStatus === 'calling' && renderCallingUI()}
+      {callStatus === 'connected' && renderConnectedUI()}
+      {callStatus === 'ended' && renderEndedUI()}
+      
+      {/* Hidden video elements for screen sharing */}
+      <video id="screenVideo" style={{ display: 'none' }} autoPlay playsInline />
     </Box>
   );
 }
