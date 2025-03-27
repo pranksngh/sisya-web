@@ -288,6 +288,7 @@ export default function VideoCallPage() {
             showAlert(`${userList.length} user(s) joined the room`, "info");
           } else if (updateType === 'DELETE') {
             setUserList((prevList) => prevList.filter(user => !userList.find(u => u.userID === user.userID)));
+            leaveRoom();
             showAlert(`${userList.length} user(s) left the room`, "info");
           }
         });
@@ -480,7 +481,7 @@ export default function VideoCallPage() {
       zegoEngine.logoutRoom(roomID);
       zegoEngine.destroyEngine();
       console.log('Left room and stopped publishing' + roomID);
-      navigate("../teacher");
+      navigate("../dashboard");
     }
   };
 
