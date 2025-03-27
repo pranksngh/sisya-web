@@ -28,10 +28,12 @@ export default function VideoCallPage() {
   
   console.log("my userid is ", userId);
   console.log("my video token is ", videotoken);
+  
   // Call state management
   const [callStatus, setCallStatus] = useState('calling'); // 'calling', 'connected', 'ended'
   const [callDuration, setCallDuration] = useState(0);
   const durationTimerRef = useRef(null);
+  const navigateRef = useRef(false); // To track if navigation has been triggered
   
   // Zego engine state
   const [zegoEngine, setZegoEngine] = useState(null);
@@ -52,18 +54,6 @@ export default function VideoCallPage() {
   // User data
   const studentName = userData?.name || "Student";
   const studentAvatar = userData?.profilePic || null;
-  onMessage(messaging, (payload) => {
-    console.log('Message received in the foreground:', payload);
-    const notificationData = payload.data;
-  console.log('Notification Data:', notificationData);
-
-  // Check if the notification type is 'end_call'
-  if (notificationData.type === 'end_call') {
-    console.log('The call has ended.');
-    // Handle the 'end_call' action as needed
-    leaveRoom();
-  }
-   });
   
   // Function to show alerts
   const showAlert = (message, severity = "info") => {
@@ -93,6 +83,57 @@ export default function VideoCallPage() {
     }, 1000);
   };
 
+  // Handle Firebase notifications
+  useEffect(() => {
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log('Message received in the foreground:', payload);
+      const notificationData = payload.data;
+      console.log('Notification Data:', notificationData);
+
+      // Check if the notification type is 'end_call'
+      if (notificationData.type === 'end_call') {
+        console.log('The call has ended.');
+        showAlert('Call ended by the other participant', 'info');
+        setCallStatus('ended');
+        handleLeaveRoom();
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Handle leaving room and navigation
+  const handleLeaveRoom = () => {
+    console.log("leave room hitting");
+    if (durationTimerRef.current) {
+      clearInterval(durationTimerRef.current);
+    }
+    
+    if (zegoEngine && !navigateRef.current) {
+      console.log("zego engine working");
+      try {
+        zegoEngine.stopPublishingStream(videostreamID);
+        if (screenStream) {
+          zegoEngine.stopPublishingStream(screenStreamID);
+        }
+        zegoEngine.logoutRoom(roomID);
+        zegoEngine.destroyEngine();
+        console.log('Left room and stopped publishing ' + roomID);
+      } catch (error) {
+        console.error("Error during cleanup:", error);
+      }
+      
+      // Set the navigation flag to prevent multiple navigations
+      navigateRef.current = true;
+      
+      // Use setTimeout to ensure state updates complete before navigation
+      setTimeout(() => {
+        console.log("Navigating to dashboard...");
+        navigate("/dashboard", { replace: true });
+      }, 300);
+    }
+  };
+
   // Initialize Zego engine
   useEffect(() => {
     // Create container for remote streams if it doesn't exist
@@ -119,10 +160,10 @@ export default function VideoCallPage() {
           return;
         }
 
-      
         const userID = userId;
         const token = videotoken;
-            console.log("assigned userid is ", userID);
+        console.log("assigned userid is ", userID);
+        
         // Register room state change callback
         zg.on('roomStateUpdate', (roomID, state, errorCode, extendedData) => {
           if (state === 'CONNECTED') {
@@ -139,18 +180,21 @@ export default function VideoCallPage() {
         });
 
         // Login to room
-        zg.loginRoom(roomID, token, { userID, userName }, { userUpdate: true });
+        await zg.loginRoom(roomID, token, { userID, userName }, { userUpdate: true });
+        console.log("Successfully logged into room");
 
         zg.setDebugVerbose(false);
 
         try {
           // Create local stream
+          console.log("Creating local stream...");
           const stream = await zg.createStream({
             camera: {
               video: true,
               audio: true,
             }
           });
+          console.log("Local stream created successfully");
           setLocalStream(stream);
           
           // Create container for local video
@@ -177,16 +221,31 @@ export default function VideoCallPage() {
           const videoElement = document.getElementById(`video_${videostreamID}`);
           if (videoElement) {
             videoElement.srcObject = stream;
+            console.log("Set srcObject for hidden video element");
           }
           
-          // Set local stream to UI video element
-          const localVideoElement = document.getElementById('localVideo');
-          if (localVideoElement) {
-            localVideoElement.srcObject = stream;
-          }
+          // IMPORTANT: Set local stream to UI video element
+          // This is done immediately and also with a delay to ensure it works
+          const setLocalVideoStream = () => {
+            const localVideoElement = document.getElementById('localVideo');
+            if (localVideoElement) {
+              localVideoElement.srcObject = stream;
+              console.log("Set srcObject for localVideo element");
+            } else {
+              console.warn("localVideo element not found");
+            }
+          };
+          
+          // Try immediately
+          setLocalVideoStream();
+          
+          // And also try after a short delay to ensure DOM is ready
+          setTimeout(setLocalVideoStream, 500);
           
           // Start publishing the stream
-          zg.startPublishingStream(videostreamID, stream);
+          console.log("Starting to publish stream:", videostreamID);
+          await zg.startPublishingStream(videostreamID, stream);
+          console.log("Publishing started for stream:", videostreamID);
           
         } catch (streamError) {
           console.error("Error creating stream:", streamError);
@@ -221,7 +280,9 @@ export default function VideoCallPage() {
             for (const stream of streamList) {
               console.log("stream id is " + stream.streamID);
               try {
+                console.log("Starting to play stream:", stream.streamID);
                 const remoteStream = await zg.startPlayingStream(stream.streamID);
+                console.log("Successfully started playing stream:", stream.streamID);
                 setRemoteStreams((prevStreams) => [...prevStreams, remoteStream]);
           
                 const streamType = stream.streamID.startsWith("hostvideo") ? 'Video' : 
@@ -230,20 +291,21 @@ export default function VideoCallPage() {
                 console.log("stream type is " + streamType);
                 
                 // Set remote stream to UI video element
-                const remoteVideoElement = document.getElementById('remoteVideo');
-                if (remoteVideoElement && streamType === 'User') {
-                  remoteVideoElement.srcObject = remoteStream;
-                  console.log('Remote video element set up');
-                } else if (streamType === 'User') {
-                  // If the element doesn't exist yet, try again after a short delay
-                  setTimeout(() => {
-                    const delayedElement = document.getElementById('remoteVideo');
-                    if (delayedElement) {
-                      delayedElement.srcObject = remoteStream;
-                      console.log('Remote video element set up after delay');
-                    }
-                  }, 500);
-                }
+                const setRemoteVideoStream = () => {
+                  const remoteVideoElement = document.getElementById('remoteVideo');
+                  if (remoteVideoElement && streamType === 'User') {
+                    remoteVideoElement.srcObject = remoteStream;
+                    console.log('Remote video element set up');
+                  } else if (streamType === 'User') {
+                    console.warn("remoteVideo element not found");
+                  }
+                };
+                
+                // Try immediately
+                setRemoteVideoStream();
+                
+                // And also try after a short delay
+                setTimeout(setRemoteVideoStream, 500);
               } catch (error) {
                 console.error(`Error playing stream ${stream.streamID}:`, error);
               }
@@ -288,8 +350,8 @@ export default function VideoCallPage() {
             showAlert(`${userList.length} user(s) joined the room`, "info");
           } else if (updateType === 'DELETE') {
             setUserList((prevList) => prevList.filter(user => !userList.find(u => u.userID === user.userID)));
-            leaveRoom();
-            showAlert(`${userList.length} user(s) left the room`, "info");
+            showAlert(`User(s) left the room`, "info");
+            handleLeaveRoom();
           }
         });
 
@@ -316,7 +378,7 @@ export default function VideoCallPage() {
     const callTimeoutId = setTimeout(() => {
       if (callStatus === 'calling') {
         showAlert("Call not answered", "warning");
-        leaveRoom();
+        handleLeaveRoom();
       }
     }, 60000); // 60 seconds timeout
 
@@ -324,13 +386,17 @@ export default function VideoCallPage() {
       clearTimeout(callTimeoutId);
       if (durationTimerRef.current) clearInterval(durationTimerRef.current);
       
-      if (zegoEngine) {
-        zegoEngine.stopPublishingStream(videostreamID);
-        if (screenStream) {
-          zegoEngine.stopPublishingStream(screenStreamID);
+      if (zegoEngine && !navigateRef.current) {
+        try {
+          zegoEngine.stopPublishingStream(videostreamID);
+          if (screenStream) {
+            zegoEngine.stopPublishingStream(screenStreamID);
+          }
+          zegoEngine.logoutRoom(roomID);
+          zegoEngine.destroyEngine();
+        } catch (error) {
+          console.error("Error during cleanup:", error);
         }
-        zegoEngine.logoutRoom(roomID);
-        zegoEngine.destroyEngine();
       }
       
       // Clean up the remote streams container
@@ -458,33 +524,16 @@ export default function VideoCallPage() {
         console.log("call end working fine !!");
         showAlert("Call ended", "info");
         setCallStatus('ended');
-        leaveRoom();
+        handleLeaveRoom();
       } else {
         console.log("end call not working");
-        leaveRoom();
+        handleLeaveRoom();
       }
     } catch (error) {
       console.log('JSON Stringify Error:', error);
-      leaveRoom();
+      handleLeaveRoom();
     }
   }  
-
-  // Leave room and navigate back
-  const leaveRoom = () => {
-    console.log("leave room hitting");
-    if (durationTimerRef.current) clearInterval(durationTimerRef.current);
-    
-    if (zegoEngine) {
-      zegoEngine.stopPublishingStream(videostreamID);
-      if (screenStream) {
-        zegoEngine.stopPublishingStream(screenStreamID);
-      }
-      zegoEngine.logoutRoom(roomID);
-      zegoEngine.destroyEngine();
-      console.log('Left room and stopped publishing' + roomID);
-      navigate("../dashboard");
-    }
-  };
 
   // Render calling UI
   const renderCallingUI = () => (
@@ -541,9 +590,31 @@ export default function VideoCallPage() {
         </IconButton>
       </Box>
       
-      {/* Hidden local video during calling state */}
-      <Box sx={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}>
-        <video id="localVideo" autoPlay playsInline muted></video>
+      {/* Local video during calling state - visible but small */}
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 120,
+          right: 20,
+          width: 80,
+          height: 120,
+          borderRadius: 2,
+          overflow: 'hidden',
+          border: '2px solid white',
+        }}
+      >
+        <video
+          id="localVideo"
+          autoPlay
+          playsInline
+          muted
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            transform: 'scaleX(-1)', // Mirror effect
+          }}
+        />
       </Box>
     </Box>
   );
@@ -590,17 +661,18 @@ export default function VideoCallPage() {
         </Paper>
       </Box>
       
-      {/* Local Video (PiP) */}
+      {/* Local Video (PiP) - Increased size and visibility */}
       <Box
         sx={{
           position: 'absolute',
           top: 20,
           right: 20,
-          width: 100,
-          height: 150,
+          width: 120,
+          height: 180,
           borderRadius: 2,
           overflow: 'hidden',
           border: '2px solid white',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.5)',
         }}
       >
         <video
@@ -613,6 +685,7 @@ export default function VideoCallPage() {
             height: '100%',
             objectFit: 'cover',
             transform: 'scaleX(-1)', // Mirror effect
+            backgroundColor: '#333', // Background color to make it visible even when no stream
           }}
         />
       </Box>
@@ -695,7 +768,7 @@ export default function VideoCallPage() {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => navigate("../teacher")}
+        onClick={() => navigate("/dashboard", { replace: true })}
         sx={{ marginTop: 3 }}
       >
         Return to Dashboard
