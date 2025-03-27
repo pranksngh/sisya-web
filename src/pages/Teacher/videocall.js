@@ -54,25 +54,15 @@ export default function VideoCallPage() {
   const studentAvatar = userData?.profilePic || null;
   onMessage(messaging, (payload) => {
     console.log('Message received in the foreground:', payload);
-      const notificationData = payload.data;
-      console.log('Notification Data:', notificationData);
+    const notificationData = payload.data;
+  console.log('Notification Data:', notificationData);
 
-      if (notificationData.type === 'end_call') {
-        console.log('The call has ended.');
-        showAlert('Call ended by the other participant', 'info');
-        setCallStatus('ended');
-        leaveRoom();
-      } else if (notificationData.type === 'call_accepted') {
-        console.log('Call was accepted');
-        showAlert('Call connected', 'success');
-        setCallStatus('connected');
-        startCallTimer();
-      } else if (notificationData.type === 'call_declined') {
-        console.log('Call was declined');
-        showAlert('Call declined by recipient', 'warning');
-        setCallStatus('ended');
-        setTimeout(() => leaveRoom(), 2000);
-      }
+  // Check if the notification type is 'end_call'
+  if (notificationData.type === 'end_call') {
+    console.log('The call has ended.');
+    // Handle the 'end_call' action as needed
+    leaveRoom();
+  }
    });
   
   // Function to show alerts
