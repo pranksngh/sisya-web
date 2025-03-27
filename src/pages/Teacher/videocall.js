@@ -471,6 +471,7 @@ export default function VideoCallPage() {
 
   // Leave room and navigate back
   const leaveRoom = () => {
+    console.log("leave room hitting");
     if (durationTimerRef.current) clearInterval(durationTimerRef.current);
     
     if (zegoEngine) {
