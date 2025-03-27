@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { ZegoExpressEngine } from "zego-express-engine-webrtc";
-import { FaMicrophoneSlash, FaMicrophone, FaVideo, FaVideoSlash, FaUsers, FaSignOutAlt, FaPaperPlane, FaDesktop, FaBullhorn, FaEnvelope } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { onMessage } from 'firebase/messaging';
+import { messaging } from '../../firebaseConfig';
 import { getUser } from '../../Functions/Login';
-import {messaging} from '../../firebaseConfig';
+import { Button, Box, IconButton, Alert, Snackbar } from "@mui/material";
+import { FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash, FaSignOutAlt } from "react-icons/fa";
+
 export default function VideoCallPage() {
   const userInfo = getUser();
   const location = useLocation();
@@ -15,8 +17,9 @@ export default function VideoCallPage() {
   const serverSecret = "175fa0e5958efde603f2ec805c7d6120"; // Your Server Secret
   const userName = user?.mentor?.name || "Unknown User";
   const roomID = randomRoomId;
-  const videostreamID = "hostvideo_"+uuidv4(); 
-  const screenStreamID = "hostscreen_"+uuidv4();
+  const videostreamID = "hostvideo_" + uuidv4();
+  const screenStreamID = "hostscreen_" + uuidv4();
+  
   const [zegoEngine, setZegoEngine] = useState(null);
   const [isScreenShared, setIsScreenShared] = useState(false);
   const [isUserListVisible, setIsUserListVisible] = useState(false);
@@ -30,25 +33,38 @@ export default function VideoCallPage() {
   const [speakRequests, setSpeakRequests] = useState([]);
   const [isSpeakRequestVisible, setIsSpeakRequestVisible] = useState(false);
   const [remoteStreams, setRemoteStreams] = useState([]);
+  
+  // New state for alerts
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("info"); // "success", "error", "warning", "info"
+
+  // Function to show alerts
+  const showAlert = (message, severity = "info") => {
+    setAlertMessage(message);
+    setAlertSeverity(severity);
+    setAlertOpen(true);
+  };
+
+  // Handle alert close
+  const handleAlertClose = () => {
+    setAlertOpen(false);
+  };
 
   onMessage(messaging, (payload) => {
     console.log('Message received in the foreground:', payload);
     const notificationData = payload.data;
-  console.log('Notification Data:', notificationData);
+    console.log('Notification Data:', notificationData);
 
-  // Check if the notification type is 'end_call'
-  if (notificationData.type === 'end_call') {
-    console.log('The call has ended.');
-    // Handle the 'end_call' action as needed
-    leaveRoom();
-  }
-   });
+    // Check if the notification type is 'end_call'
+    if (notificationData.type === 'end_call') {
+      console.log('The call has ended.');
+      showAlert('Call ended by the other participant', 'info');
+      leaveRoom();
+    }
+  });
+
   useEffect(() => {
-  
-   //read notification from user
-
-   
-
     const initZego = async () => {
       try {
         const zg = new ZegoExpressEngine(appID, serverSecret);
@@ -57,56 +73,82 @@ export default function VideoCallPage() {
         const result = await zg.checkSystemRequirements();
         if (!result.webRTC) {
           console.log("Browser does not support required WebRTC features.");
+          showAlert("Your browser does not support WebRTC features required for video calls.", "error");
           return;
         }
 
-        const userID = userId;
-        const token = videotoken;
+        const userID = "prashant706966";
+        const token = "04AAAAAGflivgADKP4WcMRPYs4YTqLlgC5QprAUtbjmIuX5USqu2rK3roKABREynDSsf9s3YiZunjiLfWJcOKI8SQ0+204BYyaWMtBmLUA8aob3lUSSMRKAe2HPwzh0hPAI/UxdJhWr517Q6pTzLP8LYCPukH4iNVxSexMkApK59zXRKV+vEBIDX6Yl1nO7F8GcSrlB6bDnpoFtUjIM7MYZDCMHJgnkwe9Iaf+pUF/fc7GCqgvyElZKFySa4CIr4YgV8S4o22d3/j7TL60DOnWbdUB";
+        
+        // Register room state change callback to monitor login status
+        zg.on('roomStateUpdate', (roomID, state, errorCode, extendedData) => {
+          if (state === 'CONNECTED') {
+            console.log('Successfully logged into room:', roomID);
+            showAlert(`Successfully joined room ${roomID}`, "success");
+          } else if (state === 'DISCONNECTED') {
+            console.log('Disconnected from room:', roomID, 'Error code:', errorCode);
+            if (errorCode !== 0) {
+              showAlert(`Failed to connect to room: Error ${errorCode}`, "error");
+            }
+          } else if (state === 'CONNECTING') {
+            console.log('Connecting to room:', roomID);
+          }
+        });
+
+        // Attempt to login to the room
         zg.loginRoom(roomID, token, { userID, userName }, { userUpdate: true });
 
         zg.setDebugVerbose(false);
 
-        const stream = await zg.createStream({
-          camera: {
-            video: true,
-            audio: true,
+        try {
+          const stream = await zg.createStream({
+            camera: {
+              video: true,
+              audio: true,
+            }
+          });
+          setLocalStream(stream);
+          
+          const remoteDivID = `remoteStream_${videostreamID}`;
+          let remoteDiv = document.getElementById(remoteDivID);
+          
+          if (!remoteDiv) {
+            remoteDiv = document.createElement('div');
+            remoteDiv.id = remoteDivID;
+            remoteDiv.className = 'user-card';
+            document.getElementById('remoteStreams')?.appendChild(remoteDiv);
+            
+            const videoElement = document.createElement('video');
+            videoElement.id = `video_${videostreamID}`;
+            videoElement.autoplay = true;
+            videoElement.muted = true;
+            videoElement.style.objectFit = 'cover';
+            remoteDiv.appendChild(videoElement);
+            
+            console.log(`User stream added with ID: ${videostreamID}`);
           }
-        });
-        setLocalStream(stream);
-
-        const remoteDivID = `remoteStream_${videostreamID}`;
-                let remoteDiv = document.getElementById(remoteDivID);
-        
-                if (!remoteDiv) {
-                  // Create a card for each user stream
-                  remoteDiv = document.createElement('div');
-                  remoteDiv.id = remoteDivID;
-                  remoteDiv.className = 'user-card'; // Class for card-like style
-                  document.getElementById('remoteStreams').appendChild(remoteDiv);
-        
-                  // Create inner elements for video and controls (mic, camera icons)
-                  const videoElement = document.createElement('video');
-                  videoElement.id = `video_${videostreamID}`;
-                  videoElement.autoplay = true;
-                  videoElement.muted = true; // Ensure audio is played for the user streams
-                  videoElement.style.objectFit = 'cover';
-                  remoteDiv.appendChild(videoElement);
-        
-                  // Add icons for mute/unmute and other controls (like the mic and camera shown in the image)
-                
-        
-                  console.log(`User stream added with ID: ${videostreamID}`);
-                }
-                document.getElementById(`video_${videostreamID}`).srcObject = stream;
-
-        zg.startPublishingStream(videostreamID, stream);
+          
+          const videoElement = document.getElementById(`video_${videostreamID}`);
+          if (videoElement) {
+            videoElement.srcObject = stream;
+          }
+          
+          // Start publishing the stream
+          zg.startPublishingStream(videostreamID, stream);
+          
+        } catch (streamError) {
+          console.error("Error creating stream:", streamError);
+          showAlert("Failed to access camera and microphone. Please check permissions.", "error");
+        }
 
         zg.on('publisherStateUpdate', (result) => {
           if (result.state === 'PUBLISHING') {
             console.log('Publishing started');
+            showAlert("Stream published successfully", "success");
             initiateCall();
           } else if (result.state === 'NO_PUBLISH') {
             console.log(`Publishing failed with error code: ${result.errorCode}`);
+            showAlert(`Failed to publish stream: Error ${result.errorCode}`, "error");
           }
         });
 
@@ -114,25 +156,23 @@ export default function VideoCallPage() {
           console.log("Room stream update type is " + JSON.stringify(updateType));
         
           if (updateType === 'ADD') {
+            showAlert(`New stream(s) added to the room`, "info");
             streamList.forEach(async (stream) => {
               console.log("stream id is " + stream.streamID);
               const remoteStream = await zg.startPlayingStream(stream.streamID);
               setRemoteStreams((prevStreams) => [...prevStreams, remoteStream]);
         
               const streamType = stream.streamID.startsWith("hostvideo") ? 'Video' : 
-                                 stream.streamID.startsWith("hostscreen") ? 'Screen' : 'User';
+                                stream.streamID.startsWith("hostscreen") ? 'Screen' : 'User';
         
-              // Add stream to a card layout based on the stream type
               console.log("stream type is " + streamType);
               if (streamType === 'User') {
-                
-                  const videoElement = document.getElementById('hostVideo');
-                  if (videoElement) {
-                    videoElement.srcObject = remoteStream;
-                  } else {
-                    console.log('Video element with I "hostVideo" not found');
-                  }
-               
+                const videoElement = document.getElementById('hostVideo');
+                if (videoElement) {
+                  videoElement.srcObject = remoteStream;
+                } else {
+                  console.log('Video element with ID "hostVideo" not found');
+                }
               }
             });
           } else if (updateType === 'DELETE') {
@@ -150,8 +190,6 @@ export default function VideoCallPage() {
             console.log("Streams deleted:", streamList.map(s => s.streamID).join(", "));
           }
         });
-        
-        
 
         zg.on('IMRecvBroadcastMessage', (roomID, chatData) => {
           if (chatData && chatData.length > 0) {
@@ -168,12 +206,14 @@ export default function VideoCallPage() {
         zg.on('roomUserUpdate', (roomID, updateType, userList) => {
           console.log("Usertype is " + JSON.stringify(updateType));
           if (updateType === 'ADD') {
-            setUserList((prevList) => [...prevList, ...userList].map(e=>{e.isMuted=true; return e}));
+            setUserList((prevList) => [...prevList, ...userList].map(e => { e.isMuted = true; return e }));
             userList.forEach(user => {
               zg.muteMicrophone(user.userID, true);
             });
+            showAlert(`${userList.length} user(s) joined the room`, "info");
           } else if (updateType === 'DELETE') {
             setUserList((prevList) => prevList.filter(user => !userList.find(u => u.userID === user.userID)));
+            showAlert(`${userList.length} user(s) left the room`, "info");
           }
         });
 
@@ -181,15 +221,15 @@ export default function VideoCallPage() {
           streamList.forEach((stream) => {
             if (stream.extraInfo && stream.extraInfo.reason === '18') {
               console.log('Stream refused to pull, reason: 18');
+              showAlert("Stream access denied", "warning");
             }
           });
         });
         
       } catch (error) {
-        // if (error.message.includes('network timeout') || error.code === 1100002) {
-          console.log('Network timeout detected, attempting to reconnect...');
-          setTimeout(initZego, 5000);
-        // }
+        console.error("Error initializing Zego:", error);
+        showAlert(`Failed to initialize video call: ${error.message}`, "error");
+        setTimeout(initZego, 5000);
       }
     };
 
@@ -212,130 +252,125 @@ export default function VideoCallPage() {
       if (isMuted) {
         zegoEngine.muteMicrophone(false);
         setIsMuted(false);
+        showAlert("Microphone unmuted", "info");
       } else {
         zegoEngine.muteMicrophone(true);
         setIsMuted(true);
+        showAlert("Microphone muted", "info");
       }
     }
   };
+
   const toggleCamera = () => {
     if (localStream) {
-      const videoTrack = localStream.getVideoTracks()[0];  // Get the video track
+      const videoTrack = localStream.getVideoTracks()[0];
   
       if (isCameraEnabled) {
-        // Disable the camera (turn off video track)
-        videoTrack.enabled = false;  // Disable the video track
-        setIsCameraEnabled(false);   // Update the state to indicate the camera is off
+        videoTrack.enabled = false;
+        setIsCameraEnabled(false);
+        showAlert("Camera turned off", "info");
       } else {
-        // Enable the camera (turn on video track)
-        videoTrack.enabled = true;   // Re-enable the video track
-        setIsCameraEnabled(true);    // Update the state to indicate the camera is on
-  
-        // Reattach the stream to the video element
-        // const videoElement = document.getElementById('hostVideo');
-        // if (videoElement) {
-        //   console.log("getting videoElement");
-        //   videoElement.srcObject = null; // Clear the current stream
-        //   videoElement.srcObject = localStream;  // Reattach the local stream
-        //   videoElement.play();  // Play the video stream to ensure it's active
-        // }else{
-        //   console.log("not getting videoElement")
-        // }
+        videoTrack.enabled = true;
+        setIsCameraEnabled(true);
+        showAlert("Camera turned on", "info");
       }
     }
   };
   
-  
-const initiateCall = async()=>{
-
-  const token = localStorage.getItem('notificationToken');
-  try {
-
-    const data = {
-      notification:{
-        title: `${userInfo.mentor.name} is calling` ,
-        body: "Doubt Call"
-      },
-      data:{
-       type: 'video_call',
-       callerName: userInfo.mentor.name,
-       teacherToken: token
-      },
+  const initiateCall = async() => {
+    const token = localStorage.getItem('notificationToken');
+    try {
+      const data = {
+        notification:{
+          title: `${userInfo.mentor.name} is calling` ,
+          body: "Doubt Call"
+        },
+        data:{
+         type: 'video_call',
+         callerName: userInfo.mentor.name,
+         teacherToken: token,
+         roomId: randomRoomId,
+        },
+        apns: {
+          headers: {
+            "apns-priority": "10",
+            "apns-push-type": "background"
+          },
+          payload: {
+            aps: {
+              "content-available": 1,
+              sound: "default",
+              alert: {
+                title: `${userInfo.mentor.name} is calling`,
+                body: "Doubt Call"
+              }
+            }
+          }
+        },
+        tokens: [userData.deviceId]
+      };
       
-      // imageData: imageFile
-      //   ? {
-      //       name: imageFile.name,
-      //       content: base64Image,
-      //     }
-      //   : null,
-      tokens: [userData.deviceId]
-    };
-    const response = await   fetch('https://sisyabackend.in/rkadmin/send_notif2', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+      const response = await fetch('https://sisyabackend.in/rkadmin/send_notif2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
 
-     const result = await response.json();
+      const result = await response.json();
 
-     if(result.success){
-          console.log("calling notification sent");
-     }else{
+      if(result.success){
+        console.log("calling notification sent");
+        showAlert("Call notification sent to recipient", "success");
+      } else {
         console.log("calling notification sent failed");
-     }
-    
-  
-  } catch (error) {
-    console.log('JSON Stringify Error:', error);
-  }
-}  
+        showAlert("Failed to send call notification", "warning");
+      }
+    } catch (error) {
+      console.log('JSON Stringify Error:', error);
+      showAlert("Error sending call notification", "error");
+    }
+  }  
 
-const endCall = async()=>{
-  try {
-
-    const data = {
-      notification:{
-        title: "ending call" ,
-        body: "Doubt Call"
-      },
-      data:{
-       type: 'end_call'
-  
-      },
+  const endCall = async() => {
+    try {
+      const data = {
+        notification:{
+          title: "ending call" ,
+          body: "Doubt Call"
+        },
+        data:{
+         type: 'end_call' 
+        },
+        tokens: [userData.deviceId],
+      };
       
-      // imageData: imageFile
-      //   ? {
-      //       name: imageFile.name,
-      //       content: base64Image,
-      //     }
-      //   : null,
-      tokens: [userData.deviceId],
-    };
-    const response = await   fetch('https://sisyabackend.in/rkadmin/send_notif2', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+      const response = await fetch('https://sisyabackend.in/rkadmin/send_notif2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
 
-     const result = await response.json();
+      const result = await response.json();
 
-     if(result.success){
-          console.log("call end working fine !!");
-          leaveRoom();
-     }else{
+      if(result.success){
+        console.log("call end working fine !!");
+        showAlert("Call ended successfully", "success");
+        leaveRoom();
+      } else {
         console.log("end call not working");
-     }
-    
-  
-  } catch (error) {
-    console.log('JSON Stringify Error:', error);
-  }
-}  
-  
+        showAlert("Failed to end call properly", "warning");
+        leaveRoom(); // Still try to leave the room
+      }
+    } catch (error) {
+      console.log('JSON Stringify Error:', error);
+      showAlert("Error ending call", "error");
+      leaveRoom(); // Still try to leave the room
+    }
+  }  
 
   const startScreenShare = async () => {
     if (zegoEngine) {
@@ -355,26 +390,22 @@ const endCall = async()=>{
           screenVideoElement.srcObject = screenStream;
         } else {
           console.error("Screen video element not found in DOM");
+          showAlert("Screen sharing element not found", "error");
         }
   
         zegoEngine.startPublishingStream(screenStreamID, screenStream);
-        // const updatedStreamInfo = {
-        //   ...streamInfo,
-        //   screenstreamID: screenStreamID,
-        // };
-        // socketService.emit('broadcast:session', { token: roomID, data: updatedStreamInfo });
+        showAlert("Screen sharing started", "success");
   
         screenStream.onended = () => {
           stopScreenShare();
         };
       } catch (error) {
         console.error('Error sharing screen:', error);
+        showAlert(`Failed to share screen: ${error.message}`, "error");
       }
     }
   };
   
-  
-
   const stopScreenShare = () => {
     if (zegoEngine && screenStream) {
       zegoEngine.stopPublishingStream(screenStreamID);
@@ -383,26 +414,26 @@ const endCall = async()=>{
 
       // Reset the screen share element
       const screenVideoElement = document.getElementById('screenVideo');
-      screenVideoElement.srcObject = null;
-      screenVideoElement.innerHTML = `<div class="no-screen-share"><FaDesktop class="no-screen-icon" /> <p>Start sharing your screen</p></div>`;
+      if (screenVideoElement) {
+        screenVideoElement.srcObject = null;
+        screenVideoElement.innerHTML = `<div class="no-screen-share"><p>Start sharing your screen</p></div>`;
+      }
+      
+      showAlert("Screen sharing stopped", "info");
     }
   };
 
   const leaveRoom = () => {
     if (zegoEngine) {
-
-      
       zegoEngine.stopPublishingStream(videostreamID);
-      // if (screenStream) {
-      //   zegoEngine.stopPublishingStream(screenStreamID);
-      // }
+      if (screenStream) {
+        zegoEngine.stopPublishingStream(screenStreamID);
+      }
       zegoEngine.logoutRoom(roomID);
       zegoEngine.destroyEngine();
       console.log('Left room and stopped publishing' + roomID);
-      // socketService.emit("class:end",{token: roomID, data:{isClosed:true}});
-      // socketService.emit("class:end",{token: streamInfo.Token, data:{isClosed:true}});
-      navigate("/teacherDashboard");
-
+      showAlert("You have left the video call", "info");
+      navigate("../teacher");
     }
   };
 
@@ -411,8 +442,10 @@ const endCall = async()=>{
       zegoEngine.sendBroadcastMessage(roomID, message).then(() => {
         setMessages([...messages, { userID: "prashant90654", userName, message }]);
         setMessage("");
+        showAlert("Message sent", "success");
       }).catch(error => {
         console.error("Failed to send message", error);
+        showAlert("Failed to send message", "error");
       });
     }
   };
@@ -435,63 +468,142 @@ const endCall = async()=>{
     );
     const user = userList.find(user => user.userID === userID);
     const newMicStatus = user ? !user.isMuted : false;
-  //  socketService.emit('toggle:mic:teacher', { token: roomID, data: { userID, isMuted: newMicStatus, raisedRequest: false } });
+    showAlert(`User ${userID} microphone ${newMicStatus ? 'muted' : 'unmuted'}`, "info");
   };
 
   const handleAcceptSpeakRequest = (userID) => {
     console.log('Accepted speak request for user:', userID);
-  //  socketService.emit('toggle:mic:teacher', { token: roomID, data: { userID, isMuted: false, raisedRequest: true } });
     setUserList(prevList =>
       prevList.map(user =>
-        user.userID === userID ? { ...user, isMuted: !user.isMuted } : user
+        user.userID === userID ? { ...user, isMuted: false } : user
       )
     );
     setSpeakRequests((prevRequests) => prevRequests.filter(req => req.userID !== userID));
+    showAlert(`Accepted speak request from user ${userID}`, "success");
   };
 
   const handleDeclineSpeakRequest = (userID) => {
     console.log('Declined speak request for user:', userID);
-   // socketService.emit('toggle:mic:teacher', { token: roomID, data: { userID, isMuted: true, raisedRequest: true } });
     setUserList(prevList =>
       prevList.map(user =>
-        user.userID === userID ? { ...user, isMuted: !user.isMuted } : user
+        user.userID === userID ? { ...user, isMuted: true } : user
       )
     );
     setSpeakRequests((prevRequests) => prevRequests.filter(req => req.userID !== userID));
+    showAlert(`Declined speak request from user ${userID}`, "info");
   };
 
   return (
-    <div className="videocall-container">
-  
-       
-       
-  
-  
-        
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: '100vh',
+        backgroundColor: "#f4f4f4",
+      }}
+    >
+      {/* Alert/Snackbar for notifications */}
+      <Snackbar 
+        open={alertOpen} 
+        autoHideDuration={6000} 
+        onClose={handleAlertClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={handleAlertClose} 
+          severity={alertSeverity} 
+          sx={{ width: '100%' }}
+        >
+          {alertMessage}
+        </Alert>
+      </Snackbar>
 
-       
+      {/* Video Section */}
+      <Box
+        sx={{
+          flexGrow: 1,
+          position: "relative",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <video
-  className="receiver-host-video"
-  autoPlay
-  id="hostVideo"
+          className="receiver-host-video"
+          autoPlay
+          id="hostVideo"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            borderRadius: "8px",
+            backgroundColor: "#000",
+          }}
+        ></video>
 
-></video>
-<div id="remoteStreams" class="stream-cards-container">       
-        </div>
-      
+        {/* Control Buttons Overlay */}
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            gap: 2,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            padding: "10px 20px",
+            borderRadius: "30px",
+          }}
+        >
+          <IconButton
+            onClick={toggleMute}
+            sx={{
+              backgroundColor: isMuted ? "#f44336" : "#1976d2",
+              color: "#fff",
+              "&:hover": { backgroundColor: isMuted ? "#d32f2f" : "#1565c0" },
+            }}
+          >
+            {isMuted ? <FaMicrophoneSlash /> : <FaMicrophone />}
+          </IconButton>
+          <IconButton
+            onClick={toggleCamera}
+            sx={{
+              backgroundColor: !isCameraEnabled ? "#f44336" : "#1976d2",
+              color: "#fff",
+              "&:hover": { backgroundColor: !isCameraEnabled ? "#d32f2f" : "#1565c0" },
+            }}
+          >
+            {isCameraEnabled ? <FaVideo /> : <FaVideoSlash />}
+          </IconButton>
+          <Button
+            onClick={endCall}
+            variant="contained"
+            color="error"
+            startIcon={<FaSignOutAlt />}
+            sx={{
+              borderRadius: "30px",
+              padding: "6px 16px",
+            }}
+          >
+            End Call
+          </Button>
+        </Box>
+      </Box>
 
-      <div className="videocall-footer">
-        <button className={`footer-button ${isMuted ? 'muted' : ''}`} onClick={toggleMute}>
-          {isMuted ? <FaMicrophoneSlash /> : <FaMicrophone />}
-        </button>
-        <button className={`footer-button ${!isCameraEnabled ? 'camera-off' : ''}`} onClick={toggleCamera}>
-          {isCameraEnabled ? <FaVideo /> : <FaVideoSlash />}
-        </button>
-       
-        <button className="leave-button" onClick={endCall}>
-          <FaSignOutAlt /> End Call
-        </button>
-      </div>
-    </div>
+      {/* Remote Streams */}
+      <Box
+        id="remoteStreams"
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 2,
+          mt: 2,
+          padding: 2,
+        }}
+      >
+        {/* Remote video streams will be dynamically added here */}
+      </Box>
+    </Box>
   );
 }
