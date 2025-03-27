@@ -136,8 +136,9 @@ export default function VideoCallPage() {
         }
 
       
-        const token = "04AAAAAGflivgADKP4WcMRPYs4YTqLlgC5QprAUtbjmIuX5USqu2rK3roKABREynDSsf9s3YiZunjiLfWJcOKI8SQ0+204BYyaWMtBmLUA8aob3lUSSMRKAe2HPwzh0hPAI/UxdJhWr517Q6pTzLP8LYCPukH4iNVxSexMkApK59zXRKV+vEBIDX6Yl1nO7F8GcSrlB6bDnpoFtUjIM7MYZDCMHJgnkwe9Iaf+pUF/fc7GCqgvyElZKFySa4CIr4YgV8S4o22d3/j7TL60DOnWbdUB";
-        
+        const token = videotoken;
+        const USERID = userId;
+        console.log("assigned userid is ", USERID);
         // Register room state change callback
         zg.on('roomStateUpdate', (roomID, state, errorCode, extendedData) => {
           if (state === 'CONNECTED') {
@@ -154,7 +155,7 @@ export default function VideoCallPage() {
         });
 
         // Login to room
-        zg.loginRoom(roomID, token, { userId, userName }, { userUpdate: true });
+        zg.loginRoom(roomID, token, { USERID, userName }, { userUpdate: true });
 
         zg.setDebugVerbose(false);
 
