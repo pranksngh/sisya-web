@@ -77,9 +77,8 @@ export default function VideoCallPage() {
           return;
         }
 
-        const userID = "prashant706966";
-        const token = "04AAAAAGflivgADKP4WcMRPYs4YTqLlgC5QprAUtbjmIuX5USqu2rK3roKABREynDSsf9s3YiZunjiLfWJcOKI8SQ0+204BYyaWMtBmLUA8aob3lUSSMRKAe2HPwzh0hPAI/UxdJhWr517Q6pTzLP8LYCPukH4iNVxSexMkApK59zXRKV+vEBIDX6Yl1nO7F8GcSrlB6bDnpoFtUjIM7MYZDCMHJgnkwe9Iaf+pUF/fc7GCqgvyElZKFySa4CIr4YgV8S4o22d3/j7TL60DOnWbdUB";
-        
+        const userID = userId;
+        const token = videotoken;
         // Register room state change callback to monitor login status
         zg.on('roomStateUpdate', (roomID, state, errorCode, extendedData) => {
           if (state === 'CONNECTED') {
@@ -278,7 +277,7 @@ export default function VideoCallPage() {
   };
   
   const initiateCall = async() => {
-    const token = localStorage.getItem('notificationToken');
+    const mytoken = localStorage.getItem('notificationToken');
     try {
       const data = {
         notification:{
@@ -288,7 +287,7 @@ export default function VideoCallPage() {
         data:{
          type: 'video_call',
          callerName: userInfo.mentor.name,
-         teacherToken: token,
+         teacherToken: mytoken,
          roomId: randomRoomId,
         },
         apns: {
