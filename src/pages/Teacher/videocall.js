@@ -309,6 +309,7 @@ export default function VideoCallPage() {
          callerName: userName,
          teacherToken: mytoken,
          roomId: randomRoomId,
+         user: userData
         },
         apns: {
           headers: {
