@@ -79,18 +79,28 @@ export default function VideoCallPage() {
   };
 
   // Handle Firebase notifications
-  onMessage(messaging, (payload) => {
-    console.log('Message received in the foreground:', payload);
-    const notificationData = payload.data;
-    console.log('Notification Data:', notificationData);
+  useEffect(() => {
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log('Message received in the foreground:', payload);
+      const notificationData = payload.data;
+      console.log('Notification Data:', notificationData);
 
-    // Check if the notification type is 'end_call'
-    if (notificationData.type === 'end_call') {
-      console.log('The call has ended.');
-      showAlert('Call ended by the other participant', 'info');
-      leaveRoom();
-    }
-  });
+      // Check if the notification type is 'end_call'
+      if (notificationData.type === 'end_call') {
+        console.log('The call has ended.');
+        showAlert('Call ended by the other participant', 'info');
+        leaveRoom();
+      } else if (notificationData.type === 'call_accepted') {
+        // If we receive a call_accepted notification, update the state
+        console.log('Call was accepted');
+        setCallState('connected');
+        startCallTimer();
+        showAlert('Call connected', 'success');
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const initZego = async () => {
@@ -191,6 +201,14 @@ export default function VideoCallPage() {
         
           if (updateType === 'ADD') {
             showAlert(`New stream(s) added to the room`, "info");
+            
+            // When a stream is added, update call state to connected
+            if (callState === 'calling') {
+              console.log("Remote stream detected, changing to connected state");
+              setCallState('connected');
+              startCallTimer();
+            }
+            
             streamList.forEach(async (stream) => {
               console.log("stream id is " + stream.streamID);
               const remoteStream = await zg.startPlayingStream(stream.streamID);
@@ -204,10 +222,6 @@ export default function VideoCallPage() {
                 const videoElement = document.getElementById('hostVideo');
                 if (videoElement) {
                   videoElement.srcObject = remoteStream;
-                  
-                  // Change call state to connected when we receive a remote stream
-                  setCallState('connected');
-                  startCallTimer();
                 } else {
                   console.log('Video element with ID "hostVideo" not found');
                 }
@@ -249,6 +263,13 @@ export default function VideoCallPage() {
               zg.muteMicrophone(user.userID, true);
             });
             showAlert(`${userList.length} user(s) joined the room`, "info");
+            
+            // When users join, it's a good indicator that the call is connected
+            if (callState === 'calling' && userList.length > 0) {
+              console.log("User joined, changing to connected state");
+              setCallState('connected');
+              startCallTimer();
+            }
           } else if (updateType === 'DELETE') {
             setUserList((prevList) => prevList.filter(user => !userList.find(u => u.userID === user.userID)));
             showAlert(`${userList.length} user(s) left the room`, "info");
@@ -309,6 +330,19 @@ export default function VideoCallPage() {
       }
     };
   }, []);
+
+  // For testing - force UI to switch to connected after 5 seconds
+  useEffect(() => {
+    // Uncomment this for testing UI transitions
+    // const testTimer = setTimeout(() => {
+    //   if (callState === 'calling') {
+    //     console.log("TEST: Forcing connected state after timeout");
+    //     setCallState('connected');
+    //     startCallTimer();
+    //   }
+    // }, 5000);
+    // return () => clearTimeout(testTimer);
+  }, [callState]);
 
   const toggleMute = () => {
     if (localStream) {
@@ -559,6 +593,8 @@ export default function VideoCallPage() {
   // Student name from userData
   const studentName = userData?.name || "Student";
   
+  console.log("Current call state:", callState); // Debug logging
+  
   // Render the calling UI
   const renderCallingUI = () => (
     <Box
@@ -779,6 +815,17 @@ export default function VideoCallPage() {
 
       {/* Render different UI based on call state */}
       {callState === 'calling' ? renderCallingUI() : renderConnectedUI()}
+      
+      {/* Debug button - uncomment for testing */}
+      {/* <Button 
+        onClick={() => {
+          setCallState('connected');
+          startCallTimer();
+        }}
+        sx={{ position: 'absolute', bottom: 5, right: 5, zIndex: 9999 }}
+      >
+        Force Connected
+      </Button> */}
     </>
   );
 }
