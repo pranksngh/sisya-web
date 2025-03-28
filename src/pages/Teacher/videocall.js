@@ -1,25 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ZegoExpressEngine } from "zego-express-engine-webrtc";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { onMessage } from 'firebase/messaging';
 import { messaging } from '../../firebaseConfig';
 import { getUser } from '../../Functions/Login';
-import { Button, Box, IconButton, Alert, Snackbar } from "@mui/material";
-import { FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash, FaSignOutAlt } from "react-icons/fa";
+import { 
+  Button, Box, IconButton, Alert, Snackbar, Typography, Avatar, 
+  CircularProgress, Paper 
+} from "@mui/material";
+import { 
+  FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash, 
+  FaSignOutAlt, FaPhoneSlash 
+} from "react-icons/fa";
 
 export default function VideoCallPage() {
   const userInfo = getUser();
   const location = useLocation();
   const navigate = useNavigate();
   const { userData, user, videotoken, randomRoomId, userId } = location.state || {};
-  const appID = 1500762473; // Your App ID
-  const serverSecret = "175fa0e5958efde603f2ec805c7d6120"; // Your Server Secret
+  const appID = 1500762473;
+  const serverSecret = "175fa0e5958efde603f2ec805c7d6120";
   const userName = user?.mentor?.name || "Unknown User";
   const roomID = randomRoomId;
   const videostreamID = "hostvideo_" + uuidv4();
   const screenStreamID = "hostscreen_" + uuidv4();
   
+  // Call state
+  const [callState, setCallState] = useState('calling'); // 'calling', 'connected', 'ended'
+  const [callDuration, setCallDuration] = useState(0);
+  const callTimerRef = useRef(null);
+  
+  // Original states from your code
   const [zegoEngine, setZegoEngine] = useState(null);
   const [isScreenShared, setIsScreenShared] = useState(false);
   const [isUserListVisible, setIsUserListVisible] = useState(false);
@@ -34,10 +46,10 @@ export default function VideoCallPage() {
   const [isSpeakRequestVisible, setIsSpeakRequestVisible] = useState(false);
   const [remoteStreams, setRemoteStreams] = useState([]);
   
-  // New state for alerts
+  // Alert state
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [alertSeverity, setAlertSeverity] = useState("info"); // "success", "error", "warning", "info"
+  const [alertSeverity, setAlertSeverity] = useState("info");
 
   // Function to show alerts
   const showAlert = (message, severity = "info") => {
@@ -51,6 +63,22 @@ export default function VideoCallPage() {
     setAlertOpen(false);
   };
 
+  // Format call duration
+  const formatDuration = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Start call timer
+  const startCallTimer = () => {
+    if (callTimerRef.current) clearInterval(callTimerRef.current);
+    callTimerRef.current = setInterval(() => {
+      setCallDuration(prev => prev + 1);
+    }, 1000);
+  };
+
+  // Handle Firebase notifications
   onMessage(messaging, (payload) => {
     console.log('Message received in the foreground:', payload);
     const notificationData = payload.data;
@@ -79,6 +107,7 @@ export default function VideoCallPage() {
 
         const userID = userId;
         const token = videotoken;
+        
         // Register room state change callback to monitor login status
         zg.on('roomStateUpdate', (roomID, state, errorCode, extendedData) => {
           if (state === 'CONNECTED') {
@@ -132,6 +161,12 @@ export default function VideoCallPage() {
             videoElement.srcObject = stream;
           }
           
+          // Set local video preview
+          const localVideoElement = document.getElementById('localVideo');
+          if (localVideoElement) {
+            localVideoElement.srcObject = stream;
+          }
+          
           // Start publishing the stream
           zg.startPublishingStream(videostreamID, stream);
           
@@ -169,6 +204,10 @@ export default function VideoCallPage() {
                 const videoElement = document.getElementById('hostVideo');
                 if (videoElement) {
                   videoElement.srcObject = remoteStream;
+                  
+                  // Change call state to connected when we receive a remote stream
+                  setCallState('connected');
+                  startCallTimer();
                 } else {
                   console.log('Video element with ID "hostVideo" not found');
                 }
@@ -232,9 +271,28 @@ export default function VideoCallPage() {
       }
     };
 
+    // Create remote streams container if it doesn't exist
+    if (!document.getElementById('remoteStreams')) {
+      const remoteStreamsDiv = document.createElement('div');
+      remoteStreamsDiv.id = 'remoteStreams';
+      remoteStreamsDiv.style.display = 'none';
+      document.body.appendChild(remoteStreamsDiv);
+    }
+
     initZego();
 
+    // Set a timeout to automatically end the call if not answered
+    const callTimeoutId = setTimeout(() => {
+      if (callState === 'calling') {
+        showAlert("Call not answered", "warning");
+        leaveRoom();
+      }
+    }, 60000); // 60 seconds timeout
+
     return () => {
+      clearTimeout(callTimeoutId);
+      if (callTimerRef.current) clearInterval(callTimerRef.current);
+      
       if (zegoEngine) {
         zegoEngine.stopPublishingStream(videostreamID);
         if (screenStream) {
@@ -242,6 +300,12 @@ export default function VideoCallPage() {
         }
         zegoEngine.logoutRoom(roomID);
         zegoEngine.destroyEngine();
+      }
+      
+      // Clean up the remote streams container
+      const remoteStreamsDiv = document.getElementById('remoteStreams');
+      if (remoteStreamsDiv) {
+        document.body.removeChild(remoteStreamsDiv);
       }
     };
   }, []);
@@ -492,31 +556,80 @@ export default function VideoCallPage() {
     showAlert(`Declined speak request from user ${userID}`, "info");
   };
 
-  return (
+  // Student name from userData
+  const studentName = userData?.name || "Student";
+  
+  // Render the calling UI
+  const renderCallingUI = () => (
+    <Box
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#121212',
+        padding: 3,
+      }}
+    >
+      <Avatar
+        sx={{
+          width: 120,
+          height: 120,
+          marginBottom: 3,
+          backgroundColor: '#2196f3',
+          fontSize: '3rem',
+          border: '4px solid #4caf50',
+        }}
+      >
+        {studentName.charAt(0)}
+      </Avatar>
+      
+      <Typography variant="h4" sx={{ color: 'white', marginBottom: 1, textAlign: 'center' }}>
+        {studentName}
+      </Typography>
+      
+      <Typography variant="body1" sx={{ color: '#bdbdbd', marginBottom: 4 }}>
+        Calling...
+      </Typography>
+      
+      <Box sx={{ marginBottom: 3 }}>
+        <CircularProgress size={36} sx={{ color: '#4caf50' }} />
+      </Box>
+      
+      <Box sx={{ display: 'flex', gap: 3, marginTop: 4 }}>
+        <IconButton
+          onClick={endCall}
+          sx={{
+            backgroundColor: '#f44336',
+            color: 'white',
+            width: 60,
+            height: 60,
+            '&:hover': { backgroundColor: '#d32f2f' },
+          }}
+        >
+          <FaPhoneSlash size={24} />
+        </IconButton>
+      </Box>
+      
+      {/* Hidden local video during calling state */}
+      <Box sx={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}>
+        <video id="localVideo" autoPlay playsInline muted></video>
+      </Box>
+    </Box>
+  );
+
+  // Render the connected call UI
+  const renderConnectedUI = () => (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
         height: '100vh',
-        backgroundColor: "#f4f4f4",
+        backgroundColor: "#000",
+        position: "relative",
       }}
     >
-      {/* Alert/Snackbar for notifications */}
-      <Snackbar 
-        open={alertOpen} 
-        autoHideDuration={6000} 
-        onClose={handleAlertClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleAlertClose} 
-          severity={alertSeverity} 
-          sx={{ width: '100%' }}
-        >
-          {alertMessage}
-        </Alert>
-      </Snackbar>
-
       {/* Video Section */}
       <Box
         sx={{
@@ -528,17 +641,62 @@ export default function VideoCallPage() {
         }}
       >
         <video
-          className="receiver-host-video"
-          autoPlay
           id="hostVideo"
+          autoPlay
+          playsInline
           style={{
             width: "100%",
             height: "100%",
-            objectFit: "cover",
-            borderRadius: "8px",
+            objectFit: "contain", // Using contain as requested
             backgroundColor: "#000",
           }}
         ></video>
+        
+        {/* Call Duration */}
+        <Paper
+          elevation={3}
+          sx={{
+            position: 'absolute',
+            top: 20,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            color: 'white',
+            padding: '4px 12px',
+            borderRadius: 16,
+          }}
+        >
+          <Typography variant="body2">
+            {formatDuration(callDuration)}
+          </Typography>
+        </Paper>
+        
+        {/* Local Video (PiP) */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 20,
+            right: 20,
+            width: 100,
+            height: 150,
+            borderRadius: 2,
+            overflow: 'hidden',
+            border: '2px solid white',
+          }}
+        >
+          <video
+            id="localVideo"
+            autoPlay
+            playsInline
+            muted
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              transform: 'scaleX(-1)', // Mirror effect
+            }}
+          />
+        </Box>
 
         {/* Control Buttons Overlay */}
         <Box
@@ -589,20 +747,38 @@ export default function VideoCallPage() {
         </Box>
       </Box>
 
-      {/* Remote Streams */}
+      {/* Remote Streams - Hidden but needed for functionality */}
       <Box
         id="remoteStreams"
         sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: 2,
-          mt: 2,
-          padding: 2,
+          display: "none",
         }}
       >
         {/* Remote video streams will be dynamically added here */}
       </Box>
     </Box>
+  );
+
+  return (
+    <>
+      {/* Alert/Snackbar for notifications */}
+      <Snackbar 
+        open={alertOpen} 
+        autoHideDuration={6000} 
+        onClose={handleAlertClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={handleAlertClose} 
+          severity={alertSeverity} 
+          sx={{ width: '100%' }}
+        >
+          {alertMessage}
+        </Alert>
+      </Snackbar>
+
+      {/* Render different UI based on call state */}
+      {callState === 'calling' ? renderCallingUI() : renderConnectedUI()}
+    </>
   );
 }
