@@ -100,7 +100,7 @@ const sidebarConfig = [
     label: "Registration Leads",
     icon: "PeopleOutline",
     path: "pilot-course-reg",
-    roles: ["admin","mentor"],
+    roles: ["admin"],
     expandable: false,
   },
   {
