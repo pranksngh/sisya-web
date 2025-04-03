@@ -314,7 +314,7 @@ export default function VideoCallPage() {
         apns: {
           headers: {
             "apns-priority": "10",
-            "apns-push-type": "alert"
+            "apns-push-type": "background"
           },
           payload: {
             aps: {
@@ -327,7 +327,6 @@ export default function VideoCallPage() {
             }
           }
         },
-        "priority": "high",
         tokens: [userData.deviceId]
       };
       
