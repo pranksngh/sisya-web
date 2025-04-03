@@ -258,7 +258,6 @@
 //     }
 //   };
 
-
 //   return (
 //     <div style={{ maxWidth: "600px", margin: "0 auto" }}>
 //       <Grid container spacing={2}>
@@ -409,11 +408,37 @@ const EnrollStudent = () => {
       setSelectedStudent(null);
       return;
     }
-  
+
     setSelectedStudent(value);
     setSelectedCourse(null);
     setOrderId(""); // Reset OrderId when student changes
   };
+
+  function sendSuccessMessage(templateId, phoneNumber) {
+    try {
+      fetch("https://sisyabackend.in/student/send_msg_x", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phone: phoneNumber,
+          template: templateId,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // Success handling if needed
+          }
+        })
+        .catch((error) => {
+          console.error("Error sending message:", error);
+        });
+    } catch (error) {
+      console.error("Error in sendSuccessMessage:", error);
+    }
+  }
 
   const handleEnroll = async () => {
     if (selectedStudent && selectedCourse && orderId.trim()) {
@@ -452,13 +477,15 @@ const EnrollStudent = () => {
         if (result.success) {
           setSelectedStudent(null);
           setSelectedCourse(null);
+          // templateId = 67c2f943d6fc050fd539fbd3
+          sendSuccessMessage("67c2f943d6fc050fd539fbd3", `${selectedStudent.phone}`);
           toast.success("Student Enrolled Successfully");
         } else {
           toast.error("something went wrong ! Try again");
         }
       } catch (error) {
-       // console.log("Error enrolling student:", error);
-       toast.error("something went wrong ! Try again");
+        // console.log("Error enrolling student:", error);
+        toast.error("something went wrong ! Try again");
       }
     } else {
       toast.error(
@@ -471,13 +498,22 @@ const EnrollStudent = () => {
     <div style={{ maxWidth: "600px", margin: "0 auto" }}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-        <Autocomplete
-          options={students}
-          getOptionLabel={(option) => `${option.id} - ${option.name} - ${option.phone}` || ''}
-          value={selectedStudent}
-          onChange={handleSelectStudent}
-          renderInput={(params) => <TextField {...params} label="Select Student" margin="normal" fullWidth />}
-        />
+          <Autocomplete
+            options={students}
+            getOptionLabel={(option) =>
+              `${option.id} - ${option.name} - ${option.phone}` || ""
+            }
+            value={selectedStudent}
+            onChange={handleSelectStudent}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Select Student"
+                margin="normal"
+                fullWidth
+              />
+            )}
+          />
           {/* <Autocomplete
             freeSolo
             options={filteredSuggestions.map(
@@ -510,7 +546,9 @@ const EnrollStudent = () => {
 
             <Autocomplete
               options={courses}
-              getOptionLabel={(option) => `${option.id}-Class${option.grade}-${option.name}`}
+              getOptionLabel={(option) =>
+                `${option.id}-Class${option.grade}-${option.name}`
+              }
               value={selectedCourse}
               onChange={(event, newValue) => setSelectedCourse(newValue)}
               renderInput={(params) => (
@@ -546,10 +584,9 @@ const EnrollStudent = () => {
           </CardContent>
         </Card>
       )}
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 };
 
 export default EnrollStudent;
-

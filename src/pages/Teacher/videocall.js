@@ -314,16 +314,19 @@ export default function VideoCallPage() {
         apns: {
           headers: {
             "apns-priority": "10",
-            "apns-push-type": "background"
+            "apns-push-type": "background",
+            "apns-expiration": "0"
           },
           payload: {
             aps: {
               "content-available": 1,
               sound: "default",
+              "category": "INCOMING_CALL",
               alert: {
                 title: `${userName} is calling`,
                 body: "Doubt Call"
-              }
+              },
+              "mutable-content": 1
             }
           }
         },
