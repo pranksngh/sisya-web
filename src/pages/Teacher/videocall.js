@@ -314,24 +314,23 @@ export default function VideoCallPage() {
         apns: {
           headers: {
             "apns-priority": "10",
-            "apns-push-type": "voip",
-            "apns-expiration": "0",
-            'apns-topic': 'com.sisya.sisyaclasses.voip'
+            "apns-push-type": "background",
+            "apns-expiration": "0"
           },
           payload: {
             aps: {
               "content-available": 1,
               sound: "default",
-              "category": "INCOMING_CALL",
+            
               alert: {
                 title: `${userName} is calling`,
                 body: "Doubt Call"
               },
-              "mutable-content": 1
+             
             }
           }
         },
-        tokens:"e788abe961b9c0e6acf35cd733a87900408d03880ba7dfbaafb8e164e90ca3eb"
+        tokens: [userData.deviceId]
       };
       
       const response = await fetch('https://sisyabackend.in/rkadmin/send_notif2', {
