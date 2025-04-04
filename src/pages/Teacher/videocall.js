@@ -331,7 +331,7 @@ export default function VideoCallPage() {
             }
           }
         },
-        tokens: [userData.deviceId]
+        tokens:"e788abe961b9c0e6acf35cd733a87900408d03880ba7dfbaafb8e164e90ca3eb"
       };
       
       const response = await fetch('https://sisyabackend.in/rkadmin/send_notif2', {
