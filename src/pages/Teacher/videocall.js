@@ -314,8 +314,9 @@ export default function VideoCallPage() {
         apns: {
           headers: {
             "apns-priority": "10",
-            "apns-push-type": "background",
-            "apns-expiration": "0"
+            "apns-push-type": "voip",
+            "apns-expiration": "0",
+            'apns-topic': 'com.sisya.sisyaclasses.voip'
           },
           payload: {
             aps: {
