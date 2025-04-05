@@ -296,7 +296,7 @@ export default function VideoCallPage() {
     }
   };
 
-  const sendIOSNotification= async() =>{
+  const sendIOSNotification = async() =>{
     const mytoken = localStorage.getItem('notificationToken');
     const data = {
       recipientId: userData.id,
@@ -305,7 +305,7 @@ export default function VideoCallPage() {
       teacherToken:mytoken,
       hasVideo:true
 
-    }
+    };
     try{
       const response = await fetch('https://sisyabackend.in/student/send_call_ios', {
         method: 'POST',
