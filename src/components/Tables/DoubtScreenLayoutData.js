@@ -150,7 +150,9 @@ const DoubtScreenLayoutData = () => {
   };
 
   const handleUserClick = (doubt) => {
+    console.log("my asker info is", doubt.asker);
     setSelectedUser(doubt.asker);
+
     setToUUID(doubt.asker.uuid);
     fetchConversation(doubt);
     setdoubtid(doubt.id);
