@@ -460,44 +460,45 @@ export default function VideoCallPage() {
     navigate("/dashboard/teacher");
   };
 
-  const startScreenShare = async () => {
-    if (zegoEngine) {
-      try {
-        const screenStream = await zegoEngine.createStream({
-          screen: {
-            audio: true,
-            videoQuality: 4,
-            width: 1280,
-            height: 720,
-            bitrate: 1500,
-            frameRate: 20,
-          },
-        });
-        setScreenStream(screenStream);
-        setIsScreenShared(true);
-        const screenVideoElement = document.getElementById("screenVideo");
-        if (screenVideoElement) {
-          screenVideoElement.srcObject = screenStream;
-        } else {
-          console.error("Screen video element not found");
-        }
-        zegoEngine.startPublishingStream(screenStreamID, screenStream);
-        const updatedStreamInfo = {
-          ...streamInfo,
-          screenstreamID: screenStreamID,
-        };
-        socketService.emit("broadcast:session", {
-          token: roomID,
-          data: updatedStreamInfo,
-        });
-        screenStream.onended = () => {
-          stopScreenShare();
-        };
-      } catch (error) {
-        console.error("Error sharing screen:", error);
-      }
-    }
-  };
+  // const startScreenShare = async () => {
+  //   if (zegoEngine) {
+  //     try {
+  //       const screenStream = await zegoEngine.createStream({
+  //         screen: {
+  //           audio: true,
+  //           videoQuality: 4,
+  //           width: 1280,
+  //           height: 720,
+  //           bitrate: 1500,
+  //           frameRate: 20,
+  //         },
+  //       });
+  //       setScreenStream(screenStream);
+  //       setIsScreenShared(true);
+  //       const screenVideoElement = document.getElementById("screenVideo");
+  //       if (screenVideoElement) {
+  //         screenVideoElement.srcObject = screenStream;
+  //       } else {
+  //         console.error("Screen video element not found");
+  //       }
+  //       zegoEngine.startPublishingStream(screenStreamID, screenStream);
+  //       const updatedStreamInfo = {
+  //         ...streamInfo,
+  //         screenstreamID: screenStreamID,
+  //       };
+  //       socketService.emit("broadcast:session", {
+  //         token: roomID,
+  //         data: updatedStreamInfo,
+  //       });
+
+  //       screenStream.onended = () => {
+  //         stopScreenShare();
+  //       };
+  //     } catch (error) {
+  //       console.error("Error sharing screen:", error);
+  //     }
+  //   }
+  // };
 
   const stopScreenShare = () => {
     if (zegoEngine && screenStream) {
@@ -689,7 +690,7 @@ export default function VideoCallPage() {
             </IconButton>
             <IconButton
               color={!isScreenShared ? "primary" : "secondary"}
-              onClick={isScreenShared ? stopScreenShare : startScreenShare}
+             // onClick={isScreenShared ? stopScreenShare : startScreenShare}
             >
               <DesktopWindows />
             </IconButton>
