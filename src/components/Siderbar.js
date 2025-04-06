@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   List,
   ListItem,
@@ -15,6 +15,38 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import * as Icons from "@mui/icons-material";
 import sidebarConfig from "./SidebarConfig"; // Your sidebar config file
 import { getUser } from "../Functions/Login";
+
+const AutoLogout = ({ timeout = 600000, onLogout }) => {
+  const timerId = useRef(null);
+
+  const resetTimer = () => {
+    if (timerId.current) clearTimeout(timerId.current);
+    timerId.current = setTimeout(() => {
+      onLogout();
+    }, timeout);
+  };
+
+  useEffect(() => {
+    const events = [
+      "load",
+      "mousemove",
+      "mousedown",
+      "click",
+      "scroll",
+      "keypress",
+    ];
+    events.forEach((event) => window.addEventListener(event, resetTimer));
+
+    resetTimer();
+
+    return () => {
+      events.forEach((event) => window.removeEventListener(event, resetTimer));
+      if (timerId.current) clearTimeout(timerId.current);
+    };
+  }, [timeout, onLogout]);
+
+  return null;
+};
 
 const Sidebar = ({ userRole }) => {
   const user = getUser();
@@ -33,7 +65,6 @@ const Sidebar = ({ userRole }) => {
     setLogoutLoading(true);
     const user = getUser();
     const role = localStorage.getItem("role");
-
 
     if (role === "teacher" && user?.mentor?.id) {
       console.log("Sending logout request for mentorId:", user.mentor.id);
@@ -72,6 +103,11 @@ const Sidebar = ({ userRole }) => {
     navigate(path);
   };
 
+  const handleAutoLogout = () => {
+    localStorage.clear();
+    navigate("/");
+  };
+
   const isActive = (path) => location.pathname === path;
 
   const renderIcon = (iconName) => {
@@ -97,6 +133,12 @@ const Sidebar = ({ userRole }) => {
         position: "relative",
       }}
     >
+      {userRole === "admin" && (
+        <AutoLogout timeout={600000} onLogout={handleAutoLogout} />
+      )}
+      {userRole === "teacher" && (
+        <AutoLogout timeout={900000} onLogout={handleAutoLogout} />
+      )}
       {/* loader */}
       {logoutLoading && (
         <Box
