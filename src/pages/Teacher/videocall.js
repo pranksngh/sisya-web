@@ -34,7 +34,7 @@ export default function VideoCallPage() {
   const userInfo = getUser();
   const location = useLocation();
   const navigate = useNavigate();
-  const { userData, user, videotoken, randomRoomId, userId, streamInfo } =
+  const { userData, user, videotoken, randomRoomId, userId } =
     location.state || {};
   const appID = 1500762473;
   const serverSecret = "175fa0e5958efde603f2ec805c7d6120";
@@ -314,6 +314,36 @@ export default function VideoCallPage() {
       }
     }
   };
+  const sendIOSNotification = async() =>{
+    const mytoken = localStorage.getItem('notificationToken');
+    const data = {
+      recipientId: userData.id,
+      callerName:userName,
+      roomId:randomRoomId,
+      teacherToken:mytoken,
+      hasVideo:true
+
+    };
+    try{
+      const response = await fetch('https://sisyabackend.in/student/send_call_ios', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      if(result.success){
+        showAlert("Call notification sent to recipient", "success");
+      }else{
+        showAlert("IOS Call notification failed", "success");
+      }
+
+    }catch(error){
+    console.log("failed ios notification", error);
+    }
+  }
 
   const initiateCall = async () => {
     const mytoken = localStorage.getItem("notificationToken");
@@ -360,7 +390,7 @@ export default function VideoCallPage() {
       const result = await response.json();
       if (result.success) {
         console.log("calling notification sent");
-        showAlert("Call notification sent to recipient", "success");
+        sendIOSNotification();
       } else {
         console.log("calling notification failed");
         showAlert("Failed to send call notification", "warning");
