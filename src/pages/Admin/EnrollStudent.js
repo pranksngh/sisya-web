@@ -458,7 +458,7 @@ const EnrollStudent = () => {
         OrderId: orderId, // Use entered OrderId
       };
 
-      console.log("Enrollment Data:", enrollmentData);
+      console.log("Enrollment Data:", JSON.stringify(enrollmentData));
 
       try {
         const response = await fetch(
@@ -481,10 +481,11 @@ const EnrollStudent = () => {
           sendSuccessMessage("67c2f943d6fc050fd539fbd3", `${selectedStudent.phone}`);
           toast.success("Student Enrolled Successfully");
         } else {
+          console.log("enrollement failed", JSON.stringify(result));
           toast.error("something went wrong ! Try again");
         }
       } catch (error) {
-        // console.log("Error enrolling student:", error);
+        console.log("Error enrolling student:", error);
         toast.error("something went wrong ! Try again");
       }
     } else {

@@ -359,22 +359,22 @@ export default function VideoCallPage() {
           teacherToken: mytoken,
           roomId: randomRoomId,
         },
-        apns: {
-          headers: {
-            "apns-priority": "10",
-            "apns-push-type": "alert",
-          },
-          payload: {
-            aps: {
-              "content-available": 1,
-              sound: "default",
-              alert: {
-                title: `${userName} is calling`,
-                body: "Doubt Call",
-              },
-            },
-          },
-        },
+        // apns: {
+        //   headers: {
+        //     "apns-priority": "10",
+        //     "apns-push-type": "alert",
+        //   },
+        //   payload: {
+        //     aps: {
+        //       "content-available": 1,
+        //       sound: "default",
+        //       alert: {
+        //         title: `${userName} is calling`,
+        //         body: "Doubt Call",
+        //       },
+        //     },
+        //   },
+        // },
         priority: "high",
         tokens: [userData.deviceId],
       };
