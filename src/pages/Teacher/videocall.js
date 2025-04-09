@@ -375,7 +375,7 @@ export default function VideoCallPage() {
         //     },
         //   },
         // },
-        priority: "high",
+     //   priority: "high",
         tokens: [userData.deviceId],
       };
 
