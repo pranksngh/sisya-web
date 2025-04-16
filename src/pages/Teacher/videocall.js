@@ -324,6 +324,7 @@ export default function VideoCallPage() {
       hasVideo:true
 
     };
+    console.log("my ios data is ", JSON.stringify(data));
     try{
       const response = await fetch('https://sisyabackend.in/student/send_call_ios', {
         method: 'POST',
