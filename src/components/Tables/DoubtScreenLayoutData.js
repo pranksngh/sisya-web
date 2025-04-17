@@ -310,6 +310,7 @@ const DoubtScreenLayoutData = () => {
       return <p>{message.content}</p>;
     }
   };
+  
 
 const generateVideoToken = async(userData)=>{
   const randomRoomId = Math.random().toString(36).substring(2, 10);
@@ -336,16 +337,11 @@ const generateVideoToken = async(userData)=>{
       console.log("video token generated successfully");
       const videotoken = result.token;
       console.log("USERID is", userId);
-      navigate("/videocall",{
-        state: {
-            userData,
-            user, // here user means mentor info
-            videotoken,
-            randomRoomId,
-            userId
+     initiateCall(randomRoomId,username,randomNumber,userId,userData,videotoken);
 
-        }
-    });
+
+
+     
     }else{
       console.log("video token generation failed", JSON.stringify(response));
     }
@@ -353,69 +349,104 @@ const generateVideoToken = async(userData)=>{
     console.log("something went wrong", error);
   }
 }
-  const initiateCall = async (userData)=>{
-  // console.log(userData);
-    const randomRoomId = Math.random().toString(36).substring(2, 10); // Generate a random 8-character alphanumeric string
-    const fcmToken = localStorage.getItem("notificationToken");
-    try {
+const sendIOSNotification = async (userData,userName,randomRoomId) => {
+  const mytoken = localStorage.getItem("notificationToken");
+  const data = {
+    recipientId: userData.id,
+    callerName: userName,
+    roomId: randomRoomId,
+    teacherToken: mytoken,
+    hasVideo: true,
+  };
+  try {
+    const response = await fetch(
+      "https://sisyabackend.in/student/send_call_ios",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
 
+    const result = await response.json();
+    if (result.success) {
+     // showAlert("Call notification sent to recipient", "success");
+    } else {
+     // showAlert("IOS Call notification failed", "success");
+    }
+  } catch (error) {
+    console.log("failed ios notification", error);
+  }
+};
+
+
+const initiateCall = async (randomRoomId,userName,randomNumber,userId,userData,videotoken) => {
+    const mytoken = localStorage.getItem("notificationToken");
+    try {
       const data = {
-        notification:{
-          title: `${user.mentor.name} is calling` ,
+        notification: {
+          title: `${userName} is calling`,
           body: "Doubt Call",
         },
-        data:{
-         type: 'video_call',
-         callerName: user.mentor.name,
-         roomId: randomRoomId,
-         teacherToken:fcmToken
+        data: {
+          type: "video_call",
+          callerName: userName,
+          teacherToken: mytoken,
+          roomId: randomRoomId,
         },
         apns: {
           headers: {
             "apns-priority": "10",
-            "apns-push-type": "background"
+            "apns-push-type": "alert",
           },
           payload: {
             aps: {
               "content-available": 1,
               sound: "default",
-              // Include a minimal alert for when app is in foreground
               alert: {
-                title: `${user.mentor.name} is calling`,
-                body: "Doubt Call"
-              }
-            }
-          }
+                title: `${userName} is calling`,
+                body: "Doubt Call",
+              },
+            },
+          },
         },
-        
-        // imageData: imageFile
-        //   ? {
-        //       name: imageFile.name,
-        //       content: base64Image,
-        //     }
-        //   : null,
+        priority: "high",
         tokens: [userData.deviceId],
       };
-      const response = await   fetch('https://sisyabackend.in/rkadmin/send_notif2', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
 
+      const response = await fetch(
+        "https://sisyabackend.in/rkadmin/send_notif2",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }
+      );
       const result = await response.json();
-       if(result.success){
-        console.log("notification sent successfully");
-       // generateVideoToken(userData, randomRoomId);
-       
-       }
-    
+      if (result.success) {
+        console.log("calling notification sent");
+        sendIOSNotification(userData,userName,randomRoomId);
+        navigate("/videocall",{
+          state: {
+              userData,
+              user, // here user means mentor info
+              videotoken,
+              randomRoomId,
+              userId
+  
+          }
+      });
+      } else {
+        console.log("calling notification failed");
+      //  showAlert("Failed to send call notification", "warning");
+      }
     } catch (error) {
-      console.log('JSON Stringify Eror:', error);
+      console.log("Error sending call notification:", error);
+    //  showAlert("Error sending call notification", "error");
     }
-  }
-
+  };
   return (
     <Box display="flex" height="90vh">
       <Box width="30%" bgcolor="grey.100" p={2} display="flex"

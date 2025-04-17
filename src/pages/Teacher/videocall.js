@@ -43,12 +43,14 @@ export default function VideoCallPage() {
   const roomID = randomRoomId;
   const videostreamID = "hostvideo_" + uuidv4();
   const screenStreamID = "hostscreen_" + uuidv4();
-
+ 
   // Call state
-  const [callState, setCallState] = useState("calling"); // 'calling', 'connected', 'ended'
+  const [callState, setCallState] = useState("connected"); // 'calling', 'connected', 'ended'
   const [callDuration, setCallDuration] = useState(0);
   const callTimerRef = useRef(null);
 
+  const [userEndedCall, setUserEndedCall] = useState(false);
+  const [hasInitiatedCall, sethasInitiatedCall] = useState(false);
   // Video call states
   const [zegoEngine, setZegoEngine] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -119,22 +121,25 @@ export default function VideoCallPage() {
 
   // Prevent accidental navigation
   useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      event.preventDefault();
-      event.returnValue = ""; // Standard way to trigger warning
-    };
+  const handleBeforeUnload = (e) => {
+    if (!userEndedCall) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, []);
+  window.addEventListener('beforeunload', handleBeforeUnload);
+  return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+}, [userEndedCall]);
 
   // Main Zego initialization
   useEffect(() => {
+    let callTimeoutId;
+    let zgInstance;
     const initZego = async () => {
       try {
         const zg = new ZegoExpressEngine(appID, serverSecret);
+        zgInstance = zg;
         setZegoEngine(zg);
 
         const result = await zg.checkSystemRequirements();
@@ -180,14 +185,21 @@ export default function VideoCallPage() {
 
         try {
           const stream = await zg.createStream({
-            camera: { video: true, audio: true },
+            camera: {
+              video: true,
+              audio: true,
+            },
           });
           setLocalStream(stream);
 
           // Set local video preview
-          const localVideoElement = document.getElementById("localVideo");
-          if (localVideoElement) {
-            localVideoElement.srcObject = stream;
+          const localVideoElement1 = document.getElementById("localVideo1");
+          const localVideoElement2 = document.getElementById("localVideo2");
+          if (localVideoElement1) {
+            localVideoElement1.srcObject = stream;
+          }
+          if (localVideoElement2) {
+            localVideoElement2.srcObject = stream;
           }
 
           // Start publishing the stream
@@ -204,7 +216,7 @@ export default function VideoCallPage() {
           if (result.state === "PUBLISHING") {
             console.log("Publishing started");
             showAlert("Stream published successfully", "success");
-            initiateCall();
+           //s initiateCall();
           } else if (result.state === "NO_PUBLISH") {
             console.log(
               `Publishing failed with error code: ${result.errorCode}`
@@ -229,6 +241,12 @@ export default function VideoCallPage() {
             }
             streamList.forEach(async (stream) => {
               console.log("stream id is " + stream.streamID);
+              if(stream.streamID.includes("hostvideo")){
+                console.log("Host video stream detected");
+                
+                //  initiateCall();
+                
+              }
               const remoteStream = await zg.startPlayingStream(stream.streamID);
               setRemoteStreams((prev) => [...prev, remoteStream]);
               const remoteVideoElement = document.getElementById("remoteVideo");
@@ -268,7 +286,7 @@ export default function VideoCallPage() {
     initZego();
 
     // Auto-end call if not answered in 60 seconds
-    const callTimeoutId = setTimeout(() => {
+    callTimeoutId = setTimeout(() => {
       if (callState === "calling") {
         showAlert("Call not answered", "warning");
         leaveRoom();
@@ -278,13 +296,16 @@ export default function VideoCallPage() {
     return () => {
       clearTimeout(callTimeoutId);
       if (callTimerRef.current) clearInterval(callTimerRef.current);
-      if (zegoEngine) {
-        zegoEngine.stopPublishingStream(videostreamID);
-        zegoEngine.logoutRoom(roomID);
-        zegoEngine.destroyEngine();
+      if (zgInstance) {
+        zgInstance.stopPublishingStream(videostreamID);
+        zgInstance.logoutRoom(roomID);
+        zgInstance.destroyEngine();
+      }
+      if (userEndedCall) {
+        navigate("/dashboard/teacher");
       }
     };
-  }, []);
+  }, [userEndedCall]);
 
   const toggleMute = () => {
     if (localStream) {
@@ -314,93 +335,93 @@ export default function VideoCallPage() {
       }
     }
   };
-  const sendIOSNotification = async() =>{
-    const mytoken = localStorage.getItem('notificationToken');
-    const data = {
-      recipientId: userData.id,
-      callerName:userName,
-      roomId:randomRoomId,
-      teacherToken:mytoken,
-      hasVideo:true
+  // const sendIOSNotification = async () => {
+  //   const mytoken = localStorage.getItem("notificationToken");
+  //   const data = {
+  //     recipientId: userData.id,
+  //     callerName: userName,
+  //     roomId: randomRoomId,
+  //     teacherToken: mytoken,
+  //     hasVideo: true,
+  //   };
+  //   try {
+  //     const response = await fetch(
+  //       "https://sisyabackend.in/student/send_call_ios",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify(data),
+  //       }
+  //     );
 
-    };
-    console.log("my ios data is ", JSON.stringify(data));
-    try{
-      const response = await fetch('https://sisyabackend.in/student/send_call_ios', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+  //     const result = await response.json();
+  //     if (result.success) {
+  //       showAlert("Call notification sent to recipient", "success");
+  //     } else {
+  //       showAlert("IOS Call notification failed", "success");
+  //     }
+  //   } catch (error) {
+  //     console.log("failed ios notification", error);
+  //   }
+  // };
 
-      const result = await response.json();
-      if(result.success){
-        showAlert("Call notification sent to recipient", "success");
-      }else{
-        showAlert("IOS Call notification failed", "success");
-      }
+  // const initiateCall = async () => {
+  //   const mytoken = localStorage.getItem("notificationToken");
+  //   try {
+  //     const data = {
+  //       notification: {
+  //         title: `${userName} is calling`,
+  //         body: "Doubt Call",
+  //       },
+  //       data: {
+  //         type: "video_call",
+  //         callerName: userName,
+  //         teacherToken: mytoken,
+  //         roomId: randomRoomId,
+  //       },
+  //       apns: {
+  //         headers: {
+  //           "apns-priority": "10",
+  //           "apns-push-type": "alert",
+  //         },
+  //         payload: {
+  //           aps: {
+  //             "content-available": 1,
+  //             sound: "default",
+  //             alert: {
+  //               title: `${userName} is calling`,
+  //               body: "Doubt Call",
+  //             },
+  //           },
+  //         },
+  //       },
+  //       priority: "high",
+  //       tokens: [userData.deviceId],
+  //     };
 
-    }catch(error){
-    console.log("failed ios notification", error);
-    }
-  }
-
-  const initiateCall = async () => {
-    const mytoken = localStorage.getItem("notificationToken");
-    try {
-      const data = {
-        notification: {
-          title: `${userName} is calling`,
-          body: "Doubt Call",
-        },
-        data: {
-          type: "video_call",
-          callerName: userName,
-          teacherToken: mytoken,
-          roomId: randomRoomId,
-        },
-        // apns: {
-        //   headers: {
-        //     "apns-priority": "10",
-        //     "apns-push-type": "alert",
-        //   },
-        //   payload: {
-        //     aps: {
-        //       "content-available": 1,
-        //       sound: "default",
-        //       alert: {
-        //         title: `${userName} is calling`,
-        //         body: "Doubt Call",
-        //       },
-        //     },
-        //   },
-        // },
-     //   priority: "high",
-        tokens: [userData.deviceId],
-      };
-
-      const response = await fetch(
-        "https://sisyabackend.in/rkadmin/send_notif2",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        }
-      );
-      const result = await response.json();
-      if (result.success) {
-        console.log("calling notification sent");
-        sendIOSNotification();
-      } else {
-        console.log("calling notification failed");
-        showAlert("Failed to send call notification", "warning");
-      }
-    } catch (error) {
-      console.log("Error sending call notification:", error);
-      showAlert("Error sending call notification", "error");
-    }
-  };
+  //     const response = await fetch(
+  //       "https://sisyabackend.in/rkadmin/send_notif2",
+  //       {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify(data),
+  //       }
+  //     );
+  //     const result = await response.json();
+  //     if (result.success) {
+  //       console.log("calling notification sent");
+  //       sendIOSNotification();
+  //     } else {
+  //       console.log("calling notification failed");
+  //       showAlert("Failed to send call notification", "warning");
+  //     }
+  //   } catch (error) {
+  //     console.log("Error sending call notification:", error);
+  //     showAlert("Error sending call notification", "error");
+  //   }
+  // };
 
   const handleEndCall = () => {
     if (callState === "calling") {
@@ -416,6 +437,7 @@ export default function VideoCallPage() {
   };
 
   const endCall = async () => {
+    setUserEndedCall(true);
     try {
       const data = {
         notification: {
@@ -454,52 +476,52 @@ export default function VideoCallPage() {
     if (zegoEngine) {
       zegoEngine.stopPublishingStream(videostreamID);
       zegoEngine.logoutRoom(roomID);
-      zegoEngine.destroyEngine();
+    //  zegoEngine.destroyEngine();
       console.log("Left room and stopped publishing " + roomID);
-      showAlert("You have left the video call", "info");
+     // showAlert("You have left the video call", "info");
+     navigate("/");
     }
-    navigate("/dashboard/teacher");
+    
   };
 
-  // const startScreenShare = async () => {
-  //   if (zegoEngine) {
-  //     try {
-  //       const screenStream = await zegoEngine.createStream({
-  //         screen: {
-  //           audio: true,
-  //           videoQuality: 4,
-  //           width: 1280,
-  //           height: 720,
-  //           bitrate: 1500,
-  //           frameRate: 20,
-  //         },
-  //       });
-  //       setScreenStream(screenStream);
-  //       setIsScreenShared(true);
-  //       const screenVideoElement = document.getElementById("screenVideo");
-  //       if (screenVideoElement) {
-  //         screenVideoElement.srcObject = screenStream;
-  //       } else {
-  //         console.error("Screen video element not found");
-  //       }
-  //       zegoEngine.startPublishingStream(screenStreamID, screenStream);
-  //       const updatedStreamInfo = {
-  //         ...streamInfo,
-  //         screenstreamID: screenStreamID,
-  //       };
-  //       socketService.emit("broadcast:session", {
-  //         token: roomID,
-  //         data: updatedStreamInfo,
-  //       });
+  const startScreenShare = async () => {
+    if (zegoEngine) {
+      try {
+        const screenStream = await zegoEngine.createStream({
+          screen: {
+            audio: true,
+            videoQuality: 4,
+            width: 1280,
+            height: 720,
+            bitrate: 1500,
+            frameRate: 20,
+          },
+        });
+        setScreenStream(screenStream);
+        setIsScreenShared(true);
+        const screenVideoElement = document.getElementById("screenVideo");
+        if (screenVideoElement) {
+          screenVideoElement.srcObject = screenStream;
+        } else {
+          console.error("Screen video element not found");
+        }
+        zegoEngine.startPublishingStream(screenStreamID, screenStream);
+        const updatedStreamInfo = {
+          screenstreamID: screenStreamID,
+        };
+        socketService.emit("broadcast:session", {
+          token: roomID,
+          data: updatedStreamInfo,
+        });
 
-  //       screenStream.onended = () => {
-  //         stopScreenShare();
-  //       };
-  //     } catch (error) {
-  //       console.error("Error sharing screen:", error);
-  //     }
-  //   }
-  // };
+        screenStream.onended = () => {
+          stopScreenShare();
+        };
+      } catch (error) {
+        console.error("Error sharing screen:", error);
+      }
+    }
+  };
 
   const stopScreenShare = () => {
     if (zegoEngine && screenStream) {
@@ -516,7 +538,7 @@ export default function VideoCallPage() {
 
   const studentName = userData?.name || "Student";
 
-  // Render calling UI 
+  // Render calling UI
   const renderCallingUI = () => (
     <Box
       sx={{
@@ -527,7 +549,7 @@ export default function VideoCallPage() {
         alignItems: "center",
         backgroundColor: "#121212",
         padding: 3,
-        overflow: "hidden"
+        overflow: "hidden",
       }}
     >
       <Avatar
@@ -569,16 +591,21 @@ export default function VideoCallPage() {
         </IconButton>
       </Box>
       <Box sx={{ position: "absolute", opacity: 0, pointerEvents: "none" }}>
-        <video id="localVideo" autoPlay playsInline muted></video>
+        <video id="localVideo1" autoPlay playsInline muted></video>
       </Box>
     </Box>
   );
 
-  // Render connected UI 
+  // Render connected UI
   const renderConnectedUI = () => (
     <Box
       className="App"
-      sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        overflow: "hidden",
+      }}
     >
       <Box
         className="main-content-classroom"
@@ -610,7 +637,15 @@ export default function VideoCallPage() {
           {!isScreenShared && (
             <Box
               className="no-screen-share"
-              sx={{ textAlign: "center", color: "#757575" }}
+              sx={{
+                display:"flex",
+                flexDirection:"column",
+                alignItems:"center",
+                justifyContent:"center",
+                color: "#757575",
+                width: "100%",
+                height: "100%",
+              }}
             >
               <DesktopWindows sx={{ fontSize: 50, color: "#bdbdbd" }} />
               <Typography>Start sharing your screen</Typography>
@@ -648,10 +683,10 @@ export default function VideoCallPage() {
             autoPlay
             playsInline
             muted
-            id="localVideo"
+            id="localVideo2"
             style={{
               width: "100%",
-              height: "45%",
+              height: "30%",
               objectFit: "cover",
               borderRadius: 8,
             }}
@@ -662,7 +697,7 @@ export default function VideoCallPage() {
             playsInline
             style={{
               width: "100%",
-              height: "45%",
+              height: "25%",
               objectFit: "cover",
               borderRadius: 8,
             }}
@@ -673,6 +708,7 @@ export default function VideoCallPage() {
               display: "flex",
               justifyContent: "space-around",
               padding: 2,
+              // height:"10%",
               backgroundColor: "#ffffff",
               borderTop: "1px solid #e0e0e0",
             }}
@@ -691,7 +727,7 @@ export default function VideoCallPage() {
             </IconButton>
             <IconButton
               color={!isScreenShared ? "primary" : "secondary"}
-             // onClick={isScreenShared ? stopScreenShare : startScreenShare}
+              onClick={isScreenShared ? stopScreenShare : startScreenShare}
             >
               <DesktopWindows />
             </IconButton>
