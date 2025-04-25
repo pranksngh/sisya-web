@@ -150,7 +150,13 @@ export default function LiveClassRoom() {
         zg.loginRoom(roomID, token, { userID, userName }, { userUpdate: true });
 
         zg.setDebugVerbose(false);
-
+     //   ZegoVideoConfig videoConfig = new ZegoVideoConfig(ZegoVideoConfigPreset.PRESET_1080P);
+        zg.setVideoConfig({
+          width: 1280,
+          height: 720,
+          bitrate: 1500,
+          frameRate: 30,
+        });
         const stream = await zg.createStream({
           camera: {
             video: true,
