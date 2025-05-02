@@ -981,6 +981,104 @@ const CourseDetailsData = () => {
           )}
         </Card>
       </TabPanel>
+      <TabPanel value={tabValue} index={6}>
+        {/* Content for Homework Tab */}
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Class Name</TableCell>
+                <TableCell>Start Time</TableCell>
+                <TableCell>End Time</TableCell>
+                <TableCell>Action</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {course.session.length > 0 ? (
+                course.session.map((session, index) => (
+                  <TableRow key={index} hover>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight="bold">
+                        {index + 1}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">{session.detail}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.secondary">
+                        {session.startTime}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.secondary">
+                        {session.endTime}
+                      </Typography>
+                    </TableCell>
+                    {/* <TableCell>
+                      <Chip
+                        label={
+                          session.SessionTest?.length > 0
+                            ? "Available"
+                            : "Not Available"
+                        }
+                        color={
+                          session.SessionTest?.length > 0
+                            ? "warning"
+                            : "success"
+                        }
+                        variant="outlined"
+                        size="small"
+                      />
+                    </TableCell> */}
+                    {/* <TableCell>
+                      {session.submittedCount ? session.submittedCount : 0}
+                    </TableCell> */}
+                    <TableCell>
+                      {session.SessionTest?.length > 0 ? (
+                        <Button
+                          variant="contained"
+                          color={session.isDone ? "success" : "primary"}
+                          size="small"
+                          onClick={() =>
+                            openModal(
+                              session.SessionTest[0].sessionTestQuestion
+                            )
+                          }
+                        >
+                          View
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="contained"
+                          color={session.isDone ? "success" : "primary"}
+                          size="small"
+                          onClick={() =>
+                            navigate("../add-homework", { state: { session } })
+                          }
+                          Add
+                          Homework
+                        >
+                          Add Homework
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">
+                    <Typography variant="body1" color="text.secondary">
+                      No Session Found
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </TabPanel>
 
       <HomeworkQuestionsModal
         selectedSessionTest={selectedSessionTest}

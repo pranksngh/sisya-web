@@ -55,6 +55,8 @@ import AddClassData from '../pages/Admin/AddClass';
 import AssignedCourse from '../pages/Mentor/AssignedCourse';
 import AssignedCourseDetail from '../pages/Mentor/AssignedCourseDetail';
 import ChangePassword from '../pages/Admin/ChangePassword';
+import AddQuiz from '../pages/Teacher/AddQuiz';
+import AiUser from '../pages/Admin/AiUser';
 
 const router = createBrowserRouter([
   {
@@ -280,6 +282,14 @@ const router = createBrowserRouter([
         path: "assigned-course-detail",
         element: React.createElement(AssignedCourseDetail),
       },
+      {
+        path: "ai-user",
+        element: React.createElement(AiUser),
+      },
+      // {
+      //   path: "quiz",
+      //   element: React.createElement(AddQuiz),
+      // },
     ],
   },
 ]);

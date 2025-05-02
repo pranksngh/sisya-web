@@ -125,6 +125,13 @@ const sidebarConfig = [
     expandable: false,
   },
   {
+    label: "Ai User Detail",
+    icon: "SupervisorAccount",
+    path: "/dashboard/ai-user",
+    roles: ["admin"],
+    expandable: false,
+  },
+  {
     label: "Enquiries",
     icon: "Notifications",
     path: "enquiry",
