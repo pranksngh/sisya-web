@@ -39,6 +39,29 @@ const AiUserDetail = () => {
       return "Unknown";
     }
   };
+  const fetchConversation = async (convId) => {
+    try {
+      const res = await fetch(
+        `https://sisyabackend.in/edtech/conversations/${convId}/messages`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const json = await res.json();
+     // console.log("Response JSON for ID", externalUserId, ":", json);
+     const userMessages = json.filter(message => message.role === "user");
+
+    // Return the content of the first "user" message or a fallback
+    return userMessages.length > 0 ? userMessages[0].content : "No user message found";
+    } catch (error) {
+      console.error("Error fetching student name:", error);
+      return "Unknown";
+    }
+  };
 
   const fetchData = async (page, rowsPerPage) => {
     setLoading(true);
@@ -51,11 +74,13 @@ const AiUserDetail = () => {
       const items = await Promise.all(
         json.map(async (item) => {
           const studentName = await fetchStudentName(item.external_user_id);
+          const content = await fetchConversation(item.id);
           return {
             id: item.id,
             studentName,
             grade: item.grade_level,
             subject: item.subject,
+            content: content,
             createdAt: new Date(item.created_at).toLocaleString(),
             updatedAt: new Date(item.updated_at).toLocaleString(),
           };
@@ -97,6 +122,7 @@ const AiUserDetail = () => {
                   <TableCell>Student Name</TableCell>
                   <TableCell>Grade</TableCell>
                   <TableCell>Subject</TableCell>
+                  <TableCell>Question</TableCell>
                   <TableCell>Created At</TableCell>
                   <TableCell>Updated At</TableCell>
                 </TableRow>
@@ -108,6 +134,7 @@ const AiUserDetail = () => {
                     <TableCell>{row.studentName}</TableCell>
                     <TableCell>{row.grade}</TableCell>
                     <TableCell>{row.subject}</TableCell>
+                    <TableCell>{row.content}</TableCell>
                     <TableCell>{row.createdAt}</TableCell>
                     <TableCell>{row.updatedAt}</TableCell>
                   </TableRow>
