@@ -169,6 +169,7 @@ const CourseDetailsData = () => {
 
       if (result.success) {
         const streamInfo = result.streamInfo;
+        const ctype = course.ctype;
         navigate("../../liveclassroom", {
           state: {
             streamInfo,
