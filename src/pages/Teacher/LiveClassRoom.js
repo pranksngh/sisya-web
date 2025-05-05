@@ -155,56 +155,63 @@ const LiveClassRoom = () => {
       }
     });
 
-    const startRecording = async() => {
-     console.log("course type is ", ctype);
-     if(ctype === "long"){
-        try{
-
-          const response = await fetch(
-            "https://cloudrecord-api.zego.im/?Action=StartRecord",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                roomId: roomID,
-                RecordInputParams: {
-                    RecordMode: 1,
-                    StreamType: 3,
-                    MaxIdleTime: 60
-                 },
-                 RecordOutputParams: {
-                 OutputFileFormat: "mp4",
-                 OutputFolder: "record/"
-                 },
-                 StorageParams: {
-                  Vendor: 10,
-                  Region: "Europe (Stockholm) eu-north-1",
-                   Bucket: "sisyaclassrecordings",
-    }
+    const startRecording = async(signatureNounce, Signature) => {
+      console.log("course type is ", ctype);
+      if(ctype === "long"){
+          try{
+              // Your authentication parameters
+             
+            //  const signatureNonce = Date.now().toString() + Math.random().toString(36).substring(2, 15);
+              const timestamp = Math.floor(Date.now() / 1000).toString();
+          //    const signature = "YOUR_GENERATED_SIGNATURE"; // You need to generate this according to Zego's requirements
               
-              }),
-            }
-          );
-          const result = await response.json();
-
-          if(response.Code === 0){
-             console.log("recording started successfully", JSON.stringify(result));
-             setTaskID(result.Data.TaskId);
-
-          }else{
-            console.log("recording start failed", JSON.stringify(response));
+              // Construct the API URL with all required parameters
+              const apiUrl = `https://cloudrecord-api.zego.im/?Action=StartRecord&AppId=${appID}&SignatureNonce=${signatureNounce}&Timestamp=${timestamp}&Signature=${Signature}&SignatureVersion=2.0&IsTest=false`;
+              
+              // Add the recording parameters
+              const recordParams = {
+                  roomId: roomID,
+                  RecordInputParams: {
+                      RecordMode: 1,
+                      StreamType: 3,
+                      MaxIdleTime: 60
+                  },
+                  RecordOutputParams: {
+                      OutputFileFormat: "mp4",
+                      OutputFolder: "record/"
+                  },
+                  StorageParams: {
+                      Vendor: 10,
+                      Region: "Europe (Stockholm) eu-north-1",
+                      Bucket: "sisyaclassrecordings"
+                  }
+              };
+              
+              // Make the API request
+              const response = await fetch(apiUrl, {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(recordParams),
+              });
+              
+              const result = await response.json();
+  
+              if(result.Code === 0){
+                  console.log("recording started successfully", JSON.stringify(result));
+                  setTaskID(result.Data.TaskId);
+              } else {
+                  console.log("recording start failed", JSON.stringify(result));
+              }
+                  
+          } catch(error) {
+              console.log("recording start failed", error);
           }
-            
-        }catch(error){
-          console.log("recording start failed", error);
-        }
-     }else{
-      console.log("invalid course to record");
-     }
-    }
-
+      } else {
+          console.log("invalid course to record");
+      }
+  };
     const initZego = async () => {
       try {
         const zg = new ZegoExpressEngine(appID, serverSecret);
@@ -223,7 +230,7 @@ const LiveClassRoom = () => {
         zg.loginRoom(roomID, token, { userID, userName }, { userUpdate: true });
 
         zg.setDebugVerbose(false);
-
+        
         const stream = await zg.createStream({
           camera: {
             video: true,
@@ -246,12 +253,13 @@ const LiveClassRoom = () => {
         }
 
         zg.startPublishingStream(videostreamID, stream);
-
+       const signatureNounce = zg.signatureNonce();
+       const signature = zg.signature();
         zg.on("publisherStateUpdate", (result) => {
           if (result.state === "PUBLISHING") {
             console.log("Publishing started😁😁😁😁");
 
-            startRecording();
+            startRecording(signatureNounce,signature);
           } else if (result.state === "NO_PUBLISH") {
             console.log(
               `Publishing failed with error code 😒😒😒😒: ${result.errorCode}`
