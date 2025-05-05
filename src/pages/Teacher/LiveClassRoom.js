@@ -61,7 +61,7 @@ const LiveClassRoom = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { streamInfo, mentorId, sessionId } = location.state || {};
+  const { streamInfo, mentorId, sessionId,ctype } = location.state || {};
 
   const appID = 1500762473; // Your App ID
   const serverSecret = "175fa0e5958efde603f2ec805c7d6120"; // Your Server Secret
@@ -90,6 +90,7 @@ const LiveClassRoom = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef(null);
+  const [taskID, setTaskID] = useState();
   const [userList, setUserList] = useState([]);
 
   const [speakRequests, setSpeakRequests] = useState([]);
@@ -154,6 +155,56 @@ const LiveClassRoom = () => {
       }
     });
 
+    const startRecording = async() => {
+     console.log("course type is ", ctype);
+     if(ctype === "long"){
+        try{
+
+          const response = await fetch(
+            "https://cloudrecord-api.zego.im/?Action=StartRecord",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                roomId: roomID,
+                RecordInputParams: {
+                    RecordMode: 1,
+                    StreamType: 3,
+                    MaxIdleTime: 60
+                 },
+                 RecordOutputParams: {
+                 OutputFileFormat: "mp4",
+                 OutputFolder: "record/"
+                 },
+                 StorageParams: {
+                  Vendor: 10,
+                  Region: "Europe (Stockholm) eu-north-1",
+                   Bucket: "sisyaclassrecordings",
+    }
+              
+              }),
+            }
+          );
+          const result = await response.json();
+
+          if(response.Code === 0){
+             console.log("recording started successfully", JSON.stringify(result));
+             setTaskID(result.Data.TaskId);
+
+          }else{
+            console.log("recording start failed", JSON.stringify(response));
+          }
+            
+        }catch(error){
+          console.log("recording start failed", error);
+        }
+     }else{
+      console.log("invalid course to record");
+     }
+    }
+
     const initZego = async () => {
       try {
         const zg = new ZegoExpressEngine(appID, serverSecret);
@@ -199,6 +250,8 @@ const LiveClassRoom = () => {
         zg.on("publisherStateUpdate", (result) => {
           if (result.state === "PUBLISHING") {
             console.log("Publishing started😁😁😁😁");
+
+            startRecording();
           } else if (result.state === "NO_PUBLISH") {
             console.log(
               `Publishing failed with error code 😒😒😒😒: ${result.errorCode}`
@@ -305,6 +358,41 @@ const LiveClassRoom = () => {
       }
     };
   }, []);
+
+  const stopRecording = async() => {
+    console.log("course type is ", ctype);
+    if(ctype === "long"){
+       try{
+
+         const response = await fetch(
+           "https://cloudrecord-api.zego.im/?Action=StopRecord",
+           {
+             method: "POST",
+             headers: {
+               "Content-Type": "application/json",
+             },
+             body: JSON.stringify({  
+                 TaskId: taskID 
+             }),
+           }
+         );
+         const result = await response.json();
+
+         if(response.Code === 0){
+            console.log("recording stop successfully", JSON.stringify(result));
+            setTaskID(result.Data.TaskId);
+            
+         }else{
+           console.log("recording stop failed", JSON.stringify(response));
+         }
+           
+       }catch(error){
+         console.log("recording stop failed", error);
+       }
+    }else{
+     console.log("invalid course to record");
+    }
+   }
 
   const toggleCamera = () => {
     if (localStream) {
@@ -513,6 +601,7 @@ const LiveClassRoom = () => {
           token: streamInfo.Token,
           data: { isClosed: true },
         });
+        stopRecording();
 
         navigate("../dashboard/teacher");
       } else {
