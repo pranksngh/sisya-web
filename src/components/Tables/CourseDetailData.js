@@ -73,10 +73,12 @@ const CourseDetailsData = () => {
       const result = await response.json();
       if (result.success) {
         const courseData = result.courses[0] || {};
+        const courseType = courseData.isLongTerm === true ? "long" : (courseData.isLongTerm === false && courseData.isFree === true) ? "free" :"short";
         setCourse({
           ...courseData,
           session: courseData.session || [], // Ensure session is an array
           ctest: courseData.ctest || [], // Ensure ctest is an array
+          ctype: courseType
         });
         if (courseData.session && courseData.session.length > 0) {
           fetchAttendanceData(courseData.session); // Fetch attendance for sessions
@@ -172,6 +174,7 @@ const CourseDetailsData = () => {
             streamInfo,
             mentorId,
             sessionId,
+            ctype
           },
         });
       } else {
