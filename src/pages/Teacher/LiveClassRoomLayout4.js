@@ -70,7 +70,6 @@ export default function LiveClassRoom() {
   const navigate = useNavigate();
   const { streamInfo, mentorId, sessionId } = location.state || {};
   const appID = 1500762473; // Your App ID
-  const serverSecret = "175fa0e5958efde603f2ec805c7d6120"; // Your Server Secret
   const userName = userInfo.mentor.name;
   const roomID = 1234;
   const videostreamID = "hostvideo_" + uuidv4();
@@ -157,7 +156,7 @@ export default function LiveClassRoom() {
 
     const initZego = async () => {
       try {
-        const zg = new ZegoExpressEngine(appID, serverSecret);
+        const zg = new ZegoExpressEngine(appID, "wss://webliveroom1500762473-api.coolzcloud.com/ws");
         setZegoEngine(zg);
 
         const result = await zg.checkSystemRequirements();

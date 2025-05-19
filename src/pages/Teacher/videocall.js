@@ -37,7 +37,6 @@ export default function VideoCallPage() {
   const { userData, user, videotoken, randomRoomId, userId } =
     location.state || {};
   const appID = 1500762473;
-  const serverSecret = "175fa0e5958efde603f2ec805c7d6120";
   const userName =
     user?.mentor?.name || userInfo?.mentor?.name || "Unknown User";
   const roomID = randomRoomId;
@@ -138,7 +137,7 @@ export default function VideoCallPage() {
     let zgInstance;
     const initZego = async () => {
       try {
-        const zg = new ZegoExpressEngine(appID, serverSecret);
+        const zg = new ZegoExpressEngine(appID, "wss://webliveroom1500762473-api.coolzcloud.com/ws");
         zgInstance = zg;
         setZegoEngine(zg);
 
