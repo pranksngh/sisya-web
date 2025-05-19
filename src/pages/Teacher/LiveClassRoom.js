@@ -64,7 +64,7 @@ const LiveClassRoom = () => {
   const { streamInfo, mentorId, sessionId,ctype } = location.state || {};
 
   const appID = 1500762473; // Your App ID
-  const serverSecret = "175fa0e5958efde603f2ec805c7d6120"; // Your Server Secret
+ // const serverSecret = "175fa0e5958efde603f2ec805c7d6120"; // Your Server Secret
 
   const userName = userInfo.mentor.name;
   const roomID = streamInfo.roomId;
@@ -207,7 +207,7 @@ const LiveClassRoom = () => {
 
     const initZego = async () => {
       try {
-        const zg = new ZegoExpressEngine(appID, serverSecret);
+        const zg = new ZegoExpressEngine(appID, "wss://webliveroom1500762473-api.coolzcloud.com/ws");
         setZegoEngine(zg);
 
         const result = await zg.checkSystemRequirements();
