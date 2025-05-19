@@ -135,19 +135,19 @@ const CourseDetailsData = () => {
 
     const joinAllowedTime = new Date(startTime.getTime() - 30 * 60 * 1000);
 
-    if (now < joinAllowedTime) {
-      console.log("toooo early");
-      toast.error(
-        `Class will start at ${startTime.toLocaleTimeString()}. You are only allowed to join 30 minutes prior to class.`
-      );
-      return;
-    }
+    // if (now < joinAllowedTime) {
+    //   console.log("toooo early");
+    //   toast.error(
+    //     `Class will start at ${startTime.toLocaleTimeString()}. You are only allowed to join 30 minutes prior to class.`
+    //   );
+    //   return;
+    // }
 
-    if (endTime && now > endTime) {
-      console.log("too late!!!!");
-      toast.error("Class time already passed.");
-      return;
-    }
+    // if (endTime && now > endTime) {
+    //   console.log("too late!!!!");
+    //   toast.error("Class time already passed.");
+    //   return;
+    // }
 
     // if joining on correct time
     setLoading(true);
@@ -169,6 +169,7 @@ const CourseDetailsData = () => {
 
       if (result.success) {
         const streamInfo = result.streamInfo;
+        console.log("stream info is", streamInfo);
         const ctype = course.ctype;
         navigate("../../liveclassroom", {
           state: {
