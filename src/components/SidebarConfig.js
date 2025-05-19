@@ -97,11 +97,22 @@ const sidebarConfig = [
     expandable: false,
   },
   {
-    label: "Registration Leads",
-    icon: "PeopleOutline",
-    path: "pilot-course-reg",
+    label: "Class Details",
+    icon: "Assessment",
+    path: "class-detail",
     roles: ["admin"],
     expandable: false,
+  },
+  {
+    label: "Registration Leads",
+    icon: "PeopleOutline",
+    roles: ["admin"],
+    expandable: true,
+    subItems: [
+      { label: "All Leads", path: "pilot-course-reg" },
+      { label: "Paid Leads", path: "pilot-course-reg-paid" },
+      { label: "Query", path: "pilot-course-reg-query" },
+    ],
   },
   {
     label: "Sales Mentor",

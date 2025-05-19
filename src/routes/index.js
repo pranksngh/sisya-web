@@ -57,6 +57,9 @@ import AssignedCourseDetail from '../pages/Mentor/AssignedCourseDetail';
 import ChangePassword from '../pages/Admin/ChangePassword';
 import AddQuiz from '../pages/Teacher/AddQuiz';
 import AiUser from '../pages/Admin/AiUser';
+import PilotRegistrationPaid from '../pages/Admin/PilotRegistrationPaid';
+import PilotRegistrationQuery from '../pages/Admin/PilotRegistrationQuery';
+import ClassDetail from '../pages/Admin/ClassDeatil';
 
 const router = createBrowserRouter([
   {
@@ -155,6 +158,10 @@ const router = createBrowserRouter([
         element: React.createElement(Courses),
       },
       {
+        path: "class-detail",
+        element: React.createElement(ClassDetail),
+      },
+      {
         path: "addCourse",
         element: React.createElement(AddCourse),
       },
@@ -177,6 +184,14 @@ const router = createBrowserRouter([
       {
         path: "pilot-course-reg",
         element: React.createElement(PilotRegistration),
+      },
+      {
+        path: "pilot-course-reg-paid",
+        element: React.createElement(PilotRegistrationPaid),
+      },
+      {
+        path: "pilot-course-reg-query",
+        element: React.createElement(PilotRegistrationQuery),
       },
       {
         path: "sales-mentor-list",
